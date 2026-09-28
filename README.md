@@ -19,7 +19,7 @@ cd release/everything-agent-darwin-arm64
 npm start
 ```
 
-如果收到的是压缩包，先解压，再进入其中包含 `package.json` 的目录执行 `npm start`。其他平台请使用对应的发布目录；Node.js 需要自行安装。
+其他平台请使用对应的发布目录；Node.js 需要自行安装。
 
 如果发布包 `npm start` 无法启动（例如平台不匹配、缺少对应平台的预编译原生模块），可以改用开发模式：回到**仓库根目录**执行 `pnpm install` 安装依赖，再执行 `pnpm run dev` 启动。开发模式直接运行源码，同样提供 Web 控制台与本地后端，并支持在 Workflow 页面编辑工作流；相关命令见下方“开发与检查”。
 
@@ -187,8 +187,6 @@ flowchart TD
 不能。`npm run build:web` 只生成浏览器资源；Engine / Agent 接口仍需要后端。执行 `npm run build` 后通过 `npm start` 启动生产服务，它同时提供静态页面和后端接口。
 
 ## 开发与检查
-
-前端已接入 Tailwind v4，基础 UI、PageHeading 和 Tools 页面主体使用工具类；其余页面按模块增量迁移。设计尺度与语义颜色统一定义在 `web/src/index.css`，新旧样式共用变量。SVG、滚动条、details/summary、动画、Markdown 排版与动态几何保留手写样式，Tools 仍复用共享页面容器、表单和提示动画。迁移规范见 [AGENTS.md](AGENTS.md#前端样式规范)。
 
 项目开发使用 pnpm，仓库只维护 `pnpm-lock.yaml`，变更依赖时应同步更新该锁文件。发布包通过 Node.js 自带的 npm 启动，无需安装 pnpm。项目使用 ESM 和严格模式 TypeScript。开发时后端使用 TypeScript 源码；生产构建将后端和工作流编译到 `dist-server/`，由 Node.js 运行，前端由 Vite 构建到 `dist-web/`。
 
