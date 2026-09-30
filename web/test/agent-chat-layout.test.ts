@@ -1,226 +1,101 @@
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+// @vitest-environment happy-dom
+import { act, createElement } from "react";
+import { createRoot, type Root } from "react-dom/client";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { AgentPage } from "../src/pages/agent/AgentPage";
 
-const stylePath = fileURLToPath(new URL("../src/index.css", import.meta.url));
+const api = vi.hoisted(() => ({ loadAgent: vi.fn(), loadContextUsage: vi.fn(), memoryAction: vi.fn(), subscribeBackgroundEvents: vi.fn() }));
+vi.mock("../src/agent-api", () => api);
+vi.mock("../src/pages/agent/AgentHarnessCanvas", () => ({ AgentHarnessCanvas: () => null }));
+let container: HTMLDivElement;
+let root: Root;
+const openConfig = vi.fn();
+const sessions = [{ id: "session-1", title: "已有会话", messageCount: 2 }];
 
-describe("Agent 会话窗口布局", () => {
-  it("停止按钮保持发送按钮尺寸和文字，图标使用圆环包围实心方块", async () => {
-    const source = await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8");
-    const css = await readFile(stylePath, "utf8");
-    expect(source).toContain('aria-label="停止生成"');
-    expect(source).toContain('<CircleStop size={15} className="[&_rect]:fill-current" aria-hidden="true" /> 停止');
-    expect(source).toMatch(/size="sm"\s+className="stop-agent"/);
-    expect(css).not.toContain(".agent-composer-actions .stop-agent");
+beforeEach(async () => {
+  vi.resetAllMocks();
+  Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+  api.loadAgent.mockResolvedValue({
+    workflow: { nodes: [], edges: [] }, semanticCount: 0, sessions,
+    settings: { agentModel: { keyConfigured: true, model: "测试模型" }, smallModel: { keyConfigured: true } },
   });
+  api.loadContextUsage.mockResolvedValue(null);
+  api.subscribeBackgroundEvents.mockReturnValue(vi.fn());
+  api.memoryAction.mockImplementation(async ({ action }) => action === "select_session" ? {
+    sessions, messages: [
+      { turnId: "turn-1", kind: "user_message", content: "保留的问题" },
+      { turnId: "turn-1", kind: "assistant_message", content: "保留的回答" },
+    ],
+  } : action === "consolidate" ? { status: "skipped", reason: "no_semantic_memory" } : null);
+  container = document.createElement("div"); document.body.append(container);
+  root = createRoot(container);
+  await act(async () => root.render(createElement(AgentPage, { onOpenConfig: openConfig })));
+});
+afterEach(async () => { await act(async () => root.unmount()); container.remove(); });
 
-  it("历史列表超出浮层高度时滚动，条目不收缩裁切标题和记录数", async () => {
-    const css = await readFile(stylePath, "utf8");
-    expect(ruleFor(css, ".session-list button")).toMatch(/flex-shrink:\s*0\s*;/);
-    expect(ruleFor(css, ".session-list")).toMatch(/overflow-y:\s*auto\s*;/);
-  });
+function button(label: string): HTMLButtonElement {
+  const found = [...container.querySelectorAll("button")].find((item) => (item.getAttribute("aria-label") ?? item.textContent?.trim()) === label);
+  expect(found, label).toBeDefined();
+  return found!;
+}
+async function click(label: string) { await act(async () => button(label).click()); }
 
-  it("聊天区保持 420px 宽度且历史列表浮层不占据消息布局", async () => {
-    const css = await readFile(stylePath, "utf8");
-    expect(ruleFor(css, ".agent-page-layout")).toMatch(/grid-template-columns:\s*minmax\(var\(--agent-main-min-width\), 1fr\) 420px/);
-    expect(ruleFor(css, ".agent-page-layout")).toMatch(/transition:\s*grid-template-columns 180ms ease/);
-    expect(ruleFor(css, ".agent-chat-dock")).toMatch(/grid-template-columns:\s*minmax\(0, 1fr\)/);
-    expect(ruleFor(css, ".session-rail")).toMatch(/max-height:\s*220px/);
-    expect(ruleFor(css, ".session-rail")).toMatch(/position:\s*absolute/);
-    expect(css).not.toContain(".session-rail-collapsed");
-    expect(ruleFor(css, ".session-rail[hidden]")).toMatch(/display:\s*none/);
-  });
-
-  it("主画布保持最小宽度，窗口更窄时改为布局整体横向滚动", async () => {
-    const css = await readFile(stylePath, "utf8");
-
-    expect(ruleFor(css, ".agent-page-layout")).toMatch(/--agent-main-min-width:\s*calc\(var\(--agent-canvas-min-width\) \+ 2 \* var\(--page-padding-inline\)\)/);
-    expect(ruleFor(css, ".agent-page-layout")).toMatch(/overflow-x:\s*auto/);
-    expect(ruleFor(css, ".agent-harness-svg")).toMatch(/min-width:\s*var\(--agent-canvas-min-width, 850px\)/);
-    // 窄屏改为单列堆叠，最小宽度不再生效，画布沿用自身滚动容器。
-    expect(css).toContain(".agent-page-layout { height: auto; min-height: 100vh; grid-template-columns: minmax(0, 1fr); }");
-  });
-
-  it("提供始终可用且标明展开状态的对话列表切换按钮", async () => {
-    const source = compactSource(await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8"));
-    expect(source).toContain('[sessionRailCollapsed, setSessionRailCollapsed] = useState(true)');
-    expect(source).toContain('hidden={sessionRailCollapsed}');
-    expect(source).not.toContain("当前 Session 全部完整回合进入上下文");
-    expect(source).toContain('aria-label="消息内容"');
-    expect(source.indexOf('className="new-session"')).toBeLessThan(source.indexOf('<div id="agent-session-rail"'));
-    expect(source.indexOf('className="model-chip"')).toBeGreaterThan(source.indexOf('className="history-toggle"'));
-    expect(source.indexOf('className="model-chip"')).toBeLessThan(source.indexOf('<div id="agent-session-rail"'));
-    expect(source.indexOf('className="model-chip"')).toBeGreaterThan(source.indexOf('aria-label="删除会话"'));
-    expect(source).not.toContain('composer-model-row');
-    const railIndex = source.indexOf('<div id="agent-session-rail"');
-    expect(railIndex).toBeGreaterThan(source.indexOf('<div className="agent-dock-header">'));
-    expect(railIndex).toBeLessThan(source.indexOf('<div className="agent-chat-log"'));
-    expect(source).toContain('aria-expanded={!sessionRailCollapsed}');
-    expect(source).toContain('aria-controls="agent-session-rail"');
-    expect(source).toContain('setSessionRailCollapsed((collapsed) => !collapsed)');
-    expect(source).toContain('sessionRailCollapsed ? "展开对话列表" : "收起对话列表"');
-    expect(source.indexOf('aria-controls="agent-session-rail"')).toBeGreaterThan(source.indexOf('<div className="chat-pane">'));
-    expect(ruleFor(await readFile(stylePath, "utf8"), '.new-session:not(:disabled):hover')).toMatch(/background:\s*var\(--accent-surface\)/);
-    expect(ruleFor(await readFile(stylePath, "utf8"), '.history-toggle:hover, .history-toggle[aria-expanded="true"]')).toMatch(/background:\s*var\(--accent-surface\)/);
-  });
-
-  it("新建对话与历史对话复用同一套按钮尺寸和排版", async () => {
-    const source = await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8");
-    const css = await readFile(stylePath, "utf8");
-
-    expect(source.match(/session-toolbar-button/g)).toHaveLength(2);
-    expect(ruleFor(css, ".session-toolbar-button")).toMatch(/min-height:\s*34px/);
-    expect(ruleFor(css, ".session-toolbar-button")).toMatch(/padding:\s*0 10px/);
-    expect(ruleFor(css, ".session-toolbar-button")).toMatch(/font-size:\s*12px/);
-    expect(ruleFor(css, ".session-toolbar-button")).toMatch(/font-weight:\s*650/);
-    expect(ruleFor(css, ".session-toolbar-button")).toMatch(/box-shadow:\s*none/);
-  });
-
-  it("新建对话不展示 loading，创建期间仍阻止重复请求", async () => {
-    const source = await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8");
-
-    expect(source).not.toContain("loading={creatingSession}");
-    expect(source).not.toContain("setCreatingSession");
-    expect(source).toContain("creatingSessionRef.current = true");
-    expect(source).toContain("creatingSessionRef.current = false");
-  });
-
-  it("标题右侧保留编辑和删除，最右侧提供保留内容的收起入口", async () => {
-    const source = await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8");
-    const css = await readFile(stylePath, "utf8");
-    const heading = source.indexOf('className="agent-session-heading"');
-    expect(source.indexOf('aria-label="重命名会话"')).toBeGreaterThan(heading);
-    expect(source.indexOf('aria-label="删除会话"')).toBeGreaterThan(heading);
-    expect(source.indexOf('className="panel-collapse-toggle chat-collapse-toggle"')).toBeGreaterThan(heading);
-    expect(source).toContain('aria-expanded={!chatCollapsed}');
-    expect(source).toContain('aria-controls="agent-chat-content"');
-    expect(source).toContain('hidden={chatCollapsed}');
-    expect(source).toContain('setChatCollapsed((collapsed) => !collapsed)');
-    expect(ruleFor(css, '.agent-chat-content[hidden]')).toMatch(/display:\s*none/);
-    expect(ruleFor(css, '.agent-page-layout[data-chat-collapsed="true"]')).toMatch(/grid-template-columns:\s*minmax\(var\(--agent-main-min-width\), 1fr\) 0/);
-    expect(ruleFor(css, '.agent-page-layout[data-chat-collapsed="true"] .agent-chat-dock')).toMatch(/border-left:\s*0/);
-  });
-
-  it("收起聊天区时按钮沿用展开时的落点，不在两个状态之间漂移", async () => {
-    const css = await readFile(stylePath, "utf8");
-    const collapsedHeader = ruleFor(css, '.agent-page-layout[data-chat-collapsed="true"] .agent-dock-header');
-
-    // 贴视口定位保证横向滚动时按钮仍可点击，锚点取视口右上角。
-    expect(ruleFor(css, ".agent-dock-header")).toMatch(/margin:\s*0 var\(--chat-inline-padding\)/);
-    // 横向滚动条不能再撑出纵向滚动条，否则 Dock 右边界会离开视口边缘。
-    expect(ruleFor(css, ".agent-page-layout")).toMatch(/overflow-x:\s*auto;\s*overflow-y:\s*hidden/);
-    expect(collapsedHeader).toMatch(/position:\s*fixed/);
-    expect(collapsedHeader).toMatch(/top:\s*0\s*;/);
-    expect(collapsedHeader).toMatch(/right:\s*0\s*;/);
-    // 收起时不再覆盖标题区的高度、内外边距与底边线，按钮纵向落点因此与展开时一致。
-    expect(collapsedHeader).not.toMatch(/min-height/);
-    expect(collapsedHeader).not.toMatch(/margin/);
-    expect(collapsedHeader).not.toMatch(/padding/);
-    expect(collapsedHeader).toMatch(/border-bottom-color:\s*transparent/);
-    // 保持标题区原有的右对齐，不额外覆盖 auto 外边距。
-    expect(ruleFor(css, ".chat-collapse-toggle")).toMatch(/margin-left:\s*auto/);
-    expect(ruleFor(css, '.agent-page-layout[data-chat-collapsed="true"] .chat-collapse-toggle')).not.toMatch(/margin-left/);
-    // 窄屏聊天区在画布下方，收起后按钮固定在视口右上角，与左侧展开侧边栏的按钮同高、同边距。
-    expect(css).toContain('.agent-page-layout[data-chat-collapsed="true"] .agent-dock-header { top: var(--panel-toggle-top); right: var(--panel-toggle-inset); min-height: 0; margin: 0; padding: 0; }');
-  });
-
-  it("左右两侧贴视口的展开按钮落在同一条水平线上", async () => {
-    const css = await readFile(stylePath, "utf8");
-    const header = ruleFor(css, ".agent-dock-header");
-    const toggleHeight = pixelsOf(ruleFor(css, ".panel-collapse-toggle"), "height", "面板收起按钮高度");
-    const headerPadding = pixelsOf(header, "padding", "标题区纵向内边距");
-    const headerMinHeight = pixelsOf(header, "min-height", "标题区最小高度");
-    const headerBorder = pixelsOf(header, "border-bottom", "标题区底边线");
-
-    // 右侧按钮的高度线由标题区盒模型推出：内边距 + 内容框内居中。
-    const chatToggleTop = headerPadding + (headerMinHeight - headerPadding * 2 - headerBorder - toggleHeight) / 2;
-    expect(pixelsOf(css, "--panel-toggle-top", "面板按钮水平线")).toBe(chatToggleTop);
-    expect(ruleFor(css, ".panel-collapse-toggle.sidebar-reopen")).toMatch(/top:\s*var\(--panel-toggle-top\)/);
-  });
-
-  it("窄屏下左右两侧展开按钮距屏幕边缘的留白一致", async () => {
-    const css = await readFile(stylePath, "utf8");
-    const mobileCollapsedHeader = css.match(/\.agent-page-layout\[data-chat-collapsed="true"\] \.agent-dock-header \{ top: var\(--panel-toggle-top\); ([^}]*)\}/)?.[1] ?? "";
-    const toggleInset = pixelsOf(css, "--panel-toggle-inset", "面板按钮边缘留白");
-
-    expect(toggleInset).toBeGreaterThan(0);
-    // 两枚按钮引用同一条间距线：左侧贴左边缘，窄屏收起后右侧贴右边缘。
-    expect(ruleFor(css, ".panel-collapse-toggle.sidebar-reopen")).toMatch(/left:\s*var\(--panel-toggle-inset\)/);
-    expect(mobileCollapsedHeader).toMatch(/right:\s*var\(--panel-toggle-inset\)/);
-    // 桌面端收起后，右侧按钮的留白沿用聊天区水平留白，与左侧按钮取同一数值。
-    expect(pixelsOf(css, "--chat-inline-padding", "聊天区水平留白")).toBe(toggleInset);
-  });
-
-  it("让 Dock 收缩到视口内并把超长会话交给日志区域滚动", async () => {
-    const css = await readFile(stylePath, "utf8");
-
-    expect(ruleFor(css, ".agent-chat-dock")).toMatch(/min-height:\s*0\s*;/);
-    expect(ruleFor(css, ".agent-chat-dock")).toMatch(/overflow:\s*hidden\s*;/);
-    expect(ruleFor(css, ".agent-chat-log")).toMatch(/overflow-y:\s*auto\s*;/);
-  });
-
-  it("将整理操作收拢为带语义状态的紧凑控件", async () => {
-    const source = compactSource(await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8"));
-    const css = await readFile(stylePath, "utf8");
-
-    expect(source).toContain('className="agent-intro-actions"');
-    expect(source).toContain('className="consolidation-action" data-status={consolidationTone}');
-    expect(source).toContain('className="consolidation-status" role="status"');
-    expect(source).toContain('className="consolidation-button" variant="secondary"');
-    expect(source).toContain('<RefreshCw size={13} aria-hidden="true" /> Consolidate');
-    expect(source).toContain('result?.status === "skipped" && result.reason === "no_semantic_memory"');
-    expect(source).toContain('setConsolidationStatus("暂无 Semantic Memory，无需整理")');
-    expect(source).toContain('!bootstrap.settings.agentModel.keyConfigured || semanticCount === 0');
-    expect(source.indexOf('className="agent-intro-actions"')).toBeGreaterThan(source.indexOf('title="Agent"'));
-    expect(ruleFor(css, ".agent-intro-actions")).toMatch(/align-items:\s*center/);
-    expect(ruleFor(css, ".consolidation-action")).toMatch(/display:\s*inline-flex/);
-    expect(ruleFor(css, ".consolidation-action")).toMatch(/align-items:\s*center/);
-    expect(ruleFor(css, '.consolidation-action[data-status="success"] .consolidation-status')).toMatch(/color:\s*#047857/);
-    expect(ruleFor(css, '.consolidation-action[data-status="success"] .consolidation-status i')).toMatch(/background:\s*#10b981/);
-    expect(ruleFor(css, '.consolidation-action[data-status="error"]')).toMatch(/border-color:\s*#efd7d4/);
-    expect(ruleFor(css, ".consolidation-status i")).toMatch(/border-radius:\s*999px/);
-  });
-
-  it("切换到 Agent 时静默检查每日整理，不触发按钮动画", async () => {
-    const source = compactSource(await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8"));
-
-    expect(source).toContain('if (trigger === "manual") setConsolidating(true)');
-    expect(source).toContain('trigger === "manual" ? await withMinimumDuration(task) : await task()');
-    expect(source).toContain('await consolidate("daily")');
-  });
-
-  it("Agent 回复期间禁用发送时输入框仍保持白色", async () => {
-    const css = await readFile(stylePath, "utf8");
-    const disabledTextarea = ruleFor(css, ".agent-composer textarea:disabled");
-
-    expect(disabledTextarea).toMatch(/background:\s*white\s*;/);
-    expect(disabledTextarea).toMatch(/opacity:\s*1\s*;/);
-  });
-
-  it("首次进入 Agent 页面立即滚动到底部，后续消息保留平滑过渡", async () => {
-    const source = await readFile(new URL("../src/pages/agent/AgentPage.tsx", import.meta.url), "utf8");
-
-    expect(source).toContain("useLayoutEffect");
-    expect(source).toContain('behavior: initialChatScrollRef.current ? "auto" : "smooth"');
-    expect(source).toContain("initialChatScrollRef.current = false");
-  });
+it("历史对话按钮控制列表显示并同步无障碍展开状态", async () => {
+  const toggle = button("展开对话列表");
+  const list = document.getElementById(toggle.getAttribute("aria-controls")!)!;
+  expect(toggle.disabled).toBe(false);
+  expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  expect(list.hidden).toBe(true);
+  await click("展开对话列表");
+  expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  expect(list.hidden).toBe(false);
+  expect(list.textContent).toContain("已有会话");
+  await click("收起对话列表");
+  expect(list.hidden).toBe(true);
 });
 
-function ruleFor(css: string, selector: string): string {
-  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = css.match(new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`));
-  expect(match, `缺少 ${selector} 样式规则`).not.toBeNull();
-  return match?.[1] ?? "";
-}
+it("Escape 收起历史列表并将焦点交还入口", async () => {
+  await click("展开对话列表");
+  const list = document.getElementById("agent-session-rail")!;
+  await act(async () => list.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })));
+  expect(list.hidden).toBe(true);
+  expect(document.activeElement).toBe(button("展开对话列表"));
+});
 
-/** 取声明块或整份样式里某个属性/自定义属性的首个 px 数值，用于校验跨组件的对齐关系。 */
-function pixelsOf(source: string, property: string, label: string): number {
-  const escapedProperty = property.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = source.match(new RegExp(`${escapedProperty}\\s*:\\s*(-?\\d+(?:\\.\\d+)?)px`));
-  expect(match, `无法从「${label}」解析 ${property} 的像素值`).not.toBeNull();
-  return Number(match?.[1]);
-}
+it("收起聊天区保留消息与草稿，并关闭历史列表", async () => {
+  const textarea = container.querySelector("textarea")!;
+  await act(async () => {
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(textarea, "未发送草稿");
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  await click("展开对话列表");
+  await click("收起聊天区");
+  expect(document.getElementById("agent-chat-content")!.hidden).toBe(true);
+  expect(document.getElementById("agent-session-rail")!.hidden).toBe(true);
+  expect(button("展开聊天区").getAttribute("aria-expanded")).toBe("false");
+  await click("展开聊天区");
+  expect(document.getElementById("agent-chat-content")!.hidden).toBe(false);
+  expect(textarea.value).toBe("未发送草稿");
+  expect(container.textContent).toContain("保留的回答");
+});
 
-function compactSource(source: string): string {
-  return source.replace(/\s+/g, " ");
-}
+it("模型入口打开配置，进入页面只触发每日整理且空库禁用手动整理", async () => {
+  await click("测试模型");
+  expect(openConfig).toHaveBeenCalledTimes(1);
+  expect(api.memoryAction.mock.calls.filter(([input]) => input.action === "consolidate")).toEqual([[{ action: "consolidate", trigger: "daily" }]]);
+  expect(button("Consolidate").disabled).toBe(true);
+  expect(container.textContent).toContain("暂无 Semantic Memory，无需整理");
+});
+
+it("新建对话在请求未结束时阻止重复提交", async () => {
+  let resolve!: (value: unknown) => void;
+  const pending = new Promise((done) => { resolve = done; });
+  api.memoryAction.mockImplementation(({ action }) => action === "create_session" ? pending : Promise.resolve({ sessions, messages: [] }));
+  await click("新建对话");
+  await click("新建对话");
+  expect(api.memoryAction.mock.calls.filter(([input]) => input.action === "create_session")).toHaveLength(1);
+  await act(async () => resolve({ session: { id: "session-2", title: "新会话", messageCount: 0 }, sessions: [...sessions, { id: "session-2", title: "新会话", messageCount: 0 }], messages: [] }));
+  expect(container.textContent).toContain("新会话");
+  expect(container.textContent).not.toContain("保留的回答");
+  expect(button("新建对话").disabled).toBe(true);
+});

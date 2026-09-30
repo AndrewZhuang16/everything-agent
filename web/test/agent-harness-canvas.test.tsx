@@ -16,6 +16,7 @@ describe("Agent 业务画布", () => {
     for (const edge of graph.edges.filter((edge) => edge.source !== "START" && edge.target !== "END")) {
       expect(edge.label).toBeTruthy();
       expect(html).toContain(edge.label);
+      expect(html.split(`data-edge="${edge.source}-&gt;${edge.target}"`)).toHaveLength(2);
     }
     expect(html).not.toContain('data-node="START"');
     expect(html).not.toContain('data-node="END"');
@@ -34,27 +35,6 @@ describe("Agent 业务画布", () => {
       expect(html).toContain(subtitle);
     }
     expect(html).not.toContain("Context budget");
-    expect(harnessPresentation.tool_schemas).toMatchObject({
-      x: harnessPresentation.procedural_memory!.x,
-      y: expect.any(Number),
-    });
-    expect(harnessPresentation.procedural_memory!.y).toBe(
-      harnessPresentation.everything_md!.y,
-    );
-    expect(harnessPresentation.tool_schemas!.y).toBeGreaterThan(
-      harnessPresentation.procedural_memory!.y,
-    );
-    expect(harnessPresentation.skills_catalog!.y).toBe(
-      harnessPresentation.tool_schemas!.y,
-    );
-    expect(html).toContain('data-edge="tool_schemas-&gt;working_memory"');
-    expect(html).toContain('d="M 326 460 V 420 H 729 V 395"');
-    expect(html).toContain('data-edge="session_chat_history-&gt;working_memory"');
-    expect(html).toContain('d="M 106 290 V 315 H 729 V 345"');
-    expect(html).toContain('data-edge="retrieval_gate-&gt;working_memory"');
-    expect(html).toContain('d="M 326 135 V 105 H 766 V 345"');
-    expect(html).toContain('data-edge="user_prompt-&gt;working_memory"');
-    expect(html).toContain('d="M 106 135 V 75 H 803 V 345"');
     expect(html).toContain("后台写入 · 独立串行队列，不阻塞回复");
     expect(html).toContain("Memory Retrieval &amp; Agent Loop");
     expect(html).toContain("记忆任务入队");
@@ -63,11 +43,7 @@ describe("Agent 业务画布", () => {
     expect(html).not.toContain("Memory Queue");
     expect(html).toContain('agent-node running');
     expect(html).toContain('agent-edge active');
-    expect(html.match(/<rect x="1"[^>]*width="1108"[^>]*class="agent-loop-box"/g)).toHaveLength(3);
-    expect(html).toContain('viewBox="0 19 1110 872"');
-    expect(html).toContain('<rect x="1" y="570" width="1108" height="170"');
-    expect(html).toContain('<rect x="1" y="760" width="1108" height="130"');
-    expect(harnessPresentation.consolidate_trigger!.y).toBe(805);
+
   });
   it("服务端移除节点时不在前端恢复固定节点", () => {
     const graph = workflow();

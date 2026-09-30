@@ -4,6 +4,8 @@ import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
 export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
   const result = call.isError
     ? removeCredentials(call.result)
+    : call.tool === "create_calendar_event"
+    ? calendarMetadata(call.result)
     : call.tool === "read_skill"
     ? skillToolMetadata(call.result)
     : call.tool === "session_search" || call.tool === "session_read"
@@ -16,7 +18,7 @@ export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
     toolCallId: call.toolUseId,
     iteration: call.iteration,
     isError: call.isError,
-    arguments: call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
+    arguments: call.tool === "create_calendar_event" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
     result,
     outputLength: call.output.length,
     summary: call.isError ? "工具执行失败" : "工具执行完成",
@@ -104,4 +106,10 @@ function removeCredentials(value: unknown, key = ""): unknown {
   if (Array.isArray(value)) return value.map((item) => removeCredentials(item));
   if (!value || typeof value !== "object") return value;
   return Object.fromEntries(Object.entries(value).map(([itemKey, itemValue]) => [itemKey, removeCredentials(itemValue, itemKey)]));
+}
+
+function calendarMetadata(value: unknown): unknown {
+  if (!value || typeof value !== "object") return { redacted: true };
+  const result = value as Record<string, unknown>;
+  return { source: result.source, status: result.status, approved: result.approved };
 }

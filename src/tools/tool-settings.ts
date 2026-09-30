@@ -1,3 +1,4 @@
+import { appleCalendarSchema } from "./apple-calendar.ts";
 import { detectSandbox } from "../sandbox/index.ts";
 import type { createLocalConfig } from "../agent-runtime/local-config.ts";
 import { readSkillSchema } from "../skills/index.ts";
@@ -8,6 +9,7 @@ import { runTerminalSchema } from "./terminal.ts";
 import { timeToolSchema } from "./tool-registry.ts";
 
 export interface ToolSettings {
+  appleCalendarEnabled: boolean;
   getCurrentTimeEnabled: boolean;
   searchWebEnabled: boolean;
   tavilyApiKey: string;
@@ -17,6 +19,7 @@ export interface ToolSettings {
 }
 
 export interface ToolSettingsInput {
+  appleCalendarEnabled?: boolean;
   getCurrentTimeEnabled: boolean;
   searchWebEnabled: boolean;
   tavilyApiKey?: string;
@@ -27,7 +30,7 @@ export interface ToolSettingsInput {
 export interface PublicToolDescriptor {
   name: string;
   description: string;
-  origin: "内置" | "Tavily";
+  origin: "内置" | "Tavily" | "Apple Calendar";
   enabled: boolean;
   configurable: boolean;
   configured: boolean;
@@ -41,6 +44,7 @@ export function createToolSettings(config: ReturnType<typeof createLocalConfig>)
   async function load(): Promise<ToolSettings> {
     const values = await config.readValues();
     return {
+      appleCalendarEnabled: parseBoolean(values.EVERYTHING_TOOL_APPLE_CALENDAR_ENABLED, false),
       getCurrentTimeEnabled: parseBoolean(values.EVERYTHING_TOOL_GET_CURRENT_TIME_ENABLED, true),
       searchWebEnabled: parseBoolean(values.EVERYTHING_TOOL_SEARCH_WEB_ENABLED, false),
       tavilyApiKey: values.TAVILY_API_KEY ?? "",
@@ -54,6 +58,9 @@ export function createToolSettings(config: ReturnType<typeof createLocalConfig>)
       throw new TypeError("工具启用状态必须是布尔值");
     }
     const before = await load();
+    const appleCalendarEnabled = input.appleCalendarEnabled ?? before.appleCalendarEnabled;
+    if (typeof appleCalendarEnabled !== "boolean") throw new TypeError("Apple Calendar 开关必须是布尔值");
+    if (appleCalendarEnabled && process.platform !== "darwin") throw new TypeError("Apple Calendar 仅支持 macOS");
     const inputApiKey = optionalSecret(input.tavilyApiKey);
     const clearApiKey = input.clearTavilyApiKey === true;
     const candidateApiKey = clearApiKey ? "" : inputApiKey || before.tavilyApiKey;
@@ -63,6 +70,7 @@ export function createToolSettings(config: ReturnType<typeof createLocalConfig>)
     if (terminalEnabled) assertTerminalUsable(before.terminalWorkspaceRoot);
 
     await config.updateConfigFile({
+      EVERYTHING_TOOL_APPLE_CALENDAR_ENABLED: String(appleCalendarEnabled),
       EVERYTHING_TOOL_GET_CURRENT_TIME_ENABLED: String(input.getCurrentTimeEnabled),
       EVERYTHING_TOOL_SEARCH_WEB_ENABLED: String(input.searchWebEnabled && Boolean(candidateApiKey)),
       EVERYTHING_TOOL_RUN_TERMINAL_ENABLED: String(terminalEnabled),
@@ -80,6 +88,12 @@ export function createToolSettings(config: ReturnType<typeof createLocalConfig>)
     const availability = detectSandbox();
     return {
       tools: [
+        {
+          name: appleCalendarSchema.name, description: appleCalendarSchema.description,
+          origin: "Apple Calendar", enabled: settings.appleCalendarEnabled && process.platform === "darwin",
+          configurable: process.platform === "darwin", configured: process.platform === "darwin",
+          configurationLabel: "仅 macOS；首次使用需要系统自动化权限，每次写入需要确认",
+        },
         fixedTool(manageMemorySchema),
         fixedTool(sessionSearchSchema),
         fixedTool(sessionReadSchema),

@@ -17,6 +17,8 @@ import { SEARCH_WEB_TOOL, TavilySearchTool, searchWebSchema } from "./tavily-sea
 import { RUN_TERMINAL_TOOL, TerminalTool, runTerminalSchema } from "./terminal.ts";
 import type { ApprovalGate } from "./approval.ts";
 
+import { AppleCalendarTool, APPLE_CALENDAR_TOOL, appleCalendarSchema } from "./apple-calendar.ts";
+
 export const TIME_TOOL = "get_current_time";
 export const timeToolSchema = {
   name: TIME_TOOL,
@@ -29,6 +31,7 @@ export const timeToolSchema = {
 } as const;
 
 export interface LocalToolOptions {
+  appleCalendarEnabled?: boolean;
   getCurrentTimeEnabled?: boolean;
   searchWebEnabled?: boolean;
   tavilyApiKey?: string;
@@ -49,6 +52,7 @@ export class LocalToolRegistry implements ToolRegistry {
   private readonly options: Required<Omit<LocalToolOptions, "approval">> & { approval: ApprovalGate | null };
   private readonly tavilySearch: TavilySearchTool | null;
   private readonly terminal: TerminalTool | null;
+  private readonly appleCalendar: AppleCalendarTool | null;
   /** 终端工具未注册的原因，供上层解释为何模型看不到该能力。 */
   readonly terminalUnavailableReason: string | null;
 
@@ -63,6 +67,7 @@ export class LocalToolRegistry implements ToolRegistry {
     this.sessionRecall = memory && recall ? new SessionRecallTools(memory, recall.currentSessionId, recall.settings) : null;
     this.readSkill = skills ? new ReadSkillTool(skills) : null;
     this.options = {
+      appleCalendarEnabled: options.appleCalendarEnabled ?? false,
       getCurrentTimeEnabled: options.getCurrentTimeEnabled ?? true,
       searchWebEnabled: options.searchWebEnabled ?? false,
       tavilyApiKey: options.tavilyApiKey ?? "",
@@ -75,6 +80,7 @@ export class LocalToolRegistry implements ToolRegistry {
       ? new TavilySearchTool(this.options.tavilyApiKey)
       : null;
 
+    this.appleCalendar = this.options.appleCalendarEnabled && process.platform === "darwin" ? new AppleCalendarTool(options.approval) : null;
     const terminal = this.createTerminal();
     this.terminal = terminal.tool;
     this.terminalUnavailableReason = terminal.reason;
@@ -110,6 +116,7 @@ export class LocalToolRegistry implements ToolRegistry {
     if (this.sessionRecall) schemas.push(sessionSearchSchema, sessionReadSchema);
     if (this.readSkill) schemas.push(readSkillSchema);
     if (this.tavilySearch) schemas.push(searchWebSchema);
+    if (this.appleCalendar) schemas.push(appleCalendarSchema);
     if (this.terminal) schemas.push(runTerminalSchema);
     return schemas;
   }
@@ -121,6 +128,7 @@ export class LocalToolRegistry implements ToolRegistry {
     context: ToolExecutionContext,
   ): unknown {
     if (context.signal?.aborted) throw context.signal.reason;
+    if (name === APPLE_CALENDAR_TOOL && this.appleCalendar) return this.appleCalendar.execute(args, context);
     if (name === MANAGE_MEMORY_TOOL && this.manageMemory) return this.manageMemory.execute(args, notify, context);
     if ((name === SESSION_SEARCH_TOOL || name === SESSION_READ_TOOL) && this.sessionRecall) {
       return this.sessionRecall.execute(name, args, notify);

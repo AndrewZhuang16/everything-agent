@@ -106,3 +106,21 @@ describe("终端工具设置", () => {
     expect((await settings.save(base)).terminalEnabled).toBe(true);
   });
 });
+
+describe("Apple Calendar 工具设置", () => {
+  it("默认关闭，平台决定是否允许启用", async () => {
+    expect((await settings.load()).appleCalendarEnabled).toBe(false);
+    const tool = (await settings.publicCatalog()).tools.find((item) => item.name === "create_calendar_event");
+    expect(tool).toMatchObject({ enabled: false, origin: "Apple Calendar", configurable: process.platform === "darwin" });
+    if (process.platform === "darwin") {
+      await settings.save({ ...base, appleCalendarEnabled: true });
+      expect((await settings.publicCatalog()).tools.find((item) => item.name === "create_calendar_event")?.enabled).toBe(true);
+      await settings.save(base);
+      expect((await settings.load()).appleCalendarEnabled).toBe(true);
+      await settings.save({ ...base, appleCalendarEnabled: false });
+      expect((await settings.load()).appleCalendarEnabled).toBe(false);
+    } else {
+      await expect(settings.save({ ...base, appleCalendarEnabled: true })).rejects.toThrow("仅支持 macOS");
+    }
+  });
+});

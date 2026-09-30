@@ -211,7 +211,9 @@ pnpm run package       # 将已有构建产物打包到 release/
 pnpm run verify:package # 验证发布包可独立启动
 ```
 
-测试通过公开接口验证行为，放在对应模块的 `test/` 目录中。覆盖率门槛为语句、函数和行 85%，分支 80%。开发约束见 [AGENTS.md](AGENTS.md)。
+测试通过公开接口验证行为，放在对应模块的 `test/` 目录中。当前 Vitest 实际执行的覆盖率门槛为语句、函数和行 90%，分支 85%；测试辅助文件不计入产品覆盖率。开发约束见 [AGENTS.md](AGENTS.md)。
+
+排查失败与慢用例时，可运行 `pnpm exec vitest run --reporter=default --reporter=json --outputFile.json=/tmp/everything-tests.json`，从 JSON 报告查看每项断言的状态和耗时。HTTP 集成测试需要本地端口监听权限；权限不足应明确失败，不能通过跳过断言掩盖。前端测试优先验证交互、无障碍状态和反馈语义，不锁死完整 class 字符串、CSS 数值或 SVG 像素坐标。模拟数据轨迹测试使用固定 seed 的最小场景，真实进程恢复、原生模块加载和沙箱超时测试保留真实执行边界。
 
 ## 当前边界与路线图
 
@@ -235,3 +237,11 @@ pnpm run verify:package # 验证发布包可独立启动
 ### 会话与执行标识
 
 `sessionId` 标识会话，`turnId` 标识一次用户提交到回复、失败或取消的完整回合。回合内使用 `iteration` 区分推理迭代，后台任务使用 `taskId`，并通过 `sourceTurnId` 关联来源回合。Trace 使用 `traceId` 统一归组，聊天生命周期事件为 `turn_started`、`turn_completed`、`turn_failed`。Engine 的 `runGraph()` 与评估实验的 Run 保留各自执行语义。完整术语见 [领域术语](./CONTEXT.md)，事件协议见 [Tracing](./src/tracing/README.md)。
+
+### Apple Calendar（macOS）
+
+Tools 页可启用 `create_calendar_event`，默认关闭。Agent 可根据标题、含时区的开始/结束时间及备注创建日程，结束时间省略时为一小时后。每次调用通过现有确认面板批准后才会写入；首次使用还需允许运行服务的应用控制系统“日历”（系统设置 → 隐私与安全性 → 自动化）。
+
+实现参考 Waku Agent，并使用 [Apple 官方 Calendar 自动化接口](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/CalendarScriptingGuide/Calendar-CreateanEvent.html)。优先使用 `Everything Agent` 专用日历；无法创建时回退至第一个可写日历，并返回实际日历名称。相同目标日历内标题和开始时间相同的事件不重复创建；不更新已有事件。失败或 30 秒超时会明确报告状态未知，请核对日历后再重试。
+
+当前仅支持创建日程，不提供查询、编辑、删除、邀请、SQLite 日程副本或 ICS 导出。此能力访问运行服务的 Mac，与浏览器所在设备无关；Windows/Linux 不注册该工具。

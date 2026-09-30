@@ -42,7 +42,7 @@ export function ToolsPage() {
     const tools = catalog?.tools ?? [];
     return [
       { name: "内置工具", description: "随 Runtime 提供，不依赖外部服务。", tools: tools.filter((tool) => tool.origin === "内置") },
-      { name: "外部集成", description: "通过本地凭证连接第三方只读服务。", tools: tools.filter((tool) => tool.origin !== "内置") },
+      { name: "外部集成", description: "连接外部服务和本机应用；日历写入需要确认。", tools: tools.filter((tool) => tool.origin !== "内置") },
     ];
   }, [catalog]);
 
@@ -70,6 +70,7 @@ export function ToolsPage() {
   async function persist({
     nextGetCurrentTimeEnabled,
     nextSearchWebEnabled,
+    nextAppleCalendarEnabled,
     nextTerminalEnabled,
     clearTavilyApiKey = false,
     closeDialog = false,
@@ -77,13 +78,14 @@ export function ToolsPage() {
   }: {
     nextGetCurrentTimeEnabled?: boolean;
     nextSearchWebEnabled?: boolean;
+    nextAppleCalendarEnabled?: boolean;
     nextTerminalEnabled?: boolean;
     clearTavilyApiKey?: boolean;
     closeDialog?: boolean;
     closeTerminalDialog?: boolean;
   } = {}): Promise<boolean> {
     const terminalChange = nextTerminalEnabled !== undefined || closeTerminalDialog;
-    const toolName = terminalChange
+    const toolName = nextAppleCalendarEnabled !== undefined ? "create_calendar_event" : terminalChange
       ? "run_terminal"
       : nextGetCurrentTimeEnabled !== undefined ? "get_current_time" : "search_web";
     setSavingTools((current) => new Set(current).add(toolName));
@@ -102,6 +104,7 @@ export function ToolsPage() {
           searchWebEnabled: clearTavilyApiKey ? false : nextSearchWebEnabled ?? (closeDialog ? searchWebEnabled : current?.tools.find((tool) => tool.name === "search_web")?.enabled ?? false),
           tavilyApiKey: toolName === "search_web" ? tavilyApiKey : "",
           clearTavilyApiKey,
+          appleCalendarEnabled: nextAppleCalendarEnabled,
           terminalEnabled: nextTerminalEnabled ?? (terminalChange ? terminalEnabled : undefined),
         }),
       );
@@ -112,7 +115,7 @@ export function ToolsPage() {
         setTerminalEnabled(next.tools.find((tool) => tool.name === toolName)?.enabled ?? false);
       } else if (toolName === "get_current_time") {
         setGetCurrentTimeEnabled(next.tools.find((tool) => tool.name === toolName)?.enabled ?? true);
-      } else {
+      } else if (toolName === "search_web") {
         setSearchWebEnabled(next.tools.find((tool) => tool.name === toolName)?.enabled ?? false);
         setTavilyApiKey("");
       }
@@ -205,7 +208,9 @@ export function ToolsPage() {
               key={tool.name}
               tool={tool}
               disabled={savingTools.has(tool.name)}
-              onToggle={tool.name === "get_current_time"
+              onToggle={tool.name === "create_calendar_event"
+                ? (enabled) => { void persist({ nextAppleCalendarEnabled: enabled }); }
+                : tool.name === "get_current_time"
                 ? handleGetCurrentTimeToggle
                 : tool.name === "search_web"
                   ? handleSearchWebToggle
@@ -287,9 +292,9 @@ function ToolCard({ tool, disabled = false, onToggle, onConfigure }: { tool: Age
       <div><CardTitle className="text-body"><code>{tool.name}</code></CardTitle><CardDescription className="mt-1.5 text-caption leading-[1.55]">{tool.description}</CardDescription></div>
       {tool.configurable
         ? <button className="group relative mt-1.5 h-[19px] w-[34px] rounded-full border-0 bg-input p-0 transition-colors duration-150 enabled:aria-checked:bg-primary disabled:bg-button-disabled" type="button" role="switch" aria-checked={tool.enabled} aria-label={`${tool.name} ${tool.enabled ? "已启用" : "已停用"}`} disabled={disabled} onClick={() => onToggle?.(!tool.enabled)}><span className="absolute top-[3px] left-[3px] size-[13px] rounded-full bg-card shadow-[0_1px_3px_rgb(0_0_0/.2)] transition-transform duration-150 group-aria-checked:translate-x-[15px]" /></button>
-        : <LockKeyhole className="mt-[7px] mr-[3px] text-muted-foreground" size={15} aria-label="固定启用" />}
+        : !tool.enabled ? <span>仅 macOS</span> : <LockKeyhole className="mt-[7px] mr-[3px] text-muted-foreground" size={15} aria-label="固定启用" />}
     </CardHeader>
-    <CardContent className="flex items-center justify-between gap-3 border-t border-border px-[17px] pt-2.5 pb-3 [&>span]:inline-flex [&>span]:items-center [&>span]:gap-1 [&>span]:text-[10px] [&>span]:text-muted-foreground"><Badge variant={tool.enabled ? "success" : "outline"}>{tool.enabled ? "已启用" : "已停用"}</Badge>{onConfigure ? <button type="button" className="inline-flex items-center gap-1 border-0 bg-transparent p-0 text-primary hover:underline" aria-label={`配置 ${tool.name}`} onClick={onConfigure}><span className="inline-flex items-center gap-1 text-[10px]">{tool.configured && <CheckCircle2 size={12} />}{tool.configured ? "配置就绪" : "需要配置"}</span></button> : <span>{tool.configurable ? tool.configured ? <><CheckCircle2 size={12} /> 配置就绪</> : "需要配置" : "固定内置能力"}</span>}</CardContent>
+    <CardContent className="flex items-center justify-between gap-3 border-t border-border px-[17px] pt-2.5 pb-3 [&>span]:inline-flex [&>span]:items-center [&>span]:gap-1 [&>span]:text-[10px] [&>span]:text-muted-foreground"><Badge variant={tool.enabled ? "success" : "outline"}>{tool.enabled ? "已启用" : "已停用"}</Badge>{onConfigure ? <button type="button" className="inline-flex items-center gap-1 border-0 bg-transparent p-0 text-primary hover:underline" aria-label={`配置 ${tool.name}`} onClick={onConfigure}><span className="inline-flex items-center gap-1 text-[10px]">{tool.configured && <CheckCircle2 size={12} />}{tool.configured ? "配置就绪" : "需要配置"}</span></button> : <span>{tool.origin === "Apple Calendar" ? tool.configurationLabel : tool.configurable ? tool.configured ? <><CheckCircle2 size={12} /> 配置就绪</> : "需要配置" : tool.configurationLabel || "固定内置能力"}</span>}</CardContent>
   </Card>;
 }
 

@@ -6,9 +6,9 @@ const { useState } = vi.hoisted(() => ({ useState: vi.fn() }));
 vi.mock("react", async (original) => ({ ...await original<typeof import("react")>(), useState }));
 beforeEach(() => useState.mockReset());
 
-it.each(["get_current_time", "search_web"])("保存 %s 时另一个开关仍可操作且状态不变", (savingTool) => {
+it.each(["get_current_time", "search_web", "create_calendar_event"])("保存 %s 时另一个开关仍可操作且状态不变", (savingTool) => {
   const catalog = {
-    tools: ["get_current_time", "search_web"].map((name) => ({
+    tools: ["get_current_time", "search_web", "create_calendar_event"].map((name) => ({
       name, description: name, origin: "内置", enabled: true, configurable: true, configured: true,
     })),
     tavily: { keyConfigured: true, keyLast4: "1234" },

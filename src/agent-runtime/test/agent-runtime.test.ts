@@ -341,7 +341,7 @@ describe("Runtime 配置与维护", () => {
     expect(env).toContain('TAVILY_API_KEY="tvly-runtime-secret"');
     const config = JSON.parse(await readFile(join(homes.at(-1)!, ".everything", "config.json"), "utf8"));
     expect(config.tools).toEqual({
-      getCurrentTimeEnabled: false, searchWebEnabled: true, runTerminalEnabled: false,
+      getCurrentTimeEnabled: false, searchWebEnabled: true, runTerminalEnabled: false, appleCalendarEnabled: false,
     });
 
     const cleared = await runtime.saveToolSettings({ getCurrentTimeEnabled: true, searchWebEnabled: false, clearTavilyApiKey: true });

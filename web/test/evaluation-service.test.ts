@@ -23,6 +23,12 @@ vi.mock('node:http', () => ({ createServer: () => {
   });
   return server;
 } }));
+// 本文件验证 Web 评估入口的生命周期；保留真实配置解析，避免 resetModules
+// 为每个非法参数重新装载整个 Runtime、数据库与模型 SDK。
+vi.mock('../../src/agent-runtime/index.ts', async () => {
+  const { parseEnv } = await import('../../src/agent-runtime/local-config.ts');
+  return { parseEnv };
+});
 vi.mock('../../src/evaluation/index.ts', () => ({
   EvaluationService: class {
     constructor(options: unknown) { state.construct(options); }

@@ -34,6 +34,7 @@ const CONFIG_PATHS = {
   EVERYTHING_EMBEDDING_MINIMUM_SIMILARITY: ["retrieval", "embedding", "minimumSimilarity"],
   EVERYTHING_TOOL_GET_CURRENT_TIME_ENABLED: ["tools", "getCurrentTimeEnabled"],
   EVERYTHING_TOOL_SEARCH_WEB_ENABLED: ["tools", "searchWebEnabled"],
+  EVERYTHING_TOOL_APPLE_CALENDAR_ENABLED: ["tools", "appleCalendarEnabled"],
   EVERYTHING_TOOL_RUN_TERMINAL_ENABLED: ["tools", "runTerminalEnabled"],
   EVERYTHING_SANDBOX_WORKSPACE_ROOT: ["sandbox", "workspaceRoot"],
 } as const;
@@ -56,6 +57,7 @@ const NUMBER_CONFIG_KEYS = new Set([
 const BOOLEAN_CONFIG_KEYS = new Set([
   "EVERYTHING_TOOL_GET_CURRENT_TIME_ENABLED",
   "EVERYTHING_TOOL_SEARCH_WEB_ENABLED",
+  "EVERYTHING_TOOL_APPLE_CALENDAR_ENABLED",
   "EVERYTHING_TOOL_RUN_TERMINAL_ENABLED",
 ]);
 
@@ -77,6 +79,7 @@ const DEFAULT_CONFIG: JsonObject = {
     getCurrentTimeEnabled: true,
     searchWebEnabled: false,
     runTerminalEnabled: false,
+    appleCalendarEnabled: false,
   },
 };
 

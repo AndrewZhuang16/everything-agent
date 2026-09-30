@@ -110,7 +110,7 @@ it.each([false, true])('刷新评分显示独立加载反馈并在结束后恢�
   expect(button.getAttribute('aria-busy')).not.toBe('true');
   expect(button.disabled).toBe(false);
   expect(button.querySelector('[data-slot="button-loading-indicator"]')).toBeNull();
-  if (failed) expect(container.querySelector('[role="alert"]')?.textContent).toContain('评分刷新失败');
+  if (failed) expectErrorFeedback('评分刷新失败');
   else expect(container.textContent).toContain('评分刷新／同步重试已完成');
 });
 it('审批请求携带 Experiment 和用例身份，离开页面不取消后台运行', async () => {
@@ -121,7 +121,7 @@ it('审批请求携带 Experiment 和用例身份，离开页面不取消后台�
   await act(async () => root.render(null)); expect(request.mock.calls.some(([, body]) => body?.action === 'cancel')).toBe(false);
 });
 it('连接失败展示错误，不把失败伪装为空数据集', async () => {
-  await act(async () => root.render(<EvaluationPage />)); request.mockRejectedValueOnce(new Error('平台断开')); await connectToPlatform(); expect(container.textContent).toContain('平台断开'); expect(container.querySelector('[role="alert"]')?.textContent).toContain('平台断开');
+  await act(async () => root.render(<EvaluationPage />)); request.mockRejectedValueOnce(new Error('平台断开')); await connectToPlatform(); expectErrorFeedback('平台断开'); expect(container.textContent).not.toContain('平台连接正常'); expect(container.querySelector('[role="combobox"]')?.textContent).toContain('选择数据集');
 });
 it('复制的是 Authorization 值，能够直接粘贴到平台请求头字段', async () => {
   const writeText = vi.fn(async () => {});
@@ -150,14 +150,14 @@ it('复制成功的提示用浮层展示并自动消失，不在页面里占位'
   await act(async () => vi.advanceTimersByTimeAsync(2_500));
   expect(container.querySelector('[role="status"]')).toBeNull();
 });
-it('复制失败按错误提示留在页面内，不显示成功浮层', async () => {
+it('复制失败通过错误浮层反馈，不显示成功文案', async () => {
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn(async () => { throw new Error('剪贴板不可用'); }) } });
   await act(async () => root.render(<EvaluationPage />));
   await openGuide();
   request.mockResolvedValueOnce({ Authorization: 'Bearer dedicated-test-token' });
   await clickInDialog('复制 authorization 值');
-  expect(container.querySelector('[role="alert"]')?.textContent).toContain('剪贴板不可用');
-  expect(container.querySelector('[role="status"]')).toBeNull();
+  expectErrorFeedback('剪贴板不可用');
+  expect(container.textContent).not.toContain('authorization 值已复制');
 });
 /** 找到连接平台按钮，并取出它当前的加载动画状态。 */
 function connectButton() {
@@ -190,27 +190,35 @@ it('连接平台期间按钮转圈并禁用，最短反馈时长后给出成功�
   expect(toast?.textContent).toContain('平台连接正常，已发现 2 个数据集');
   expect(container.querySelector('[role="alert"]')).toBeNull();
 });
-it('连接平台失败时停止动画，只用页面内错误提示', async () => {
+it('连接平台失败时停止动画，错误浮层到时清除', async () => {
   await act(async () => root.render(<EvaluationPage />));
   request.mockRejectedValueOnce(new Error('平台断开'));
   await connectToPlatform();
   expect(connectButton().spinning).toBe(false);
-  expect(container.querySelector('[role="alert"]')?.textContent).toContain('平台断开');
+  expectErrorFeedback('平台断开');
+  await act(async () => vi.advanceTimersByTimeAsync(2_500));
   expect(container.querySelector('[role="status"]')).toBeNull();
 });
-it('未配置时连接失败沿用轮询已展示的同一错误，浮层再提示而不改写 alert', async () => {
-  const unconfigured = structuredClone(dashboard); unconfigured.configured = false; unconfigured.error = '缺少 Langfuse 项目 ID 或 API 凭证';
+/** 用户操作与轮询错误共用可访问状态浮层，不能误用成功变体。 */
+function expectErrorFeedback(message: string) {
+  const feedback = container.querySelector('[role="status"]');
+  expect(feedback?.textContent).toBe(message);
+  expect(feedback?.classList.contains('save-message--error')).toBe(true);
+  expect(container.querySelector('[role="alert"]')).toBeNull();
+}
+it('相同轮询错误只提示一次，用户再次连接时仍可得到错误反馈', async () => {
+  const unconfigured = structuredClone(dashboard);
+  unconfigured.configured = false; unconfigured.error = '缺少 Langfuse 项目 ID 或 API 凭证';
   request.mockResolvedValue(unconfigured);
   await act(async () => root.render(<EvaluationPage />));
-  // 轮询已把连接错误常驻展示在 alert 区，且不带「Error:」前缀
-  expect(container.querySelector('[role="alert"]')?.textContent).toBe('缺少 Langfuse 项目 ID 或 API 凭证');
-  request.mockRejectedValueOnce(new Error('缺少 Langfuse 项目 ID 或 API 凭证'));
+  expectErrorFeedback(unconfigured.error);
+  await act(async () => vi.advanceTimersByTimeAsync(2_500));
+  expect(container.querySelector('[role="status"]')).toBeNull();
+  await act(async () => vi.advanceTimersByTimeAsync(2_000));
+  expect(container.querySelector('[role="status"]')).toBeNull();
+  request.mockRejectedValueOnce(new Error(unconfigured.error));
   await connectToPlatform();
-  // 相同错误不再覆盖 alert，避免出现「Error: 缺少…」与「缺少…」两种文案导致页面漂移
-  expect(container.querySelector('[role="alert"]')?.textContent).toBe('缺少 Langfuse 项目 ID 或 API 凭证');
-  const toast = container.querySelector('[role="status"]');
-  expect(toast?.className).toContain('save-message--error');
-  expect(toast?.textContent).toContain('缺少 Langfuse 项目 ID 或 API 凭证');
+  expectErrorFeedback(unconfigured.error);
 });
 
 it('页面常驻展示数据集 Metadata 默认值与 Experiment 采用的配置，平台步骤只在弹窗出现', async () => {
@@ -226,55 +234,24 @@ it('页面常驻展示数据集 Metadata 默认值与 Experiment 采用的配置
   const guideButton = [...container.querySelectorAll('button')].find(button => button.textContent?.includes('Langfuse Experiment 配置说明'));
   expect(guideButton).toBeDefined();
   expect(guideButton!.closest('[aria-label="数据集与实验"]')).not.toBeNull();
-  // 入口与标题块同行左右排列，按钮文案不再与描述重复；标题块本身仍是「标题 + 说明」两行
-  const header = guideButton!.closest('.eval-panel-header');
-  expect(header).not.toBeNull();
-  const heading = header!.querySelector('.eval-panel-heading');
-  expect(heading).not.toBeNull();
-  expect(heading!.querySelector('h2')?.textContent).toBe('数据集与实验');
-  const description = heading!.querySelector('p');
-  expect(description?.textContent).toBe('选择 Langfuse 数据集后在本机启动 Experiment，执行过程与平台入口共用，需要审批时暂停该用例。');
-  // 入口是标题块的兄弟项：说明留在标题块内（不会被按钮撑高），宽度不足时按钮整行换到标题块下方
-  expect(heading!.contains(guideButton!)).toBe(false);
-  expect(guideButton!.parentElement).toBe(header);
-  expect(guideButton!.classList.contains('absolute')).toBe(false);
-  expect(description!.parentElement).toBe(heading);
-  expect(description!.parentElement!.classList.contains('relative')).toBe(false);
   await openGuide();
   expect(document.body.textContent).toContain('via Webhook');
   expect(document.body.textContent).toContain('Set up remote experiment trigger in UI');
   expect([...document.querySelectorAll('code')].some(code => code.textContent === 'authorization')).toBe(true);
   expect([...document.querySelectorAll('details')].some(item => item.textContent?.includes('按下面的顺序在 Langfuse 界面完成一次性配置'))).toBe(false);
 });
-it('实验配置的示例框与回调地址、Default config 使用各自合适的代码框样式', async () => {
+it('配置说明提供可直接使用的回调地址、Default config 与请求头字段', async () => {
   await act(async () => root.render(<EvaluationPage />));
   await openGuide();
-  const metadata = [...container.querySelectorAll('code')].find(code => code.textContent === '{"terminal":false,"memorySnapshot":false}');
-  // 数据集 Metadata 示例是常驻页面的整行示例，保留块级代码框的内边距
-  expect(metadata?.className).toContain('eval-code-block');
-  expect(metadata?.className).toContain('p-3');
-  // 弹窗里的短值走内联代码框，不套用块级示例的 p-3，否则框明显大于文字
-  const guide = document.querySelector('.eval-guide-dialog')!;
-  const webhook = [...guide.querySelectorAll('code')].find(code => code.textContent === dashboard.webhookUrl);
-  expect(webhook).toBeDefined();
-  // 回调地址紧跟在“URL 填回调地址”之后，同一段落内不另起一行
-  expect(webhook!.previousSibling?.nodeType).toBe(Node.TEXT_NODE);
-  expect(webhook!.closest('p')?.textContent).toContain('URL 填回调地址');
-  expect(webhook!.closest('p')?.querySelector('br')).toBeNull();
+  const dialog = document.querySelector('[role="alertdialog"]')!;
   for (const text of [dashboard.webhookUrl, '{"name":"Everything Agent"}', 'authorization']) {
-    const block = [...guide.querySelectorAll('code')].find(code => code.textContent === text);
-    expect(block).toBeDefined();
-    expect(block!.className).toContain('eval-code-inline');
-    expect(block!.className).not.toContain('eval-code-block');
-    expect(block!.className).not.toContain('p-3');
+    expect([...dialog.querySelectorAll('code')].some(code => code.textContent === text)).toBe(true);
   }
 });
 it('运行区提示列出用例输入支持的三种写法', async () => {
   await act(async () => root.render(<EvaluationPage />));
   const launch = container.querySelector('[aria-label="数据集与实验"]')!;
   const note = [...launch.querySelectorAll('p')].find(item => item.textContent?.includes('输入支持字符串'));
-  // 提示段落允许叠加间距工具类（如 pt-2），这里只校验它仍走 eval-note 样式
-  expect(note?.className).toContain('eval-note');
   expect(note?.textContent).toBe('输入支持字符串、{ prompt } 或 { turns: ["第一轮", "第二轮"] }。');
 });
 it('平台启动说明与 Langfuse v4 实际界面一致，不残留不存在的老文案', async () => {

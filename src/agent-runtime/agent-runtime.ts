@@ -244,6 +244,7 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
             settings: recallSettings(settings, tokenEstimator),
           }, skills, {
             getCurrentTimeEnabled: toolSettings.getCurrentTimeEnabled,
+            appleCalendarEnabled: toolSettings.appleCalendarEnabled,
             terminalEnabled: toolSettings.terminalEnabled,
             terminalWorkspaceRoot: settings.sandboxWorkspaceRoot,
             terminalSessionTempDir: terminalTempDir,
@@ -360,6 +361,7 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
       settings: recallSettings(settings, tokenEstimator),
     }, skills, {
       getCurrentTimeEnabled: toolSettings.getCurrentTimeEnabled,
+      appleCalendarEnabled: toolSettings.appleCalendarEnabled,
       terminalEnabled: toolSettings.terminalEnabled,
       terminalWorkspaceRoot: settings.sandboxWorkspaceRoot,
       terminalSessionTempDir: terminalTempDir,

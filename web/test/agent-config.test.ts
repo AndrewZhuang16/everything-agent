@@ -81,3 +81,19 @@ it("Web 保存入口接收 Gemini 双模型与独立 Embedding Provider，并拒
     await expect(async () => saveAgentSettings({ ...input, embeddingProvider: "anthropic" })).rejects.toThrow("Embedding Provider");
   } finally { await runtime.close(); state.runtime = null; await rm(home, { recursive: true, force: true }); }
 });
+
+it("Web 工具接口保存 Apple Calendar 开关并拒绝非法类型", async () => {
+  const home = await mkdtemp(join(tmpdir(), "web-calendar-"));
+  const runtime = state.runtime = createAgentRuntime({ home, defaultSystemPromptPath: join(home, "default.md") });
+  const platform = vi.spyOn(process, "platform", "get").mockReturnValue("darwin");
+  try {
+    vi.resetModules();
+    const { saveTools } = await import("../server/agent-service.ts");
+    const result = await saveTools({ getCurrentTimeEnabled: true, searchWebEnabled: false, appleCalendarEnabled: true });
+    expect(result.tools.find((tool) => tool.name === "create_calendar_event")?.enabled).toBe(true);
+    expect(() => saveTools({ getCurrentTimeEnabled: true, searchWebEnabled: false, appleCalendarEnabled: "true" })).toThrow();
+  } finally {
+    platform.mockRestore();
+    await runtime.close(); state.runtime = null; await rm(home, { recursive: true, force: true });
+  }
+});

@@ -25,3 +25,13 @@ describe("publicToolEvent 失败态", () => {
     expect(event.result).toContain("未找到指定技能");
   });
 });
+
+it("日历事件只展示结果状态，不暴露日程内容和日历标识", () => {
+  const event = publicToolEvent({ ...failedCall("create_calendar_event", ""),
+    isError: false, args: { title: "私人标题", notes: "私人内容", start: "2026-10-01" },
+    result: { status: "created", approved: true, source: "Apple Calendar", calendar: "私人日历", eventId: "秘密标识" },
+  });
+  expect(event.arguments).toEqual({ redacted: true });
+  expect(event.result).toEqual({ status: "created", approved: true, source: "Apple Calendar" });
+  expect(JSON.stringify(event)).not.toMatch(/私人|秘密/);
+});

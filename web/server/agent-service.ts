@@ -60,6 +60,7 @@ export function saveTools(body: Record<string, unknown>) {
     searchWebEnabled: requiredBoolean(body.searchWebEnabled, "search_web enabled"),
     tavilyApiKey: optionalText(body.tavilyApiKey, "Tavily API Key", 10_000),
     clearTavilyApiKey: body.clearTavilyApiKey === true,
+    ...(body.appleCalendarEnabled === undefined ? {} : { appleCalendarEnabled: requiredBoolean(body.appleCalendarEnabled, "Apple Calendar 开关") }),
     // 工作区根目录属于 Sandbox 配置，只能从配置页面保存。
     ...(body.terminalEnabled === undefined ? {} : { terminalEnabled: requiredBoolean(body.terminalEnabled, "run_terminal enabled") }),
   });

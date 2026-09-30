@@ -123,3 +123,11 @@ Embedding Provider 保存在 `.everything/config.json` 的 `retrieval.embedding.
 Runtime 在同步 `onCompacted` 回调中把本轮尚未保存的原始工具消息与新检查点一起提交 SQLite。Session 重启后从检查点续接；完成回合只追加尚未落盘的原文，避免重复。若压缩成功后主任务失败，已提交的有效检查点仍保留；如果压缩本身取消、超时、生成或保存失败，则不覆盖旧检查点。完整 Chat Log 不被摘要替换，compact 不写 Semantic Memory。
 
 摘要遗漏时可以用 `session_read` 的 `sessionId: "current"` 分页核对已压缩原文。当前会话仍不参与 `session_search` 或 Gate 自动召回。Web 的 Compact 节点显示真实开始、成功与失败；聊天内显示前后 token 水位、耗时及软目标达成情况，成功标记随聊天记录持久化。JSONL 和 Langfuse 使用 `compact_*` 事件，摘要 generation 嵌套在 compact 步骤下，默认事件只包含身份与统计数据。
+
+### Apple Calendar
+
+`saveToolSettings({ getCurrentTimeEnabled, searchWebEnabled, appleCalendarEnabled })` 控制 Apple Calendar；开关保存在 `.everything/config.json` 的 `tools.appleCalendarEnabled`，默认 `false`。macOS 下启用后，下一回合注册 `create_calendar_event`，上下文估算同步使用相同工具目录。无需凭证。首次操作需要 macOS 自动化授权，运行时每次创建前通过 `ApprovalGate` 请求确认，缺少确认通道时拒绝写入。
+
+参数为 `title`、带时区的 `start`、可选 `end` 和 `notes`。结束时间默认开始后一小时，必须晚于开始时间。使用固定 JXA 脚本通过 `/usr/bin/osascript` 调用 Calendar，用户内容仅作为独立参数传入；子进程支持取消及 30 秒超时。同一注册表内写入串行执行，目标日历内相同标题和开始时间会返回 `existing`，不会修改已有事件；不同进程之间不提供原子去重保证。去重先按标题查询，再在 JavaScript 中比较开始时间，避免 Calendar 的复合属性筛选触发 `-1725` 错误。
+
+复用 `tool_started`、`tool_completed`、`tool_failed` 与审批事件，不新增 Harness 节点。日程参数在工具事件中脱敏，成功结果只投影来源、状态和批准标记；完整标题、时间和备注仅用于模型交互和用户确认。执行失败不包含原始子进程命令，避免异常泄露私人内容。此工具只创建 Apple Calendar 日程，不维护本地日程数据库。

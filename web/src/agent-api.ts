@@ -148,7 +148,7 @@ export interface AgentSkill {
 export interface AgentTool {
   name: string;
   description: string;
-  origin: "内置" | "Tavily";
+  origin: "内置" | "Tavily" | "Apple Calendar";
   enabled: boolean;
   configurable: boolean;
   configured: boolean;
@@ -395,6 +395,7 @@ export function saveTools(value: {
   tavilyApiKey: string;
   clearTavilyApiKey: boolean;
   terminalEnabled?: boolean | undefined;
+  appleCalendarEnabled?: boolean | undefined;
 }): Promise<{ ok: true } & ToolsCatalog> {
   return requestJson(`${endpoint}/tools`, {
     method: "PUT",

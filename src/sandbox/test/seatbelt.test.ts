@@ -1,3 +1,6 @@
+import { createServer } from "node:http";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -103,9 +106,31 @@ describe.skipIf(!seatbelt.usable)("Seatbelt 实际边界", () => {
     expect(readFileSync(join(workspace, ".git", "HEAD"), "utf8")).toContain("refs/heads/master");
   });
 
-  it("默认切断出站网络", async () => {
-    const result = await run("curl -s -m 5 -o /dev/null https://example.com");
-    expect(result.exitCode).not.toBe(0);
+  it("默认切断出站网络，不能把外部站点故障误判为沙箱生效", async () => {
+    let requests = 0;
+    const server = createServer((_request, response) => { requests++; response.end("本地服务可达"); });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        server.once("error", reject);
+        server.listen(0, "127.0.0.1", () => { server.removeListener("error", reject); resolve(); });
+      });
+      const address = server.address();
+      if (!address || typeof address === "string") throw new Error("测试服务未监听 TCP 端口");
+      const url = `http://127.0.0.1:${address.port}`;
+      const args = ["--noproxy", "*", "--silent", "--show-error", "--max-time", "2", url];
+      // 用同一客户端先确认目标可达；没有 curl、代理干扰或服务未启动都应导致测试失败。
+      expect((await promisify(execFile)("/usr/bin/curl", args)).stdout).toBe("本地服务可达");
+      const result = await run(`/usr/bin/curl --noproxy '*' --silent --show-error --max-time 2 ${url}`);
+      expect(result.exitCode).not.toBe(0);
+      expect(result.timedOut).toBe(false);
+      expect(requests).toBe(1);
+    } finally {
+      if (server.listening) {
+        const closed = new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+        server.closeAllConnections();
+        await closed;
+      }
+    }
   });
 
   it("子进程环境不含父进程的凭证", async () => {

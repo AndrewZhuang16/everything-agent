@@ -21,12 +21,15 @@ export default defineConfig({
         "src/tools/manage-memory.ts",
         "src/tools/tool-registry.ts",
         "src/tools/approval.ts",
+        "src/tools/apple-calendar.ts",
         "src/tools/tavily-search.ts",
         "src/tools/terminal.ts",
         "src/tools/tool-settings.ts",
         "src/tracing/**/*.ts",
         "src/index.ts",
       ],
+      // 测试辅助脚本不是产品代码，不把 sandbox-probe 等计入生产覆盖率。
+      exclude: ["**/test/**"],
       reporter: ["text", "html"],
       // 基础引擎代码量较小，较高门槛可防止新增分支却没有相应用例。
       thresholds: {

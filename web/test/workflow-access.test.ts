@@ -21,8 +21,17 @@ it.each([true, false])("工作流编辑权限=%s，读取和运行始终可用�
   const loadWorkflow = vi.fn(async () => ({ graph }));
   const handler = createLocalApi({ workflowDirectory: directory, workflowEditable: editable, loadWorkflow });
   const server = createServer((req, res) => { void handler(req, res, () => res.end()); });
-  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-  cleanup.push(() => new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve())));
+  cleanup.push(async () => {
+    if (!server.listening) return;
+    const closed = new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    server.closeAllConnections();
+    await closed;
+  });
+  // 监听失败必须立即拒绝，不能等 Vitest 超时后遗留未处理的 error 事件。
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => { server.removeListener("error", reject); resolve(); });
+  });
   const address = server.address() as { port: number };
   const url = `http://127.0.0.1:${address.port}/api/local-workflow`;
   const loaded = await (await fetch(url)).json();
