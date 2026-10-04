@@ -187,7 +187,7 @@ describe("个人助理 Runtime", () => {
 
     await runtime.run({ sessionId: session.id, prompt: "搜索最新消息" }, options());
 
-    expect(toolNames[0]).toEqual(expect.arrayContaining(["manage_memory", "session_search", "session_read", "read_skill", "search_web"]));
+    expect(toolNames[0]).toEqual(expect.arrayContaining(["manage_everything", "manage_memory", "session_search", "session_read", "read_skill", "search_web"]));
     expect(toolNames[0]).not.toContain("get_current_time");
   });
 

@@ -43,3 +43,15 @@ it("日历查询结果的私人正文和标识不进入事件流", () => {
   expect(event.arguments).toEqual({ redacted: true });
   expect(event.result).toEqual({ status: "queried", approved: false, source: "Apple Calendar" });
 });
+
+it("常驻规则读写事件仅保留元数据，不泄露正文", () => {
+  for (const action of ["read", "write"]) {
+    const event = publicToolEvent({ ...failedCall("manage_everything", ""), isError: false,
+      args: { action, content: "私人规则正文" },
+      result: { action, content: "私人规则正文", status: "saved", effectiveFrom: "next_turn" },
+    });
+    expect(event.arguments).toMatchObject({ action, contentLength: 6 });
+    expect(event.result).toMatchObject({ action, status: "saved", contentLength: 6 });
+    expect(JSON.stringify(event)).not.toContain("私人规则正文");
+  }
+});

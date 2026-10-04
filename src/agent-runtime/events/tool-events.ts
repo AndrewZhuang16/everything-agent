@@ -4,6 +4,8 @@ import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
 export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
   const result = call.isError
     ? removeCredentials(call.result)
+    : call.tool === "manage_everything"
+    ? everythingMetadata(call.result)
     : call.tool === "manage_calendar"
     ? calendarMetadata(call.result)
     : call.tool === "read_skill"
@@ -18,7 +20,7 @@ export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
     toolCallId: call.toolUseId,
     iteration: call.iteration,
     isError: call.isError,
-    arguments: call.tool === "manage_calendar" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
+    arguments: call.tool === "manage_everything" ? everythingMetadata(call.args) : call.tool === "manage_calendar" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
     result,
     outputLength: call.output.length,
     summary: call.isError ? "工具执行失败" : "工具执行完成",
@@ -112,4 +114,10 @@ function calendarMetadata(value: unknown): unknown {
   if (!value || typeof value !== "object") return { redacted: true };
   const result = value as Record<string, unknown>;
   return { source: result.source, status: result.status, approved: result.approved };
+}
+
+function everythingMetadata(value: unknown): unknown {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return { redacted: true };
+  const item = value as Record<string, unknown>;
+  return { action: item.action, status: item.status, contentLength: typeof item.content === "string" ? item.content.length : item.contentLength, effectiveFrom: item.effectiveFrom };
 }

@@ -1,3 +1,4 @@
+import { manageEverythingSchema } from "./manage-everything.ts";
 import { appleCalendarSchema } from "./apple-calendar.ts";
 import { detectSandbox } from "../sandbox/index.ts";
 import type { createLocalConfig } from "../agent-runtime/local-config.ts";
@@ -94,6 +95,7 @@ export function createToolSettings(config: ReturnType<typeof createLocalConfig>)
           configurable: process.platform === "darwin", configured: process.platform === "darwin",
           configurationLabel: "仅 macOS；首次使用需要系统自动化权限，每次写入需要确认",
         },
+        fixedTool(manageEverythingSchema),
         fixedTool(manageMemorySchema),
         fixedTool(sessionSearchSchema),
         fixedTool(sessionReadSchema),

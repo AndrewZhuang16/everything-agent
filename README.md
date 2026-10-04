@@ -92,7 +92,7 @@ npm start
 
 | 需求 | 配置入口与说明 |
 | --- | --- |
-| 调整助理常驻规则 | 在配置页编辑 Procedural Memory，保存到 `.everything/EVERYTHING.md` |
+| 调整助理常驻规则 | 在配置页编辑 Procedural Memory，或通过 `manage_everything` 工具读取、更新 `.everything/EVERYTHING.md` |
 | 使用 Skills | 在 **Skills** 页面创建或编辑技能；每轮仅注入名称与描述，使用时再加载正文，见 [Skills 文档](src/skills/README.md) |
 | 启用语义向量检索 | 在配置页的 Memory Retrieval 中选择 Dense 或 Hybrid，并选择独立的 Embedding Provider（OpenAI Compatible / Google Gemini），填写连接参数并重建索引；固定请求 1024 维向量。历史会话检索始终使用 FTS5，见 [Memory 文档](src/memory/README.md) |
 | 联网搜索 | 在 **Tools** 中配置 Tavily API Key 并启用 `search_web` |

@@ -1,3 +1,4 @@
+import { ManageEverythingTool, MANAGE_EVERYTHING_TOOL, manageEverythingSchema } from "./manage-everything.ts";
 import type {
   AgentObserver,
   ToolExecutionContext,
@@ -31,6 +32,8 @@ export const timeToolSchema = {
 } as const;
 
 export interface LocalToolOptions {
+  /** 当前运行时常驻规则的读写能力。 */
+  everythingConfig?: ConstructorParameters<typeof ManageEverythingTool>[0];
   appleCalendarEnabled?: boolean;
   getCurrentTimeEnabled?: boolean;
   searchWebEnabled?: boolean;
@@ -46,10 +49,11 @@ export interface LocalToolOptions {
 
 /** 注册本地受控工具，并在执行前统一检查取消信号和参数。 */
 export class LocalToolRegistry implements ToolRegistry {
+  private readonly manageEverything: ManageEverythingTool | null;
   private readonly manageMemory: ManageMemoryTool | null;
   private readonly sessionRecall: SessionRecallTools | null;
   private readonly readSkill: ReadSkillTool | null;
-  private readonly options: Required<Omit<LocalToolOptions, "approval">> & { approval: ApprovalGate | null };
+  private readonly options: Required<Omit<LocalToolOptions, "approval" | "everythingConfig">> & { approval: ApprovalGate | null };
   private readonly tavilySearch: TavilySearchTool | null;
   private readonly terminal: TerminalTool | null;
   private readonly appleCalendar: AppleCalendarTool | null;
@@ -63,6 +67,7 @@ export class LocalToolRegistry implements ToolRegistry {
     skills?: SkillStore,
     options: LocalToolOptions = {},
   ) {
+    this.manageEverything = options.everythingConfig ? new ManageEverythingTool(options.everythingConfig) : null;
     this.manageMemory = manageMemory ?? (memory ? new ManageMemoryTool(memory) : null);
     this.sessionRecall = memory && recall ? new SessionRecallTools(memory, recall.currentSessionId, recall.settings) : null;
     this.readSkill = skills ? new ReadSkillTool(skills) : null;
@@ -112,6 +117,7 @@ export class LocalToolRegistry implements ToolRegistry {
   schemas(): unknown {
     const schemas: unknown[] = [];
     if (this.options.getCurrentTimeEnabled) schemas.push(timeToolSchema);
+    if (this.manageEverything) schemas.push(manageEverythingSchema);
     if (this.manageMemory) schemas.push(manageMemorySchema);
     if (this.sessionRecall) schemas.push(sessionSearchSchema, sessionReadSchema);
     if (this.readSkill) schemas.push(readSkillSchema);
@@ -128,6 +134,7 @@ export class LocalToolRegistry implements ToolRegistry {
     context: ToolExecutionContext,
   ): unknown {
     if (context.signal?.aborted) throw context.signal.reason;
+    if (name === MANAGE_EVERYTHING_TOOL && this.manageEverything) return this.manageEverything.execute(args, context);
     if (name === APPLE_CALENDAR_TOOL && this.appleCalendar) return this.appleCalendar.execute(args, context);
     if (name === MANAGE_MEMORY_TOOL && this.manageMemory) return this.manageMemory.execute(args, notify, context);
     if ((name === SESSION_SEARCH_TOOL || name === SESSION_READ_TOOL) && this.sessionRecall) {
