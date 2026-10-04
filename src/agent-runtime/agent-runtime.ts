@@ -38,8 +38,8 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
   const { readSystemPrompt } = config;
   const settingsStore = createRuntimeSettings(config);
   const toolSettingsStore = createToolSettings(config);
-  // 终端工具在工作区之外唯一可写的目录，同时作为子进程 TMPDIR。
-  const terminalTempDir = join(everythingHome, "terminal-tmp");
+  // 终端临时文件集中放在 sandbox 下；自定义工作区时仍作为额外可写目录和子进程 TMPDIR。
+  const terminalTempDir = join(everythingHome, "sandbox", "terminal-tmp");
   // 同一时刻只允许一轮运行，因此活跃的审批通道最多一个；界面的确认走独立请求进来。
   let activeApprovals: ApprovalRegistry | null = null;
   const loadRuntimeSettings = settingsStore.load;

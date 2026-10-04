@@ -4,7 +4,7 @@ import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
 export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
   const result = call.isError
     ? removeCredentials(call.result)
-    : call.tool === "create_calendar_event"
+    : call.tool === "manage_calendar"
     ? calendarMetadata(call.result)
     : call.tool === "read_skill"
     ? skillToolMetadata(call.result)
@@ -18,7 +18,7 @@ export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
     toolCallId: call.toolUseId,
     iteration: call.iteration,
     isError: call.isError,
-    arguments: call.tool === "create_calendar_event" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
+    arguments: call.tool === "manage_calendar" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
     result,
     outputLength: call.output.length,
     summary: call.isError ? "工具执行失败" : "工具执行完成",

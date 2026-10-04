@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -50,6 +50,16 @@ const modelSettings = (): Pick<AgentSettingsInput, "agentModel" | "smallModel"> 
 });
 
 describe("个人助理 Runtime", () => {
+  it("启用终端后将临时目录创建在 sandbox 下", async () => {
+    const runtime = await setup();
+    await runtime.saveToolSettings({ getCurrentTimeEnabled: true, searchWebEnabled: false, appleCalendarEnabled: false, terminalEnabled: true });
+    const session = await runtime.createSession();
+    await runtime.contextUsage(session.id);
+    const home = join(homes.at(-1)!, ".everything");
+    expect((await stat(join(home, "sandbox", "terminal-tmp"))).isDirectory()).toBe(true);
+    await expect(stat(join(home, "terminal-tmp"))).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   it("自定义程序性记忆后仍注入运行时记忆策略，且不写回用户规则", async () => {
     model();
     const runtime = await setup();

@@ -85,7 +85,7 @@ export function ToolsPage() {
     closeTerminalDialog?: boolean;
   } = {}): Promise<boolean> {
     const terminalChange = nextTerminalEnabled !== undefined || closeTerminalDialog;
-    const toolName = nextAppleCalendarEnabled !== undefined ? "create_calendar_event" : terminalChange
+    const toolName = nextAppleCalendarEnabled !== undefined ? "manage_calendar" : terminalChange
       ? "run_terminal"
       : nextGetCurrentTimeEnabled !== undefined ? "get_current_time" : "search_web";
     setSavingTools((current) => new Set(current).add(toolName));
@@ -208,7 +208,7 @@ export function ToolsPage() {
               key={tool.name}
               tool={tool}
               disabled={savingTools.has(tool.name)}
-              onToggle={tool.name === "create_calendar_event"
+              onToggle={tool.name === "manage_calendar"
                 ? (enabled) => { void persist({ nextAppleCalendarEnabled: enabled }); }
                 : tool.name === "get_current_time"
                 ? handleGetCurrentTimeToggle

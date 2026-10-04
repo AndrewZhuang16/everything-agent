@@ -27,11 +27,19 @@ describe("publicToolEvent 失败态", () => {
 });
 
 it("日历事件只展示结果状态，不暴露日程内容和日历标识", () => {
-  const event = publicToolEvent({ ...failedCall("create_calendar_event", ""),
+  const event = publicToolEvent({ ...failedCall("manage_calendar", ""),
     isError: false, args: { title: "私人标题", notes: "私人内容", start: "2026-10-01" },
     result: { status: "created", approved: true, source: "Apple Calendar", calendar: "私人日历", eventId: "秘密标识" },
   });
   expect(event.arguments).toEqual({ redacted: true });
   expect(event.result).toEqual({ status: "created", approved: true, source: "Apple Calendar" });
   expect(JSON.stringify(event)).not.toMatch(/私人|秘密/);
+});
+it("日历查询结果的私人正文和标识不进入事件流", () => {
+  const event = publicToolEvent({ ...failedCall("manage_calendar", ""), isError: false,
+    args: { action: "query", calendar: "私人日历" },
+    result: { status: "queried", approved: false, source: "Apple Calendar", events: [{ title: "私人标题", eventId: "秘密标识" }] },
+  });
+  expect(event.arguments).toEqual({ redacted: true });
+  expect(event.result).toEqual({ status: "queried", approved: false, source: "Apple Calendar" });
 });

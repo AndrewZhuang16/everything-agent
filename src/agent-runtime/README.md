@@ -126,8 +126,8 @@ Runtime 在同步 `onCompacted` 回调中把本轮尚未保存的原始工具消
 
 ### Apple Calendar
 
-`saveToolSettings({ getCurrentTimeEnabled, searchWebEnabled, appleCalendarEnabled })` 控制 Apple Calendar；开关保存在 `.everything/config.json` 的 `tools.appleCalendarEnabled`，默认 `false`。macOS 下启用后，下一回合注册 `create_calendar_event`，上下文估算同步使用相同工具目录。无需凭证。首次操作需要 macOS 自动化授权，运行时每次创建前通过 `ApprovalGate` 请求确认，缺少确认通道时拒绝写入。
+`saveToolSettings({ getCurrentTimeEnabled, searchWebEnabled, appleCalendarEnabled })` 控制 Apple Calendar；开关保存在 `.everything/config.json` 的 `tools.appleCalendarEnabled`，默认 `false`。macOS 下启用后，下一回合注册 `manage_calendar`，上下文估算同步使用相同工具目录。无需凭证。首次操作需要 macOS 自动化授权，运行时每次创建或修改前通过 `ApprovalGate` 请求确认，缺少确认通道时拒绝写入。
 
-参数为 `title`、带时区的 `start`、可选 `end` 和 `notes`。结束时间默认开始后一小时，必须晚于开始时间。使用固定 JXA 脚本通过 `/usr/bin/osascript` 调用 Calendar，用户内容仅作为独立参数传入；子进程支持取消及 30 秒超时。同一注册表内写入串行执行，目标日历内相同标题和开始时间会返回 `existing`，不会修改已有事件；不同进程之间不提供原子去重保证。去重先按标题查询，再在 JavaScript 中比较开始时间，避免 Calendar 的复合属性筛选触发 `-1725` 错误。
+创建参数为 `title`、带时区的 `start`、可选 `end` 和 `notes`。结束时间默认开始后一小时，必须晚于开始时间。使用固定 JXA 脚本通过 `/usr/bin/osascript` 调用 Calendar，用户内容仅作为独立参数传入；子进程支持取消及 30 秒超时。同一注册表内写入串行执行，目标日历内相同标题和开始时间会返回 `existing`，不会修改已有事件；不同进程之间不提供原子去重保证。去重先按标题查询，再在 JavaScript 中比较开始时间，避免 Calendar 的复合属性筛选触发 `-1725` 错误。
 
-复用 `tool_started`、`tool_completed`、`tool_failed` 与审批事件，不新增 Harness 节点。日程参数在工具事件中脱敏，成功结果只投影来源、状态和批准标记；完整标题、时间和备注仅用于模型交互和用户确认。执行失败不包含原始子进程命令，避免异常泄露私人内容。此工具只创建 Apple Calendar 日程，不维护本地日程数据库。
+复用 `tool_started`、`tool_completed`、`tool_failed` 与审批事件，不新增 Harness 节点。日程参数在工具事件中脱敏，成功结果只投影来源、状态和批准标记；完整标题、时间和备注仅用于模型交互和用户确认。执行失败不包含原始子进程命令，避免异常泄露私人内容。此工具通过 `action: query | create | update` 查询、创建或修改 Apple Calendar 日程，不维护本地日程数据库。查询无需审批，必须提供含时区的 `start` 与 `end`，范围最多31天；可选 `calendar` 和 `limit`（默认50、最多100），结果按开始时间排序，`truncated=true` 时缩小查询范围。修改用查询返回的 `calendar` 与 `eventId` 唯一定位，至少指定一个标题、开始时间、结束时间或备注字段；省略字段保留原值，不支持修改重复日程；查询不展开重复规则的未来发生实例。查询结果中的标题、时间、备注和事件标识同样不进入公开事件流。

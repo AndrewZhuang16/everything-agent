@@ -4,11 +4,11 @@ import type { ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
 
 const { execute } = vi.hoisted(() => ({ execute: vi.fn() }));
 vi.mock("node:child_process", () => ({ execFile: Object.assign(vi.fn(), { [Symbol.for("nodejs.util.promisify.custom")]: execute }) }));
-const input = { title: '讨论 "计划"\\\n中文', start: "2026-10-01T09:00:00+08:00", notes: "私人备注" };
+const input = { action: "create", title: '讨论 "计划"\\\n中文', start: "2026-10-01T09:00:00+08:00", notes: "私人备注" };
 const context: ToolExecutionContext = { signal: undefined, deadline: null, iteration: 1, toolUseId: "calendar-1" };
 const request = vi.fn();
 function registry(enabled = true) { return new LocalToolRegistry(undefined, undefined, undefined, undefined, { appleCalendarEnabled: enabled, approval: { request } }); }
-function call(args: unknown = input, ctx = context, tools = registry()) { return tools.execute("create_calendar_event", args, () => {}, ctx); }
+function call(args: unknown = input, ctx = context, tools = registry()) { return tools.execute("manage_calendar", args, () => {}, ctx); }
 beforeEach(() => {
   vi.spyOn(process, "platform", "get").mockReturnValue("darwin");
   request.mockReset().mockResolvedValue(true);
@@ -17,7 +17,7 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 it("默认禁用，非 macOS 不注册", () => {
-  expect(registry(false).schemas()).not.toEqual(expect.arrayContaining([expect.objectContaining({ name: "create_calendar_event" })]));
+  expect(registry(false).schemas()).not.toEqual(expect.arrayContaining([expect.objectContaining({ name: "manage_calendar" })]));
   vi.spyOn(process, "platform", "get").mockReturnValue("linux");
   expect(() => call()).toThrow("未注册");
 });
@@ -43,7 +43,7 @@ it.each([null, [], {}, { ...input, title: " " }, { ...input, title: 1 }, { ...in
 });
 it("已有事件返回真实来源与重复状态", async () => {
   execute.mockResolvedValue({ stdout: JSON.stringify({ status: "existing", calendar: "工作", eventId: "existing-1" }) });
-  await expect(call({ title: "会议", start: input.start, end: "2026-10-01T10:30+08:00" })).resolves.toMatchObject({ status: "existing", calendar: "工作" });
+  await expect(call({ action: "create", title: "会议", start: input.start, end: "2026-10-01T10:30+08:00" })).resolves.toMatchObject({ status: "existing", calendar: "工作" });
 });
 it.each(["", "{}", '{"status":"created"}', '{"status":"created","calendar":"x","eventId":""}', "null"])("无效返回不报告成功：%s", async (stdout) => {
   execute.mockResolvedValue({ stdout });
@@ -89,4 +89,59 @@ it("固定脚本在日历端去重并回退至可写日历", async () => {
   const later = { ...JSON.parse(args[0]), start: "2026-10-02T01:00:00.000Z", end: "2026-10-02T02:00:00.000Z" };
   expect(JSON.parse(run([JSON.stringify(later)]))).toMatchObject({ status: "created" });
   expect(push).toHaveBeenCalledTimes(2);
+});
+
+it("查询无需确认并返回日程", async () => {
+  execute.mockResolvedValue({ stdout: JSON.stringify({ status: "queried", events: [], truncated: false }) });
+  await expect(call({ action: "query", start: input.start, end: "2026-10-02T09:00+08:00" })).resolves.toMatchObject({ status: "queried", events: [], approved: false });
+  expect(request).not.toHaveBeenCalled();
+});
+it("修改必须确认并按日历和事件标识定位", async () => {
+  execute.mockResolvedValue({ stdout: JSON.stringify({ status: "updated", calendar: "工作", eventId: "uid-1" }) });
+  await expect(call({ action: "update", calendar: "工作", eventId: "uid-1", notes: "新备注" })).resolves.toMatchObject({ status: "updated", approved: true });
+  expect(request).toHaveBeenCalledOnce();
+});
+it.each([
+  { action: "query", start: input.start },
+  { action: "query", start: input.start, end: "2027-10-01T09:00Z" },
+  { action: "update", calendar: "工作", eventId: "uid" },
+  { action: "update", eventId: "uid", title: "新标题" },
+  { action: "delete" },
+])("拒绝非法操作参数：%j", async (args) => {
+  await expect(call(args)).rejects.toThrow();
+  expect(request).not.toHaveBeenCalled();
+  expect(execute).not.toHaveBeenCalled();
+});
+it("查询脚本按重叠时间筛选、排序并限制条数，修改脚本保留未指定字段", async () => {
+  await call();
+  const script = execute.mock.calls[0]![1][3];
+  const first = { uid: () => "uid-1", summary: () => "会议", startDate: () => new Date("2026-10-01T01:00Z"), endDate: () => new Date("2026-10-01T02:00Z"), description: () => "备注", recurrence: () => "" };
+  const second = { ...first, uid: () => "uid-2", startDate: () => new Date("2026-10-01T00:00Z") };
+  const outside = { ...first, uid: () => "outside", startDate: () => new Date("2026-10-03T01:00Z"), endDate: () => new Date("2026-10-03T02:00Z") };
+  const events = Object.assign(() => [first, second, outside], { whose: (query: { uid: string }) => () => [first, second, outside].filter((event) => event.uid() === query.uid) });
+  const calendar = { name: () => "工作", writable: () => true, events };
+  const calendars = Object.assign(() => [calendar], { whose: (query: { name: string }) => () => query.name === "工作" ? [calendar] : [] });
+  const run = new Function("Application", `${script}; return run;`)(() => ({ calendars }));
+  const query = { action: "query", start: "2026-10-01T00:30Z", end: "2026-10-02T00:00Z", limit: 1 };
+  expect(JSON.parse(run([JSON.stringify(query)]))).toMatchObject({ status: "queried", truncated: true, events: [{ eventId: "uid-2", calendar: "工作", notes: "备注" }] });
+  expect(JSON.parse(run([JSON.stringify({ ...query, calendar: "不存在" })]))).toMatchObject({ events: [], truncated: false });
+  expect(() => run([JSON.stringify({ action: "update", calendar: "工作", eventId: "missing", title: "新标题" })])).toThrow("定位日程");
+  expect(() => run([JSON.stringify({ action: "update", calendar: "工作", eventId: "uid-1", end: "2026-09-01T00:00Z" })])).toThrow("结束时间");
+  expect(JSON.parse(run([JSON.stringify({ action: "update", calendar: "工作", eventId: "uid-1", notes: "" })]))).toMatchObject({ status: "updated", eventId: "uid-1" });
+  expect(first.description).toBe("");
+  expect(first.summary()).toBe("会议");
+});
+it("查询失败不声称写入状态未知且不泄露私人内容", async () => {
+  execute.mockRejectedValue(new Error("私人日历"));
+  await expect(call({ action: "query", start: input.start, end: "2026-10-02T09:00+08:00" })).rejects.toThrow("查询失败");
+  expect(request).not.toHaveBeenCalled();
+});
+it("查询拒绝格式错误的返回", async () => {
+  execute.mockResolvedValue({ stdout: JSON.stringify({ status: "queried", events: [{ title: "私人标题" }], truncated: false }) });
+  await expect(call({ action: "query", start: input.start, end: "2026-10-02T09:00+08:00" })).rejects.toThrow("查询失败");
+});
+
+it("修改接受查询返回的含毫秒 ISO 时间", async () => {
+  execute.mockResolvedValue({ stdout: JSON.stringify({ status: "updated", calendar: "工作", eventId: "uid" }) });
+  await expect(call({ action: "update", calendar: "工作", eventId: "uid", start: "2026-10-01T01:00:00.000Z", end: "2026-10-01T02:00:00.000Z" })).resolves.toMatchObject({ status: "updated" });
 });

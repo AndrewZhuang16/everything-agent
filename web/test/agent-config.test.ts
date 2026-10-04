@@ -90,7 +90,7 @@ it("Web 工具接口保存 Apple Calendar 开关并拒绝非法类型", async ()
     vi.resetModules();
     const { saveTools } = await import("../server/agent-service.ts");
     const result = await saveTools({ getCurrentTimeEnabled: true, searchWebEnabled: false, appleCalendarEnabled: true });
-    expect(result.tools.find((tool) => tool.name === "create_calendar_event")?.enabled).toBe(true);
+    expect(result.tools.find((tool) => tool.name === "manage_calendar")?.enabled).toBe(true);
     expect(() => saveTools({ getCurrentTimeEnabled: true, searchWebEnabled: false, appleCalendarEnabled: "true" })).toThrow();
   } finally {
     platform.mockRestore();

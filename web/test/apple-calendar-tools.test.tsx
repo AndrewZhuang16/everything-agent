@@ -9,7 +9,7 @@ vi.mock("../src/lib/minimum-duration", () => ({ withMinimumDuration: (task: () =
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 it.each([false, true])("日历开关独立保存，失败时保持原状态：%s", async (failure) => {
   const catalog: ToolsCatalog = {
-    tools: [{ name: "create_calendar_event", description: "创建日程", origin: "Apple Calendar", enabled: false, configured: true, configurable: true }],
+    tools: [{ name: "manage_calendar", description: "查询、创建或修改日程", origin: "Apple Calendar", enabled: false, configured: true, configurable: true }],
     tavily: { keyConfigured: false, keyLast4: "" }, terminal: { sandboxKind: null, unavailableReason: null, workspaceRoot: "" },
   };
   vi.mocked(loadTools).mockResolvedValue(catalog);
