@@ -240,7 +240,7 @@ pnpm run verify:package # 验证发布包可独立启动
 
 ### Apple Calendar（macOS）
 
-Tools 页可启用 `manage_calendar`，默认关闭。使用 `action: query | create | update` 查询、创建或修改日程。查询必须提供含时区的 `start`、`end`（最多31天），可用 `calendar` 筛选，`limit` 默认为50、最多100；返回重叠该时间范围的日程及 `calendar`、`eventId`，`truncated=true` 时需缩小时间范围。修改必须提供查询返回的 `calendar`、`eventId`，以及至少一个 `title`、`start`、`end`、`notes` 字段；省略字段保留原值，空备注可清除备注，暂不支持修改重复日程。创建需要标题和开始时间，结束时间省略时为一小时后。查询无需确认，创建和修改通过现有确认面板批准后才会写入；首次使用还需允许运行服务的应用控制系统“日历”（系统设置 → 隐私与安全性 → 自动化）。
+Tools 页可启用 `manage_calendar`，默认关闭。使用 `action: query | create | update` 查询、创建或修改日程。查询必须提供含时区的 `start`、`end`（最多31天），可用 `calendar` 筛选，`limit` 默认为50、最多100；返回重叠该时间范围的日程及 `calendar`、`eventId`，`truncated=true` 时需缩小时间范围。修改必须提供查询返回的 `calendar`、`eventId`，以及至少一个 `title`、`start`、`end`、`notes` 字段；省略字段保留原值，空备注可清除备注，暂不支持修改重复日程。创建需要标题和开始时间，结束时间省略时为一小时后。查询先由 Calendar 按重叠时间区间筛选，避免逐条扫描全部历史事件。查询无需确认，创建和修改通过现有确认面板批准后才会写入；首次使用还需允许运行服务的应用控制系统“日历”（系统设置 → 隐私与安全性 → 自动化）。
 
 实现参考 Waku Agent，并使用 [Apple 官方 Calendar 自动化接口](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/CalendarScriptingGuide/Calendar-CreateanEvent.html)。优先使用 `Everything Agent` 专用日历；无法创建时回退至第一个可写日历，并返回实际日历名称。创建时，相同目标日历内标题和开始时间相同的事件不重复创建。写入失败或 30 秒超时会明确报告状态未知，请核对日历后再重试。
 

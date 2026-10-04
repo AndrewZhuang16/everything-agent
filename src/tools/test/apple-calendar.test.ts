@@ -118,7 +118,7 @@ it("查询脚本按重叠时间筛选、排序并限制条数，修改脚本保�
   const first = { uid: () => "uid-1", summary: () => "会议", startDate: () => new Date("2026-10-01T01:00Z"), endDate: () => new Date("2026-10-01T02:00Z"), description: () => "备注", recurrence: () => "" };
   const second = { ...first, uid: () => "uid-2", startDate: () => new Date("2026-10-01T00:00Z") };
   const outside = { ...first, uid: () => "outside", startDate: () => new Date("2026-10-03T01:00Z"), endDate: () => new Date("2026-10-03T02:00Z") };
-  const events = Object.assign(() => [first, second, outside], { whose: (query: { uid: string }) => () => [first, second, outside].filter((event) => event.uid() === query.uid) });
+  const events = Object.assign(() => [first, second, outside], { whose: (query: { uid?: string; _and?: unknown[] }) => () => query._and ? [first, second] : [first, second, outside].filter((event) => event.uid() === query.uid) });
   const calendar = { name: () => "工作", writable: () => true, events };
   const calendars = Object.assign(() => [calendar], { whose: (query: { name: string }) => () => query.name === "工作" ? [calendar] : [] });
   const run = new Function("Application", `${script}; return run;`)(() => ({ calendars }));
@@ -144,4 +144,18 @@ it("查询拒绝格式错误的返回", async () => {
 it("修改接受查询返回的含毫秒 ISO 时间", async () => {
   execute.mockResolvedValue({ stdout: JSON.stringify({ status: "updated", calendar: "工作", eventId: "uid" }) });
   await expect(call({ action: "update", calendar: "工作", eventId: "uid", start: "2026-10-01T01:00:00.000Z", end: "2026-10-01T02:00:00.000Z" })).resolves.toMatchObject({ status: "updated" });
+});
+it("查询在 Calendar 端筛选重叠区间，不逐条扫描全部历史日程", async () => {
+  await call();
+  const script = execute.mock.calls[0]![1][3];
+  const whose = vi.fn(() => () => []);
+  const events = Object.assign(() => { throw new Error("全量扫描历史日程导致超时"); }, { whose });
+  const calendars = () => [{ events }];
+  const run = new Function("Application", `${script}; return run;`)(() => ({ calendars }));
+  const input = { action: "query", start: "2026-10-05T00:00:00+08:00", end: "2026-10-05T23:59:59+08:00", limit: 50 };
+  expect(JSON.parse(run([JSON.stringify(input)]))).toMatchObject({ status: "queried", events: [], truncated: false });
+  expect(whose).toHaveBeenCalledWith({ _and: [
+    { startDate: { _lessThan: new Date(input.end) } },
+    { endDate: { _greaterThan: new Date(input.start) } },
+  ] });
 });

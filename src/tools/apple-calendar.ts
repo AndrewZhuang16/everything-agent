@@ -33,7 +33,12 @@ const CREATE_SCRIPT = `function run(argv) {
     const calendars = input.calendar ? app.calendars.whose({name: input.calendar})() : app.calendars();
     const events = [];
     calendars.forEach(function(calendar) {
-      calendar.events().forEach(function(event) {
+      // 先由 Calendar 筛选重叠区间，避免跨进程逐条读取全部历史日程导致超时。
+      // 复合条件必须显式使用 _and；普通对象中的多个属性不能可靠表达此筛选。
+      calendar.events.whose({_and: [
+        {startDate: {_lessThan: new Date(input.end)}},
+        {endDate: {_greaterThan: new Date(input.start)}}
+      ]})().forEach(function(event) {
         const start = event.startDate(); const end = event.endDate();
         if (start < new Date(input.end) && end > new Date(input.start)) {
           events.push({calendar: calendar.name(), eventId: event.uid(), title: event.summary(), start: start.toISOString(), end: end.toISOString(), notes: event.description() || ""});
