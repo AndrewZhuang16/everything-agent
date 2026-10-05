@@ -1,12 +1,14 @@
 import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { RUN_TERMINAL_TOOL, TerminalTool, runTerminalSchema } from "../index.ts";
 import { createBuiltinTools } from "../index.ts";
 import { publicToolEvent as projectToolEvent, builtinToolEventProjection } from "../index.ts";
 import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
 const publicToolEvent = (call: ToolCallRecord) => projectToolEvent(call, builtinToolEventProjection(call.tool));
+import { detectSandbox } from "../../sandbox/index.ts";
+import * as sandboxModule from "../../sandbox/index.ts";
 import type { Sandbox, SandboxCommand, SandboxResult } from "../../sandbox/index.ts";
 import type { ApprovalGate, ApprovalRequest } from "../index.ts";
 import type { AgentObserver, ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
@@ -179,13 +181,11 @@ describe("run_terminal 在注册表中的可见性", () => {
   it("未启用时模型看不到该工具", () => {
     const registry = createBuiltinTools({ options: { terminalEnabled: false } });
     expect(schemaNames(registry)).not.toContain(RUN_TERMINAL_TOOL);
-    expect(registry.terminalUnavailableReason).toBeNull();
   });
 
-  it("启用但未配置工作区时不注册，并给出原因", () => {
+  it("启用但未配置工作区时不注册", () => {
     const registry = createBuiltinTools({ options: { terminalEnabled: true } });
     expect(schemaNames(registry)).not.toContain(RUN_TERMINAL_TOOL);
-    expect(registry.terminalUnavailableReason).toContain("工作区");
   });
 
   it("配置完整时注册工具", () => {
@@ -195,8 +195,29 @@ describe("run_terminal 在注册表中的可见性", () => {
       terminalSessionTempDir: tempDir,
     } });
     const registered = schemaNames(registry).includes(RUN_TERMINAL_TOOL);
-    // 沙箱不可用的平台上工具不会注册，此时必须给出原因而不是静默缺失。
-    expect(registered || registry.terminalUnavailableReason !== null).toBe(true);
+    // 工具是否注册取决于当前环境能否提供内核沙箱。
+    expect(registered).toBe(detectSandbox().available);
+  });
+
+  it("沙箱不可用时不注册终端，其他工具仍可用", () => {
+    const detection = vi.spyOn(sandboxModule, "detectSandbox").mockReturnValue({ available: false, reason: "测试环境无沙箱" });
+    try {
+      const registry = createBuiltinTools({ options: { terminalEnabled: true, terminalWorkspaceRoot: workspace } });
+      expect(schemaNames(registry)).not.toContain(RUN_TERMINAL_TOOL);
+      expect(schemaNames(registry)).toContain("get_current_time");
+    } finally {
+      detection.mockRestore();
+    }
+  });
+
+  it("构造参数错误直接抛出，不静默省略终端", () => {
+    const detection = vi.spyOn(sandboxModule, "detectSandbox").mockReturnValue({ available: true, kind: "seatbelt" });
+    try {
+      expect(() => createBuiltinTools({ options: { terminalEnabled: true, terminalWorkspaceRoot: "relative-path" } }))
+        .toThrow(/workspaceRoot/);
+    } finally {
+      detection.mockRestore();
+    }
   });
 
   it("未注册时调用会明确报错", async () => {

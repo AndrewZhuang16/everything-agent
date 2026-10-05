@@ -31,7 +31,7 @@ const tools = new LocalToolRegistry([{
 }]);
 ```
 
-`createBuiltinTools(context)` 集中装配现有内置工具，绑定执行函数与安全投影。它根据配置、平台和实际依赖决定是否注册；终端沙箱不可用时不注册终端，返回 `terminalUnavailableReason`，不会降级为无保护执行。Memory、Session Recall 与 Skills 依赖缺省时，相应工具不注册；时间工具默认启用。
+`createBuiltinTools(context)` 集中装配现有内置工具，绑定执行函数与安全投影。它根据配置、平台和实际依赖决定是否注册；终端未配置工作区或沙箱不可用时不注册终端，不会降级为无保护执行；其他构造错误直接抛出。工厂只返回注册表，界面中的沙箱可用性原因由配置目录提供。Memory、Session Recall 与 Skills 依赖缺省时，相应工具不注册；时间工具默认启用。
 
 配置管理仍使用现有工具开关和凭证字段。`createToolSettings(store)` 只依赖 `ToolConfigStore` 的读取、普通配置写入和凭证写入能力；`ManageEverythingTool` 只依赖 `EverythingRuleStore` 的常驻规则读写能力。持久化实现由宿主提供，不通过 Runtime 类型定义接口。
 

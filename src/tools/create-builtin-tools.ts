@@ -13,6 +13,7 @@ import type { ApprovalGate } from "./approval.ts";
 
 import { AppleCalendarTool, appleCalendarSchema } from "./apple-calendar.ts";
 
+import { detectSandbox } from "../sandbox/index.ts";
 import { LocalToolRegistry } from "./tool-registry.ts";
 import { currentTimeTool } from "./current-time.ts";
 import { builtinToolEventProjection } from "./tool-events.ts";
@@ -49,7 +50,7 @@ export interface ToolFactoryContext {
 export type ToolFactory = (context: ToolFactoryContext) => ToolCollection | Promise<ToolCollection>;
 
 /** 装配内置工具；不可用的终端不注册，不降级为无沙箱执行。 */
-export function createBuiltinTools(context: ToolFactoryContext = {}): LocalToolRegistry & { terminalUnavailableReason: string | null } {
+export function createBuiltinTools(context: ToolFactoryContext = {}): LocalToolRegistry {
   const { memory, recall, skills } = context;
   const options = { ...context.settings, ...context.options };
   const tools: LocalTool[] = [];
@@ -79,21 +80,13 @@ export function createBuiltinTools(context: ToolFactoryContext = {}): LocalToolR
     const tool = new AppleCalendarTool(options.approval);
     add(appleCalendarSchema, (args, _notify, ctx) => tool.execute(args, ctx));
   }
-  let terminalUnavailableReason: string | null = null;
-  if (options.terminalEnabled) {
-    if (!options.terminalWorkspaceRoot) terminalUnavailableReason = "尚未配置工作区根目录";
-    else {
-      try {
-        const tool = new TerminalTool({
-          workspaceRoot: options.terminalWorkspaceRoot,
-          sessionTempDir: options.terminalSessionTempDir || options.terminalWorkspaceRoot,
-          ...(options.approval ? { approval: options.approval } : {}),
-        });
-        add(runTerminalSchema, (args, notify, ctx) => tool.execute(args, notify, ctx));
-      } catch (error) {
-        terminalUnavailableReason = error instanceof Error ? error.message : String(error);
-      }
-    }
+  if (options.terminalEnabled && options.terminalWorkspaceRoot && detectSandbox().available) {
+    const tool = new TerminalTool({
+      workspaceRoot: options.terminalWorkspaceRoot,
+      sessionTempDir: options.terminalSessionTempDir || options.terminalWorkspaceRoot,
+      ...(options.approval ? { approval: options.approval } : {}),
+    });
+    add(runTerminalSchema, (args, notify, ctx) => tool.execute(args, notify, ctx));
   }
-  return Object.assign(new LocalToolRegistry(tools), { terminalUnavailableReason });
+  return new LocalToolRegistry(tools);
 }
