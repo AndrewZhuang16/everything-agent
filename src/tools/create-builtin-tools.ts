@@ -1,21 +1,21 @@
-import { ManageEverythingTool, manageEverythingSchema } from "./manage-everything.ts";
+import { ManageEverythingTool, manageEverythingSchema } from "./builtin/manage-everything.ts";
 import type { MemoryRuntime } from "../memory/index.ts";
 import { ReadSkillTool, readSkillSchema, type SkillStore } from "../skills/index.ts";
-import { ManageMemoryTool, manageMemorySchema } from "./manage-memory.ts";
+import { ManageMemoryTool, manageMemorySchema } from "./builtin/manage-memory.ts";
 import {
   SessionRecallTools,
   sessionReadSchema,
   sessionSearchSchema,
-} from "./session-recall.ts";
-import { TavilySearchTool, searchWebSchema } from "./tavily-search.ts";
-import { TerminalTool, runTerminalSchema } from "./terminal.ts";
+} from "./builtin/session-recall.ts";
+import { TavilySearchTool, searchWebSchema } from "./builtin/tavily-search.ts";
+import { TerminalTool, runTerminalSchema } from "./builtin/terminal.ts";
 import type { ApprovalGate } from "./approval.ts";
 
-import { AppleCalendarTool, appleCalendarSchema } from "./apple-calendar.ts";
+import { AppleCalendarTool, appleCalendarSchema } from "./builtin/apple-calendar.ts";
 
 import { detectSandbox } from "../sandbox/index.ts";
 import { LocalToolRegistry } from "./tool-registry.ts";
-import { currentTimeTool } from "./current-time.ts";
+import { currentTimeTool } from "./builtin/current-time.ts";
 import { builtinToolEventProjection } from "./tool-events.ts";
 import type { LocalTool, ToolCollection } from "./types.ts";
 import type { ToolSettings } from "./tool-settings.ts";

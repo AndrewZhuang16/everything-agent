@@ -1,10 +1,10 @@
 import { mkdirSync } from "node:fs";
 import { isAbsolute, join, relative, resolve, sep } from "node:path";
-import { buildSandboxEnv, createSandbox } from "../sandbox/index.ts";
-import type { Sandbox, SandboxDenialHint, SandboxPolicy } from "../sandbox/index.ts";
-import type { AgentObserver, ToolExecutionContext } from "../agent-loop/types.ts";
-import { evaluateCommand } from "./approval.ts";
-import type { ApprovalGate } from "./approval.ts";
+import { buildSandboxEnv, createSandbox } from "../../sandbox/index.ts";
+import type { Sandbox, SandboxDenialHint, SandboxPolicy } from "../../sandbox/index.ts";
+import type { AgentObserver, ToolExecutionContext } from "../../agent-loop/types.ts";
+import { evaluateCommand } from "../approval.ts";
+import type { ApprovalGate } from "../approval.ts";
 
 export const RUN_TERMINAL_TOOL = "run_terminal";
 

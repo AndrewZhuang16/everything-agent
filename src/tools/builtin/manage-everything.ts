@@ -1,4 +1,4 @@
-import type { ToolExecutionContext } from "../agent-loop/agent-loop.ts";
+import type { ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
 
 /** 常驻规则读写能力，由宿主提供持久化实现。 */
 export interface EverythingRuleStore {

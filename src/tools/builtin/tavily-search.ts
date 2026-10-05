@@ -1,4 +1,4 @@
-import type { ToolExecutionContext } from "../agent-loop/types.ts";
+import type { ToolExecutionContext } from "../../agent-loop/types.ts";
 
 export const SEARCH_WEB_TOOL = "search_web";
 

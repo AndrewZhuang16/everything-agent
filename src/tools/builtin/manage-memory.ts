@@ -1,6 +1,6 @@
-import type { MemoryManagementOptions, MemoryRuntime } from "../memory/index.ts";
-import { readMemoryCandidate } from "../memory/index.ts";
-import type { AgentObserver, ToolExecutionContext } from "../agent-loop/agent-loop.ts";
+import type { MemoryManagementOptions, MemoryRuntime } from "../../memory/index.ts";
+import { readMemoryCandidate } from "../../memory/index.ts";
+import type { AgentObserver, ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
 
 export const MANAGE_MEMORY_TOOL = "manage_memory";
 export const manageMemorySchema = {

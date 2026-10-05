@@ -2,6 +2,10 @@
 
 `everything-agent/tools` 是工具模块的公开入口。工具模块不依赖 `agent-runtime`；宿主通过能力接口注入配置存储、常驻规则、Memory、Skills 和审批通道。
 
+## 文件组织
+
+具体工具实现统一放在 `builtin/`：`current-time.ts`、`manage-everything.ts`、`manage-memory.ts`、`session-recall.ts`、`tavily-search.ts`、`apple-calendar.ts` 和 `terminal.ts`。注册表、内置装配入口、配置、审批、事件投影与公共类型保留在 tools 根目录；行为测试仍集中在 `test/`。宿主继续从 `everything-agent/tools` 导入，内部文件移动不改变公开入口。
+
 ## 注册与装配
 
 `LocalToolRegistry` 接收 `LocalTool[]`，只负责按名称查找、拒绝重名、取消检查、schema 列举和公开事件投影。空注册表没有内置工具。`schemas()` 按注册顺序返回独立快照；未知工具报错，执行异常交给 Agent Loop 转换为失败结果和事件。
@@ -47,4 +51,4 @@ Registry 将注册项的 `eventProjection` 用于参数、成功结果与失败�
 
 未提供投影的工具及未知工具，默认以 `{ redacted: true }` 隐藏参数与结果。通用事件封装还递归移除凭证字段。内置工具投影在工具模块中维护：记忆、常驻规则、日历与 Skill 正文只保留元数据；终端输出只保留长度及状态；内置工具失败仍保留既有错误信息并移除凭证字段。该投影只约束工具事件，模型请求快照及工具返回给模型的内容沿用现有追踪策略。
 
-新增普通工具需要增加实现与行为测试，并在 tools 内装配入口登记执行和安全投影。需要启停、凭证或专用界面时，更新工具配置与前端；不需要修改 Runtime 调度或 Runtime 事件名称分支。
+新增普通工具需要在 `builtin/` 增加实现，并在 `test/` 增加行为测试，并在 tools 内装配入口登记执行和安全投影。需要启停、凭证或专用界面时，更新工具配置与前端；不需要修改 Runtime 调度或 Runtime 事件名称分支。

@@ -1,12 +1,12 @@
-import { manageEverythingSchema } from "./manage-everything.ts";
-import { appleCalendarSchema } from "./apple-calendar.ts";
+import { manageEverythingSchema } from "./builtin/manage-everything.ts";
+import { appleCalendarSchema } from "./builtin/apple-calendar.ts";
 import { detectSandbox } from "../sandbox/index.ts";
 import { readSkillSchema } from "../skills/index.ts";
-import { manageMemorySchema } from "./manage-memory.ts";
-import { sessionReadSchema, sessionSearchSchema } from "./session-recall.ts";
-import { searchWebSchema } from "./tavily-search.ts";
-import { runTerminalSchema } from "./terminal.ts";
-import { timeToolSchema } from "./current-time.ts";
+import { manageMemorySchema } from "./builtin/manage-memory.ts";
+import { sessionReadSchema, sessionSearchSchema } from "./builtin/session-recall.ts";
+import { searchWebSchema } from "./builtin/tavily-search.ts";
+import { runTerminalSchema } from "./builtin/terminal.ts";
+import { timeToolSchema } from "./builtin/current-time.ts";
 
 /** 工具配置所需的最小存储能力，凭证与普通配置分别写入。 */
 export interface ToolConfigStore {

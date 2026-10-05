@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { ToolExecutionContext } from "../agent-loop/agent-loop.ts";
-import type { ApprovalGate } from "./approval.ts";
+import type { ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
+import type { ApprovalGate } from "../approval.ts";
 
 const runFile = promisify(execFile);
 export const APPLE_CALENDAR_TOOL = "manage_calendar";

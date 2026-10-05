@@ -1,4 +1,4 @@
-import type { LocalTool } from "./types.ts";
+import type { LocalTool } from "../types.ts";
 
 export const TIME_TOOL = "get_current_time";
 export const timeToolSchema = {

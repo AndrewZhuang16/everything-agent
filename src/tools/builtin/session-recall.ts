@@ -1,5 +1,5 @@
-import type { AgentObserver } from "../agent-loop/agent-loop.ts";
-import type { MemoryRuntime, SessionRecallSettings } from "../memory/index.ts";
+import type { AgentObserver } from "../../agent-loop/agent-loop.ts";
+import type { MemoryRuntime, SessionRecallSettings } from "../../memory/index.ts";
 
 export const SESSION_SEARCH_TOOL = "session_search";
 export const SESSION_READ_TOOL = "session_read";
