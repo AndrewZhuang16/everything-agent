@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { parseWorkspaceRoot } from "../../agent-runtime/configuration/schema.ts";
 import { createLocalConfig } from "../../agent-runtime/local-config.ts";
 import { detectSandbox } from "../../sandbox/index.ts";
-import { createToolSettings } from "../tool-settings.ts";
+import { createToolSettings } from "../index.ts";
 
 let home = "";
 let config: ReturnType<typeof createLocalConfig>;

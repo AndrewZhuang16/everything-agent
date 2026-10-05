@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluateCommand } from "../approval.ts";
+import { evaluateCommand } from "../index.ts";
 
 describe("命令审批判定", () => {
   it("普通开发命令直接放行", () => {

@@ -13,6 +13,4 @@ export type { ContextUsage, ContextWaterline } from "./context-window.ts";
 export { createLocalConfig, parseEnv, updateEnvText } from "./local-config.ts";
 export type { LocalConfigPaths } from "./local-config.ts";
 export type { AgentSkill, SaveSkillInput } from "../skills/index.ts";
-export type { PublicToolDescriptor, ToolSettings, ToolSettingsInput } from "../tools/tool-settings.ts";
-export { SEARCH_WEB_TOOL, TavilySearchTool, searchWebSchema } from "../tools/tavily-search.ts";
 export { clearEverythingData } from "./local-data.ts";

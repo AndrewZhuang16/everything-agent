@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createAgentRuntime, type AgentRuntime, type AgentSettingsInput } from "../index.ts";
+import { LocalToolRegistry, type ToolFactory } from "../../tools/index.ts";
 import type { ModelRequest, ModelResponse } from "../../agent-loop/agent-loop.ts";
 
 const { create, createModelClient } = vi.hoisted(() => ({
@@ -19,7 +20,7 @@ afterEach(async () => {
   create.mockReset();
   createModelClient.mockClear();
 });
-async function setup() {
+async function setup(runtimeOptions: Parameters<typeof createAgentRuntime>[1] = {}) {
   const root = await mkdtemp(join(tmpdir(), "agent-runtime-"));
   const home = join(root, ".everything");
   await mkdir(home);
@@ -35,7 +36,7 @@ async function setup() {
       small: { provider: "anthropic", model: "small-test", baseUrl: "https://small.example" },
     },
   })}\n`);
-  const runtime = createAgentRuntime(paths);
+  const runtime = createAgentRuntime(paths, runtimeOptions);
   runtimes.push(runtime);
   return runtime;
 }
@@ -643,4 +644,38 @@ it("长会话自动 compact 后水位下降，检查点、聊天标记与脱敏�
   expect(records.map((record) => record.type)).toEqual(["compact_started", "compact_model_started", "compact_model_completed", "compact_completed"]);
   expect(records.at(-1)).toMatchObject({ sessionId: session.id, payload: { targetReached: true } });
   expect(JSON.stringify(records)).not.toContain("历史任务已完成");
+});
+
+
+it("异步注入工具工厂同时服务预览和回合，并使用工具自有的事件投影", async () => {
+  const execute = vi.fn(() => ({ content: "私人结果", status: "完成" }));
+  const tool = {
+    schema: { name: "custom_lookup", description: "自定义查询", input_schema: { type: "object" } },
+    execute,
+    eventProjection: { arguments: () => ({ redacted: true }), result: () => ({ status: "完成" }) },
+  };
+  const factory = vi.fn<ToolFactory>(async () => new LocalToolRegistry([tool]));
+  const runtime = await setup({ toolFactory: factory });
+  const session = await runtime.createSession();
+  await runtime.contextUsage(session.id);
+  expect(factory).toHaveBeenCalledTimes(1);
+  expect(factory.mock.calls[0]![0].memoryManagement).toBeUndefined();
+  let calls = 0;
+  create.mockImplementation(async request => {
+    if (!Array.isArray(request.tools) || request.tools.length === 0) return response('{"intent":"none"}');
+    expect(request.tools).toEqual([tool.schema]);
+    if (++calls === 1) return { content: [{ type: "tool_use", id: "custom-call", name: tool.schema.name, input: { query: "私人参数" } }], stop_reason: "tool_use" };
+    return response("查询完成");
+  });
+  const events: Array<{ kind: string; event: Record<string, unknown> }> = [];
+  const result = await runtime.run({ sessionId: session.id, prompt: "查询" }, {
+    ...options(), observer: (kind, event) => { events.push({ kind, event }); },
+  });
+  expect(result.reply).toBe("查询完成");
+  expect(factory).toHaveBeenCalledTimes(2);
+  expect(factory.mock.calls[1]![0].memoryManagement).toMatchObject({ currentSessionId: session.id, evidenceMessageId: expect.any(Number) });
+  expect(execute).toHaveBeenCalledTimes(1);
+  const completed = events.find(item => item.kind === "tool_completed")!;
+  expect(completed.event).toMatchObject({ tool: tool.schema.name, arguments: { redacted: true }, result: { status: "完成" } });
+  expect(JSON.stringify(completed)).not.toContain("私人");
 });

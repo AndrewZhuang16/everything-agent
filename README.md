@@ -157,7 +157,7 @@ flowchart TD
 | `src/agent-loop/` | [Agent 回合接口与事件](src/agent-loop/README.md) |
 | `src/agent-runtime/` | [集成接口、配置与资源生命周期](src/agent-runtime/README.md) |
 | `src/agent-graph/` | [Agent Harness 拓扑与可视化边界](src/agent-graph/README.md) |
-| `src/model/`、`src/tools/` | [模型协议适配](src/model/README.md)与工具注册、校验、执行 |
+| `src/model/`、`src/tools/` | [模型协议适配](src/model/README.md)与[独立工具模块](src/tools/README.md)的注册、装配、校验、执行及安全事件投影 |
 | `src/memory/` | [Session、SQLite、检索与长期记忆](src/memory/README.md) |
 | `src/skills/`、`src/sandbox/` | [按需技能](src/skills/README.md)与[终端执行边界](src/sandbox/README.md) |
 | `src/tracing/`、`src/evaluation/` | [运行记录](src/tracing/README.md)与[真实环境评估](src/evaluation/README.md) |

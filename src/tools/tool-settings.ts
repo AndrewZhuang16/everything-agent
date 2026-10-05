@@ -1,13 +1,19 @@
 import { manageEverythingSchema } from "./manage-everything.ts";
 import { appleCalendarSchema } from "./apple-calendar.ts";
 import { detectSandbox } from "../sandbox/index.ts";
-import type { createLocalConfig } from "../agent-runtime/local-config.ts";
 import { readSkillSchema } from "../skills/index.ts";
 import { manageMemorySchema } from "./manage-memory.ts";
 import { sessionReadSchema, sessionSearchSchema } from "./session-recall.ts";
 import { searchWebSchema } from "./tavily-search.ts";
 import { runTerminalSchema } from "./terminal.ts";
-import { timeToolSchema } from "./tool-registry.ts";
+import { timeToolSchema } from "./current-time.ts";
+
+/** 工具配置所需的最小存储能力，凭证与普通配置分别写入。 */
+export interface ToolConfigStore {
+  readValues(): Promise<Record<string, string>>;
+  updateConfigFile(updates: Record<string, string>): Promise<void>;
+  updateSecretEnvFile(updates: Record<string, string>, clears: readonly string[]): Promise<void>;
+}
 
 export interface ToolSettings {
   appleCalendarEnabled: boolean;
@@ -39,7 +45,7 @@ export interface PublicToolDescriptor {
 }
 
 /** 管理工具启用状态与外部工具凭证，只有凭证写入 `.everything/.env`。 */
-export function createToolSettings(config: ReturnType<typeof createLocalConfig>) {
+export function createToolSettings(config: ToolConfigStore) {
   return { load, save, publicCatalog };
 
   async function load(): Promise<ToolSettings> {

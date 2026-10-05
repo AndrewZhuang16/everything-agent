@@ -1,27 +1,18 @@
-import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
+import type { ToolEventProjection } from "./types.ts";
+import type { ToolCallRecord } from "../agent-loop/agent-loop.ts";
 
-/** 工具事件的公开投影：记忆正文只保留元数据，普通工具递归移除凭证字段。 */
-export function publicToolEvent(call: ToolCallRecord): Record<string, unknown> {
+/** 根据工具提供的安全投影封装公开事件，并递归移除凭证；缺省投影隐藏正文。 */
+export function publicToolEvent(call: ToolCallRecord, projection: ToolEventProjection = privateProjection): Record<string, unknown> {
   const result = call.isError
-    ? removeCredentials(call.result)
-    : call.tool === "manage_everything"
-    ? everythingMetadata(call.result)
-    : call.tool === "manage_calendar"
-    ? calendarMetadata(call.result)
-    : call.tool === "read_skill"
-    ? skillToolMetadata(call.result)
-    : call.tool === "session_search" || call.tool === "session_read"
-    ? sessionRecallToolMetadata(call.result)
-    : call.tool === "run_terminal"
-    ? terminalToolMetadata(call.result)
-    : call.tool === "manage_memory" ? memoryToolMetadata(call.result) : removeCredentials(call.result);
+    ? (projection.error ?? redact)(call.result)
+    : projection.result(call.result);
   return {
     tool: call.tool,
     toolCallId: call.toolUseId,
     iteration: call.iteration,
     isError: call.isError,
-    arguments: call.tool === "manage_everything" ? everythingMetadata(call.args) : call.tool === "manage_calendar" ? { redacted: true } : call.tool === "manage_memory" ? memoryToolMetadata(call.args) : removeCredentials(call.args),
-    result,
+    arguments: removeCredentials(projection.arguments(call.args)),
+    result: removeCredentials(result),
     outputLength: call.output.length,
     summary: call.isError ? "工具执行失败" : "工具执行完成",
   };
@@ -120,4 +111,22 @@ function everythingMetadata(value: unknown): unknown {
   if (!value || typeof value !== "object" || Array.isArray(value)) return { redacted: true };
   const item = value as Record<string, unknown>;
   return { action: item.action, status: item.status, contentLength: typeof item.content === "string" ? item.content.length : item.contentLength, effectiveFrom: item.effectiveFrom };
+}
+
+
+const redact = () => ({ redacted: true });
+const privateProjection: ToolEventProjection = { arguments: redact, result: redact };
+
+/** 内置工具的安全展示策略；装配时绑定到工具，Runtime 不识别工具名称。 */
+export function builtinToolEventProjection(name: string): ToolEventProjection {
+  const result = name === "manage_everything" ? everythingMetadata
+    : name === "manage_calendar" ? calendarMetadata
+    : name === "read_skill" ? skillToolMetadata
+    : name === "session_search" || name === "session_read" ? sessionRecallToolMetadata
+    : name === "run_terminal" ? terminalToolMetadata
+    : name === "manage_memory" ? memoryToolMetadata : removeCredentials;
+  const args = name === "manage_everything" ? everythingMetadata
+    : name === "manage_calendar" ? redact
+    : name === "manage_memory" ? memoryToolMetadata : removeCredentials;
+  return { arguments: args, result, error: removeCredentials };
 }

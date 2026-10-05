@@ -1,5 +1,5 @@
 import { beforeEach, afterEach, expect, it, vi } from "vitest";
-import { LocalToolRegistry } from "../tool-registry.ts";
+import { createBuiltinTools } from "../index.ts";
 import type { ToolExecutionContext } from "../../agent-loop/agent-loop.ts";
 
 const { execute } = vi.hoisted(() => ({ execute: vi.fn() }));
@@ -7,7 +7,7 @@ vi.mock("node:child_process", () => ({ execFile: Object.assign(vi.fn(), { [Symbo
 const input = { action: "create", title: '讨论 "计划"\\\n中文', start: "2026-10-01T09:00:00+08:00", notes: "私人备注" };
 const context: ToolExecutionContext = { signal: undefined, deadline: null, iteration: 1, toolUseId: "calendar-1" };
 const request = vi.fn();
-function registry(enabled = true) { return new LocalToolRegistry(undefined, undefined, undefined, undefined, { appleCalendarEnabled: enabled, approval: { request } }); }
+function registry(enabled = true) { return createBuiltinTools({ options: { appleCalendarEnabled: enabled, approval: { request } } }); }
 function call(args: unknown = input, ctx = context, tools = registry()) { return tools.execute("manage_calendar", args, () => {}, ctx); }
 beforeEach(() => {
   vi.spyOn(process, "platform", "get").mockReturnValue("darwin");
@@ -32,7 +32,7 @@ it("先确认再写入，保留文本并正确转换时区、默认一小时", a
 });
 it.each([false, undefined])("无确认通道或拒绝确认不写入：%s", async (approved) => {
   request.mockResolvedValue(approved);
-  const tools = approved === undefined ? new LocalToolRegistry(undefined, undefined, undefined, undefined, { appleCalendarEnabled: true }) : registry();
+  const tools = approved === undefined ? createBuiltinTools({ options: { appleCalendarEnabled: true } }) : registry();
   await expect(call(input, context, tools)).rejects.toThrow("未确认");
   expect(execute).not.toHaveBeenCalled();
 });

@@ -28,8 +28,8 @@
       "default": "./src/agent-graph/harness-graph.ts"
     },
     "./tools": {
-      "types": "./src/tools/tool-registry.ts",
-      "default": "./src/tools/tool-registry.ts"
+      "types": "./src/tools/index.ts",
+      "default": "./src/tools/index.ts"
     },
     "./model": {
       "types": "./src/model/model-client.ts",

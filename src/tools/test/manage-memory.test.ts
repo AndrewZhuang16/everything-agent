@@ -3,8 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRuntime, type SessionRecallSettings } from "../../memory/index.ts";
-import { ManageMemoryTool } from "../manage-memory.ts";
-import { LocalToolRegistry } from "../tool-registry.ts";
+import { ManageMemoryTool, type ToolFactoryContext } from "../index.ts";
+import { createBuiltinTools } from "../index.ts";
 
 const memories: MemoryRuntime[] = [];
 const noop = () => {};
@@ -24,7 +24,7 @@ describe("本地记忆工具", () => {
     });
     expect(() => tool.execute({ action: "submit", content: "用户喜欢布偶猫" }, noop)).toThrow("submit 缺少必填字段：intent、subject、attribute");
     expect(() => tool.execute({ action: "submit", content: "用户喜欢布偶猫", intent: "remember", subject: "宠物偏好" }, noop)).toThrow("submit 缺少必填字段：attribute");
-    const schemas = new LocalToolRegistry(runtime, tool).schemas() as Array<{ name: string; input_schema: unknown }>;
+    const schemas = createBuiltinTools({ memory: runtime }).schemas() as Array<{ name: string; input_schema: unknown }>;
     expect(schemas.find((schema) => schema.name === "manage_memory")?.input_schema).toMatchObject({
       anyOf: [
         { properties: { action: { enum: ["search"] } }, required: ["query"] },
@@ -36,11 +36,12 @@ describe("本地记忆工具", () => {
   it("submit 绑定当前用户证据并由小模型选择写入，search 仍只读", async () => {
     const runtime = await memory(); const session = runtime.createSession();
     const evidence = runtime.startTurn(session.id, "r1", "我喜欢红茶");
-    const tool = new ManageMemoryTool(runtime, {
+    const management: ToolFactoryContext["memoryManagement"] = {
       currentSessionId: session.id, turnId: "r1", evidenceMessageId: evidence.id, model: "small",
       client: { messages: { create: () => ({ content: [{ type: "text", text: JSON.stringify({ action: "create", reason: "新偏好", evidenceMessageIds: [evidence.id], subject: "饮品偏好", content: "喜欢红茶", category: "preference", stable: true, futureUseful: true }) }], stop_reason: "end_turn" }) } },
-    });
-    const registry = new LocalToolRegistry(runtime, tool);
+    };
+    const tool = new ManageMemoryTool(runtime, management);
+    const registry = createBuiltinTools({ memory: runtime, memoryManagement: management });
     await expect(registry.execute("manage_memory", { action: "submit", intent: "remember", subject: "用户", attribute: "饮品偏好", content: "喜欢红茶" }, () => {}, { signal: new AbortController().signal, deadline: null, iteration: 1, toolUseId: "t1" })).toMatchObject({ status: "queued" });
     await runtime.waitForBackgroundTasks();
     await expect(tool.execute({ action: "search", query: "红茶" }, noop)).resolves.toHaveLength(1);
@@ -72,7 +73,7 @@ describe("本地记忆工具", () => {
     const runtime = await memory(); const current = runtime.createSession("当前"); const historical = runtime.createSession("历史");
     await addRun(runtime, current.id, "r1", "发布方案", "当前方案");
     await addRun(runtime, historical.id, "r2", "发布方案", "历史方案");
-    const registry = new LocalToolRegistry(runtime, undefined, { currentSessionId: current.id, settings: recall });
+    const registry = createBuiltinTools({ memory: runtime, recall: { currentSessionId: current.id, settings: recall } });
     const schemas = registry.schemas() as Array<{ name: string }>;
     expect(schemas.map((item) => item.name)).toEqual(["get_current_time", "manage_memory", "session_search", "session_read"]);
     const context = { signal: undefined, deadline: null, iteration: 1, toolUseId: "t1" };
@@ -99,7 +100,7 @@ describe("本地记忆工具", () => {
     const current = runtime.createSession("当前"); const historical = runtime.createSession("历史");
     await addRun(runtime, historical.id, "r2", "发布方案", "历史方案");
     await runtime.createSemantic("饮品偏好", "喜欢红茶");
-    const registry = new LocalToolRegistry(runtime, undefined, { currentSessionId: current.id, settings: recall });
+    const registry = createBuiltinTools({ memory: runtime, recall: { currentSessionId: current.id, settings: recall } });
     const context = { signal: undefined, deadline: null, iteration: 1, toolUseId: "t1" };
     const events: Array<{ kind: string; corpus: unknown }> = [];
     const notify = (kind: string, event: Record<string, unknown>) => { events.push({ kind, corpus: event.corpus }); };
@@ -112,7 +113,7 @@ describe("本地记忆工具", () => {
   });
 
   it("无 Memory 时只开放时间工具，并统一校验取消和未知工具", async () => {
-    const plain = new LocalToolRegistry();
+    const plain = createBuiltinTools();
     const context = { signal: undefined, deadline: null, iteration: 1, toolUseId: "t1" };
     expect(plain.schemas()).toHaveLength(1);
     expect(plain.execute("get_current_time", {}, async () => {}, context)).toMatchObject({ timeZone: expect.any(String) });

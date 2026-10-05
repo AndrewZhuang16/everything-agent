@@ -17,14 +17,12 @@ agent-runtime/
 ├── integrations/
 │   ├── model.ts              # 模型客户端接入与请求预算检查
 │   └── memory.ts             # 召回预算、Embedding 客户端与索引绑定
-├── events/
-│   └── tool-events.ts        # 工具事件脱敏与记忆元数据投影
 ├── local-config.ts           # 本地配置与规则文件持久化
 ├── local-data.ts             # 本地数据清理
 └── test/                     # 通过公开入口验证行为
 ```
 
-`agent-runtime.ts` 持有实例状态，负责执行顺序和真实事件发布。配置模块不持有 Memory 或 Tracer 的生命周期；接入模块通过参数接收依赖和事件接收器；工具事件模块只转换事件数据。内部辅助模块不从 `index.ts` 导出，宿主继续通过统一公开入口使用 Runtime。
+`agent-runtime.ts` 持有实例状态，负责执行顺序和真实事件发布。配置模块不持有 Memory 或 Tracer 的生命周期；接入模块通过参数接收依赖和事件接收器；工具装配与事件脱敏由独立的 `src/tools/` 模块维护。内部辅助模块不从 `index.ts` 导出，宿主继续通过统一公开入口使用 Runtime。
 
 ## 公开接口
 
@@ -51,6 +49,8 @@ try {
 }
 ```
 
+可通过第二个参数 `{ toolFactory }` 注入同步或异步工具工厂；默认使用 tools 模块的 `createBuiltinTools`。执行与 `contextUsage()` 共用该入口，Runtime 仅提供会话、能力和当前回合证据，并使用工具集合的 `publicToolEvent` 序列化事件。工具接口、配置能力和安全投影见 [Tools](../tools/README.md)。
+
 路径由宿主提供。实例独立持有 Memory、Tracer、工具和会话锁；不同实例应使用不同数据目录。同一目录的多实例并发协调尚未实现。
 
 - `run(input, options)`：检索记忆、组装上下文、调用 Loop、保存完整回合及 trace，返回 `AgentTurnResult`（含 `turnId`）；输入和选项分别为 `AgentTurnInput`、`AgentTurnOptions`。Web 聊天入口为 `POST /api/local-agent/turn`。
@@ -72,7 +72,7 @@ try {
 
 同一会话的回合串行执行，后续回合读取前一回合保存的工作记忆。不同会话可以并行。Loop 限制 10 次迭代和 5 分钟（300000ms）超时，并接收宿主取消信号；检索与排队阶段不在 Loop 超时范围内。
 
-沿用现有 AgentObserver 事件名称和含义，为转发事件关联 `turnId`、`sessionId`，补充上下文来源元数据。每轮以 `skills_discovered` 记录可用目录，`read_skill` 成功后产生不含正文的 `skill_loaded`；对应工具完成事件也只公开名称、描述和正文长度。工具事件在共享执行层进行凭证移除，Session Recall 工具只公开检索元数据。JSONL Tracer 保留既有回合开始、完成、失败及模型/工具追踪语义。`turn_completed` 与 `turn_failed` 补充回合级事实：供应商与模型、`ms` 的三段拆分（`retrievalMs` 含 gate 小模型调用、`modelMs`、`toolMs`）、`failedToolCallCount`、`derivedTaskIds`（本回合入队的后台记忆写入任务，用于关联独立的任务 trace 文件）以及上下文水位字段；`turn_failed` 另有 `cancelled` 与 `timedOut`，把用户主动停止和整轮超时同模型或工具故障区分开。静态 Harness 拓扑仍由 `agentHarnessGraph.describe()` 提供，Web 负责转换为画布格式；Runtime 不伪造 Graph 执行事件。
+沿用现有 AgentObserver 事件名称和含义，为转发事件关联 `turnId`、`sessionId`，补充上下文来源元数据。每轮以 `skills_discovered` 记录可用目录，`read_skill` 成功后产生不含正文的 `skill_loaded`；对应工具完成事件也只公开名称、描述和正文长度。工具事件由工具集合提供安全投影并进行凭证移除，Session Recall 工具只公开检索元数据。JSONL Tracer 保留既有回合开始、完成、失败及模型/工具追踪语义。`turn_completed` 与 `turn_failed` 补充回合级事实：供应商与模型、`ms` 的三段拆分（`retrievalMs` 含 gate 小模型调用、`modelMs`、`toolMs`）、`failedToolCallCount`、`derivedTaskIds`（本回合入队的后台记忆写入任务，用于关联独立的任务 trace 文件）以及上下文水位字段；`turn_failed` 另有 `cancelled` 与 `timedOut`，把用户主动停止和整轮超时同模型或工具故障区分开。静态 Harness 拓扑仍由 `agentHarnessGraph.describe()` 提供，Web 负责转换为画布格式；Runtime 不伪造 Graph 执行事件。
 
 ## 本地配置
 

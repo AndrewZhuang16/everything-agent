@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   agentHarnessGraph,
   createModelClient,
-  LocalToolRegistry,
+  createBuiltinTools,
 } from "../../index.ts";
 
 describe("Agent Harness", () => {
@@ -34,7 +34,7 @@ describe("Agent Harness", () => {
   });
 
   it("只执行已注册的只读时间工具", async () => {
-    const registry = new LocalToolRegistry();
+    const registry = createBuiltinTools();
     expect(registry.schemas()).toEqual([expect.objectContaining({ name: "get_current_time" })]);
     const result = await registry.execute("get_current_time", {}, vi.fn(), {
       signal: undefined,

@@ -1,8 +1,8 @@
 import { createRuntimeTracer } from "../tracing/runtime-tracer.ts";
 import { join } from "node:path";
 import { RoughTokenEstimator } from "../model/token-estimator.ts";
-import { LocalToolRegistry } from "../tools/tool-registry.ts";
-import { ManageMemoryTool } from "../tools/manage-memory.ts";
+import { createBuiltinTools, createToolSettings } from "../tools/index.ts";
+import type { ToolFactory, ToolSettingsInput } from "../tools/index.ts";
 import { MemoryRuntime } from "../memory/index.ts";
 import { readTraceFiles } from "../tracing/jsonl-tracer.ts";
 import { AgentLoopAbortError, AgentLoopTimeoutError, runAgentLoop } from "../agent-loop/agent-loop.ts";
@@ -19,12 +19,9 @@ import { availableInputTokens, contextWaterline, CONTEXT_SAFETY_TOKENS } from ".
 import type { ContextUsage } from "./context-window.ts";
 import { createRuntimeClient } from "./integrations/model.ts";
 import { configureMemoryRuntime, recallSettings } from "./integrations/memory.ts";
-import { publicToolEvent } from "./events/tool-events.ts";
 import { startDailyConsolidationCheck } from "./daily-consolidation.ts";
 import type { DailyConsolidationCheck } from "./daily-consolidation.ts";
 import { formatSkillCatalog, SkillStore } from "../skills/index.ts";
-import { createToolSettings } from "../tools/tool-settings.ts";
-import type { ToolSettingsInput } from "../tools/tool-settings.ts";
 import type { AgentTurnInput, AgentTurnOptions, AgentTurnResult } from "./types.ts";
 
 import { RUNTIME_SYSTEM_PROMPT } from "./system-prompt.ts";
@@ -32,12 +29,13 @@ import { RUNTIME_SYSTEM_PROMPT } from "./system-prompt.ts";
 const DEFAULT_TIMEOUT_MS = 300_000;
 
 /** 创建本地个人助理 Runtime；资源与会话锁由实例独立持有。 */
-export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?: boolean } = {}) {
+export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?: boolean; toolFactory?: ToolFactory } = {}) {
   const everythingHome = paths.home;
   const config = createLocalConfig(paths);
   const { readSystemPrompt } = config;
   const settingsStore = createRuntimeSettings(config);
   const toolSettingsStore = createToolSettings(config);
+  const toolFactory = options.toolFactory ?? createBuiltinTools;
   // 终端临时文件集中放在 sandbox 下；自定义工作区时仍作为额外可写目录和子进程 TMPDIR。
   const terminalTempDir = join(everythingHome, "sandbox", "terminal-tmp");
   // 同一时刻只允许一轮运行，因此活跃的审批通道最多一个；界面的确认走独立请求进来。
@@ -231,28 +229,21 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
           skills: availableSkills.map((skill) => ({ name: skill.name, description: skill.description })),
           count: availableSkills.length,
         });
+        const tools = await toolFactory({
+          memory, skills, settings: toolSettings,
+          memoryManagement: {
+            client: agentClient, model: settings.agentModel.model, currentSessionId: sessionId,
+            turnId, evidenceMessageId: userEvidence.id, observer: emit,
+          },
+          recall: { currentSessionId: sessionId, settings: recallSettings(settings, tokenEstimator) },
+          options: { everythingConfig: config, terminalSessionTempDir: terminalTempDir, approval: approvals },
+        });
         const result = await runAgentLoop({
           client: agentClient,
           model: settings.agentModel.model,
           system: [RUNTIME_SYSTEM_PROMPT, baseSystem, skillCatalog, retrieval.context].filter(Boolean).join("\n\n"),
           messages,
-          tools: new LocalToolRegistry(memory, new ManageMemoryTool(memory, {
-            client: agentClient, model: settings.agentModel.model, currentSessionId: sessionId,
-            turnId, evidenceMessageId: userEvidence.id, observer: emit,
-          }), {
-            currentSessionId: sessionId,
-            settings: recallSettings(settings, tokenEstimator),
-          }, skills, {
-            everythingConfig: config,
-            getCurrentTimeEnabled: toolSettings.getCurrentTimeEnabled,
-            appleCalendarEnabled: toolSettings.appleCalendarEnabled,
-            terminalEnabled: toolSettings.terminalEnabled,
-            terminalWorkspaceRoot: settings.sandboxWorkspaceRoot,
-            terminalSessionTempDir: terminalTempDir,
-            approval: approvals,
-            searchWebEnabled: toolSettings.searchWebEnabled,
-            tavilyApiKey: toolSettings.tavilyApiKey,
-          }),
+          tools,
           maxIterations: settings.maxIterations,
           maxTokens: settings.maxTokens,
           timeoutMs: DEFAULT_TIMEOUT_MS,
@@ -262,7 +253,7 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
           tokenEstimator,
           signal,
           observer: emit,
-          serializeToolEvent: publicToolEvent,
+          serializeToolEvent: call => tools.publicToolEvent(call),
           turnId,
         });
         // Loop 原地追加消息；只提交本轮新增内容，避免重复写入历史或用户证据。
@@ -357,18 +348,10 @@ export function createAgentRuntime(paths: LocalConfigPaths, options: { langfuse?
     const availableSkills = await skills.list();
     const system = [RUNTIME_SYSTEM_PROMPT, await readSystemPrompt(), formatSkillCatalog(availableSkills)]
       .filter(Boolean).join("\n\n");
-    const tools = new LocalToolRegistry(memory, new ManageMemoryTool(memory), {
-      currentSessionId: sessionId,
-      settings: recallSettings(settings, tokenEstimator),
-    }, skills, {
-      everythingConfig: config,
-      getCurrentTimeEnabled: toolSettings.getCurrentTimeEnabled,
-      appleCalendarEnabled: toolSettings.appleCalendarEnabled,
-      terminalEnabled: toolSettings.terminalEnabled,
-      terminalWorkspaceRoot: settings.sandboxWorkspaceRoot,
-      terminalSessionTempDir: terminalTempDir,
-      searchWebEnabled: toolSettings.searchWebEnabled,
-      tavilyApiKey: toolSettings.tavilyApiKey,
+    const tools = await toolFactory({
+      memory, skills, settings: toolSettings,
+      recall: { currentSessionId: sessionId, settings: recallSettings(settings, tokenEstimator) },
+      options: { everythingConfig: config, terminalSessionTempDir: terminalTempDir },
     });
     return {
       contextWindow: settings.modelContextWindow,

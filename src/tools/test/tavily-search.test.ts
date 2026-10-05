@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LocalToolRegistry } from "../tool-registry.ts";
+import { createBuiltinTools } from "../index.ts";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -11,9 +11,9 @@ describe("Tavily 网页搜索工具", () => {
       results: [{ title: "示例", url: "https://example.com", content: "摘要", score: 0.9, raw_content: "不得返回" }],
       response_time: "0.42", request_id: "request-1",
     })));
-    const registry = new LocalToolRegistry(undefined, undefined, undefined, undefined, {
+    const registry = createBuiltinTools({ options: {
       searchWebEnabled: true, tavilyApiKey: "tvly-secret",
-    });
+    } });
 
     expect((registry.schemas() as Array<{ name: string }>).map((item) => item.name)).toEqual(["get_current_time", "search_web"]);
     await expect(registry.execute("search_web", { query: "最新消息", max_results: 3 }, async () => {}, context)).resolves.toEqual({
@@ -27,20 +27,20 @@ describe("Tavily 网页搜索工具", () => {
   });
 
   it("拒绝越界参数，并且停用工具后不再向模型公开或执行", async () => {
-    const disabled = new LocalToolRegistry(undefined, undefined, undefined, undefined, {
+    const disabled = createBuiltinTools({ options: {
       getCurrentTimeEnabled: false, searchWebEnabled: false, tavilyApiKey: "tvly-secret",
-    });
+    } });
     expect(disabled.schemas()).toEqual([]);
     expect(() => disabled.execute("get_current_time", {}, async () => {}, context)).toThrow("工具未注册");
     expect(() => disabled.execute("search_web", { query: "消息" }, async () => {}, context)).toThrow("工具未注册");
 
-    const enabled = new LocalToolRegistry(undefined, undefined, undefined, undefined, { searchWebEnabled: true, tavilyApiKey: "key" });
+    const enabled = createBuiltinTools({ options: { searchWebEnabled: true, tavilyApiKey: "key" } });
     await expect(enabled.execute("search_web", { query: " ", max_results: 99 }, async () => {}, context)).rejects.toThrow("query");
   });
 
   it("外部错误不泄露 API Key", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("secret", { status: 401 }));
-    const registry = new LocalToolRegistry(undefined, undefined, undefined, undefined, { searchWebEnabled: true, tavilyApiKey: "private-key" });
+    const registry = createBuiltinTools({ options: { searchWebEnabled: true, tavilyApiKey: "private-key" } });
     await expect(registry.execute("search_web", { query: "test" }, async () => {}, context)).rejects.toThrow("HTTP 401");
   });
 });

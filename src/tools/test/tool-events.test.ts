@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { publicToolEvent } from "../events/tool-events.ts";
-import type { ToolCallRecord } from "../../agent-loop/types.ts";
+import { publicToolEvent as projectToolEvent, builtinToolEventProjection } from "../index.ts";
+import type { ToolCallRecord } from "../../agent-loop/agent-loop.ts";
+
+function publicToolEvent(call: ToolCallRecord) {
+  return projectToolEvent(call, builtinToolEventProjection(call.tool));
+}
 
 function failedCall(tool: string, message: string): ToolCallRecord {
   return {

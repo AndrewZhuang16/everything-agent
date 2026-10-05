@@ -1,5 +1,10 @@
-import type { createLocalConfig } from "../agent-runtime/local-config.ts";
 import type { ToolExecutionContext } from "../agent-loop/agent-loop.ts";
+
+/** 常驻规则读写能力，由宿主提供持久化实现。 */
+export interface EverythingRuleStore {
+  readSystemPrompt(): Promise<string>;
+  saveSystemPrompt(value: string): Promise<void>;
+}
 
 export const MANAGE_EVERYTHING_TOOL = "manage_everything";
 export const manageEverythingSchema = {
@@ -18,9 +23,9 @@ export const manageEverythingSchema = {
 
 /** 只操作运行时常驻规则，复用配置页的原子持久化，不接受文件路径。 */
 export class ManageEverythingTool {
-  private readonly config: Pick<ReturnType<typeof createLocalConfig>, "readSystemPrompt" | "saveSystemPrompt">;
+  private readonly config: EverythingRuleStore;
 
-  constructor(config: Pick<ReturnType<typeof createLocalConfig>, "readSystemPrompt" | "saveSystemPrompt">) {
+  constructor(config: EverythingRuleStore) {
     this.config = config;
   }
 

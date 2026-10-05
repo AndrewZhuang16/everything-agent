@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { LocalToolRegistry } from "../tool-registry.ts";
+import { createBuiltinTools } from "../index.ts";
 import { createLocalConfig } from "../../agent-runtime/local-config.ts";
 
 const homes: string[] = [];
@@ -11,7 +11,7 @@ const context = () => ({ signal: new AbortController().signal, deadline: null, i
 async function setup() {
   const home = await mkdtemp(join(tmpdir(), "everything-rules-")); homes.push(home);
   const config = createLocalConfig({ home, defaultSystemPromptPath: join(home, "template.md") });
-  return { home, config, registry: new LocalToolRegistry(undefined, undefined, undefined, undefined, { everythingConfig: config }) };
+  return { home, config, registry: createBuiltinTools({ options: { everythingConfig: config } }) };
 }
 it("注册工具并读写与配置页共享的常驻规则", async () => {
   const { home, config, registry } = await setup();
@@ -36,6 +36,6 @@ it("取消和超时不写入规则", async () => {
   expect(await config.readSystemPrompt()).toBe("原规则\n");
 });
 it("未注入规则配置时不注册工具", () => {
-  const registry = new LocalToolRegistry();
+  const registry = createBuiltinTools();
   expect(() => registry.execute("manage_everything", { action: "read" }, () => {}, context())).toThrow("工具未注册");
 });
