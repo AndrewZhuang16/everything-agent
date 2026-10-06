@@ -209,7 +209,7 @@ pnpm test              # Vitest 行为测试
 pnpm run test:coverage # 覆盖率检查
 pnpm run build         # 后端与工作流编译 + 前端类型检查与构建
 pnpm run example       # 最小 Graph 示例，无需模型密钥
-pnpm run package       # 将已有构建产物打包到 release/
+pnpm run package       # 沿用 pnpm 锁定版本安装生产依赖，将已有构建产物打包到 release/
 pnpm run verify:package # 验证发布包可独立启动
 ```
 

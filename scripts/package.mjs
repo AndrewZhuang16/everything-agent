@@ -1,4 +1,5 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -36,8 +37,7 @@ writeFileSync(join(outDir, "package.json"), `${JSON.stringify({
   engines: { node: sourcePackage.engines.node },
   scripts: { start: "node dist-server/web/server/prod-server.js" },
   dependencies: {
-    "@node-rs/jieba": sourcePackage.dependencies["@node-rs/jieba"],
-    "@langfuse/client": sourcePackage.dependencies["@langfuse/client"],
+    ...sourcePackage.dependencies,
   },
 }, null, 2)}\n`);
 
@@ -48,12 +48,18 @@ cpSync(join(root, "docs", "production.md"), join(outDir, "README.md"));
 const langfuseDoc = join(root, "docs", "langfuse-deploy.md");
 if (existsSync(langfuseDoc)) cpSync(langfuseDoc, join(outDir, "langfuse.md"));
 
-// 在产物目录内安装生产依赖，含平台对应的原生二进制；跨平台用 --os/--cpu 覆盖可选依赖。
-const installArgs = ["install", "--omit=dev", "--no-audit", "--no-fund"];
-if (platform !== process.platform || arch !== process.arch) {
-  installArgs.push(`--os=${platform}`, `--cpu=${arch}`);
+// 保持清单与根锁文件一致，冻结安装包括间接依赖在内的全部生产依赖。
+// 临时目录使用独立、扁平的 node_modules，复制后无需访问开发目录或 pnpm store。
+const dependencyDir = mkdtempSync(join(tmpdir(), "everything-release-dependencies-"));
+try {
+  cpSync(join(root, "package.json"), join(dependencyDir, "package.json"));
+  cpSync(join(root, "pnpm-lock.yaml"), join(dependencyDir, "pnpm-lock.yaml"));
+  const installArgs = ["install", "--prod", "--frozen-lockfile", "--config.node-linker=hoisted", `--os=${platform}`, `--cpu=${arch}`];
+  execFileSync(pnpmCommand(), installArgs, { cwd: dependencyDir, stdio: "inherit" });
+  cpSync(join(dependencyDir, "node_modules"), join(outDir, "node_modules"), { recursive: true });
+} finally {
+  rmSync(dependencyDir, { recursive: true, force: true });
 }
-execFileSync(npmCommand(), installArgs, { cwd: outDir, stdio: "inherit" });
 
 console.log(`已生成自包含产物：${outDir}`);
 console.log(`进入该目录后执行 npm start 即可启动，无需 npm install。`);
@@ -67,8 +73,8 @@ function parseArgs(argv) {
   return result;
 }
 
-function npmCommand() {
-  return process.platform === "win32" ? "npm.cmd" : "npm";
+function pnpmCommand() {
+  return process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 }
 
 function fail(message) {

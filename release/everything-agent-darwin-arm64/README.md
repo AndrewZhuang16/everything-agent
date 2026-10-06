@@ -2,7 +2,7 @@
 
 ## 环境与支持范围
 
-构建电脑和接收者电脑都需要 Node.js **24.12 或更高版本**，包含 npm。开发和打包推荐 pnpm；接收者使用 Node.js 自带的 npm 启动，无需安装 pnpm。
+构建电脑和接收者电脑都需要 Node.js **24.12 或更高版本**，包含 npm。开发和打包需要 pnpm；接收者使用 Node.js 自带的 npm 启动，无需安装 pnpm。
 
 发布包包含前端、后端、工作流和生产依赖，**不包含 Node.js 运行时**。它不是双击即开的桌面安装程序。
 
@@ -29,6 +29,8 @@ pnpm run verify:package
 | `npm run package` | 复制现有构建产物并安装生产依赖，不会自动重新构建 |
 | `npm run verify:package` | 把当前平台发布包复制到项目外的临时目录，验证独立启动与实际接口 |
 
+打包在临时目录使用根目录原始 `package.json` 和 `pnpm-lock.yaml`，通过 `pnpm install --prod --frozen-lockfile` 安装目标平台的全部生产依赖（包括间接依赖）。清单与锁文件不一致时直接失败，不升级依赖。安装结果使用独立的扁平 `node_modules`，随包复制后不依赖开发目录或 pnpm store；发布目录根部不放置 `package-lock.json` 或 `pnpm-lock.yaml`，用户继续执行 `npm start`。
+
 打包过程需要访问 npm 仓库，成功后输出：
 
 ```text
@@ -39,7 +41,6 @@ release/everything-agent-<platform>-<arch>/
 │   └── web/server/prod-server.js
 ├── node_modules/
 ├── package.json
-├── package-lock.json
 ├── README.md
 ├── langfuse.md
 └── .langfuse/
@@ -110,7 +111,7 @@ npm run package -- --platform win32 --arch x64
 npm run package -- --platform linux --arch x64
 ```
 
-参数会传递给 npm 的 `--os` / `--cpu` 以选择可选依赖。它们不提供模拟器，也不代表跨平台验证通过。Linux 还存在 glibc / musl 差异；当前脚本没有提供 `--libc` 选项。最可靠的交付方式是在目标系统构建、打包，并在目标系统完成启动检查。
+参数会传递给 pnpm 的 `--os` / `--cpu` 以选择可选依赖。它们不提供模拟器，也不代表跨平台验证通过。Linux 还存在 glibc / musl 差异；当前脚本没有提供 `--libc` 选项。最可靠的交付方式是在目标系统构建、打包，并在目标系统完成启动检查。
 
 目前实测通过的是 **macOS ARM64、Node.js v26.8.2、npm 11.19.1**；没有验证 Windows、Linux 或最低支持版本 Node.js 24.12 的运行结果。
 
@@ -131,7 +132,7 @@ npm run verify:package -- /absolute/path/to/package
 | 现象 | 原因与处理 |
 | --- | --- |
 | “尚未构建产物”或缺少 `dist-web` | 先在仓库运行 `npm run build`，成功后再打包 |
-| npm 在安装生产依赖时长时间重试 | 打包需要联网；检查 npm 仓库、代理和执行环境的联网权限 |
+| pnpm 在安装生产依赖时长时间重试 | 打包需要联网；检查 npm 仓库、代理和执行环境的联网权限 |
 | `connect EPERM 127.0.0.1:7897` | 本次验证中是沙箱禁止连接本机代理；允许相应网络访问后打包成功，无需修改依赖或以管理员身份安装 |
 | `listen EPERM` | 执行环境禁止监听本机端口，需要允许本地服务监听后才能做启动验证 |
 | `EADDRINUSE` | 端口被占用；设置 `EVERYTHING_PORT` 为其他端口 |
