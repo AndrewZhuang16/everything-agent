@@ -36,9 +36,6 @@ writeFileSync(join(outDir, "package.json"), `${JSON.stringify({
   type: "module",
   engines: { node: sourcePackage.engines.node },
   scripts: { start: "node dist-server/web/server/prod-server.js" },
-  dependencies: {
-    ...sourcePackage.dependencies,
-  },
 }, null, 2)}\n`);
 
 // 随包提供安装与运行文档，接收者无需查阅开发仓库。

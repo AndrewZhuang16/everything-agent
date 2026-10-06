@@ -29,7 +29,7 @@ pnpm run verify:package
 | `npm run package` | 复制现有构建产物并安装生产依赖，不会自动重新构建 |
 | `npm run verify:package` | 把当前平台发布包复制到项目外的临时目录，验证独立启动与实际接口 |
 
-打包在临时目录使用根目录原始 `package.json` 和 `pnpm-lock.yaml`，通过 `pnpm install --prod --frozen-lockfile` 安装目标平台的全部生产依赖（包括间接依赖）。清单与锁文件不一致时直接失败，不升级依赖。安装结果使用独立的扁平 `node_modules`，随包复制后不依赖开发目录或 pnpm store；发布目录根部不放置 `package-lock.json` 或 `pnpm-lock.yaml`，用户继续执行 `npm start`。
+打包在临时目录使用根目录原始 `package.json` 和 `pnpm-lock.yaml`，通过 `pnpm install --prod --frozen-lockfile` 安装目标平台的全部生产依赖（包括间接依赖）。清单与锁文件不一致时直接失败，不升级依赖。安装结果使用独立的扁平 `node_modules`，随包复制后不依赖开发目录或 pnpm store；发布目录根部不放置 `package-lock.json` 或 `pnpm-lock.yaml`，用户继续执行 `npm start`。发布包的 `package.json` 只保留启动和运行元数据，不声明 `dependencies` 或 `devDependencies`；运行所需依赖已经随包提供。
 
 打包过程需要访问 npm 仓库，成功后输出：
 

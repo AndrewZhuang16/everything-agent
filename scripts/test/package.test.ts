@@ -33,7 +33,10 @@ fs.writeFileSync('node_modules/fixture/package.json', JSON.stringify({ version: 
     expect(installation.args).toEqual(expect.arrayContaining(["install", "--prod", "--frozen-lockfile", "--os=win32", "--cpu=x64"]));
     expect(existsSync(installation.cwd)).toBe(false);
     const output = join(root, "release/everything-agent-win32-x64");
-    expect(JSON.parse(readFileSync(join(output, "package.json"), "utf8")).scripts.start).toBe("node dist-server/web/server/prod-server.js");
+    const releaseManifest = JSON.parse(readFileSync(join(output, "package.json"), "utf8"));
+    expect(releaseManifest.scripts.start).toBe("node dist-server/web/server/prod-server.js");
+    expect(releaseManifest).not.toHaveProperty("dependencies");
+    expect(releaseManifest).not.toHaveProperty("devDependencies");
     expect(JSON.parse(readFileSync(join(output, "node_modules/fixture/package.json"), "utf8")).version).toBe("1.0.0");
     expect(existsSync(join(output, "package-lock.json"))).toBe(false);
     expect(existsSync(join(output, "pnpm-lock.yaml"))).toBe(false);
