@@ -239,7 +239,3 @@ pnpm run verify:package # 验证发布包可独立启动
 ### 会话与执行标识
 
 `sessionId` 标识会话，`turnId` 标识一次用户提交到回复、失败或取消的完整回合。回合内使用 `iteration` 区分推理迭代，后台任务使用 `taskId`，并通过 `sourceTurnId` 关联来源回合。Trace 使用 `traceId` 统一归组，聊天生命周期事件为 `turn_started`、`turn_completed`、`turn_failed`。Engine 的 `runGraph()` 与评估实验的 Run 保留各自执行语义。完整术语见 [领域术语](./CONTEXT.md)，事件协议见 [Tracing](./src/tracing/README.md)。
-
-### Apple Calendar（macOS）
-
-Tools 页可启用 `manage_calendar`，默认关闭。使用 `action: query | create | update` 查询、创建或修改日程。查询必须提供含时区的 `start`、`end`（最多31天），可用 `calendar` 筛选，`limit` 默认为50、最多100；返回重叠该时间范围的日程及 `calendar`、`eventId`，`truncated=true` 时需缩小时间范围。修改必须提供查询返回的 `calendar`、`eventId`，以及至少一个 `title`、`start`、`end`、`notes` 字段；省略字段保留原值，空备注可清除备注，暂不支持修改重复日程。创建需要标题和开始时间，结束时间省略时为一小时后。查询先由 Calendar 按重叠时间区间筛选，避免逐条扫描全部历史事件。查询无需确认，创建和修改通过现有确认面板批准后才会写入；首次使用还需允许运行服务的应用控制系统“日历”（系统设置 → 隐私与安全性 → 自动化）。
