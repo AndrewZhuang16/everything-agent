@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { RefreshCw, ExternalLink, Copy, Play, Square, FlaskConical, PlugZap, ListChecks, SlidersHorizontal, BookOpen, ChevronRight } from 'lucide-react';
+import { RefreshCw, ExternalLink, Copy, Play, Square, FlaskConical, PlugZap, ListChecks, SlidersHorizontal, BookOpen, ChevronRight, Clock3 } from 'lucide-react';
 import { PageHeading } from '../../components/PageHeading';
 import { SaveMessage } from '../../components/SaveMessage';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../components/ui/alert-dialog';
@@ -298,7 +298,7 @@ export function EvaluationPage() {
                   <strong>{item.id}</strong>
                   <span className={`eval-status eval-status-${item.status}`}>{labels[item.status]}</span>
                   <span className={`eval-status eval-status-${item.sync}`}>{labels[item.sync]}</span>
-                  <span className="eval-item-duration">{item.ms === undefined ? '—' : `${(item.ms / 1000).toFixed(1)}s`}</span>
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm leading-none text-muted-foreground tabular-nums" aria-label={`耗时 ${item.ms === undefined ? '未知' : `${(item.ms / 1000).toFixed(1)}秒`}`}><Clock3 size={14} className="block shrink-0" aria-hidden="true" /><span>{item.ms === undefined ? '—' : `${(item.ms / 1000).toFixed(1)}s`}</span></span>
                 </summary>
                 <div className="eval-item-body">
                   <p className="eval-run-metrics">{item.model ?? '模型尚未返回'} · 工具 {item.toolCalls} 次 · 输入 {item.inputTokens ?? '—'} / 输出 {item.outputTokens ?? '—'} tokens</p>

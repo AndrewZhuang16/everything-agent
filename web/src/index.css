@@ -662,7 +662,6 @@ button:disabled { cursor: not-allowed; }
 .eval-item-summary::-webkit-details-marker { display: none; }
 .eval-item-summary:hover { color: var(--primary); }
 .eval-item-summary strong { color: var(--foreground); font-family: var(--font-mono); font-size: 12px; overflow-wrap: anywhere; }
-.eval-item-duration { margin-left: auto; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
 .eval-item-body { display: grid; gap: 14px; border-top: 1px solid var(--border); padding: 16px; }
 .eval-item-body > * { margin: 0; }
 .eval-run-metrics { color: var(--muted-foreground); font-size: 12px; line-height: 1.65; overflow-wrap: anywhere; }
