@@ -1,0 +1,75 @@
+<clickhouse>
+    <!-- 系统日志按事件时间保留 1 天；TTL 在后台合并时执行。 -->
+    <asynchronous_insert_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </asynchronous_insert_log>
+    <asynchronous_metric_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </asynchronous_metric_log>
+    <background_schedule_pool_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </background_schedule_pool_log>
+    <error_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </error_log>
+    <metric_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </metric_log>
+    <opentelemetry_span_log>
+        <engine replace="replace">ENGINE = MergeTree PARTITION BY toYYYYMM(finish_date) ORDER BY (finish_date, finish_time_us) TTL finish_date + INTERVAL 1 DAY DELETE</engine>
+    </opentelemetry_span_log>
+    <part_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </part_log>
+    <processors_profile_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </processors_profile_log>
+    <query_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </query_log>
+    <query_metric_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </query_metric_log>
+    <query_views_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </query_views_log>
+    <text_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </text_log>
+    <!-- 个人部署无需数据库内部堆栈采样；与 Langfuse 业务 Trace 无关。 -->
+    <trace_log remove="1"/>
+    <aggregated_zookeeper_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </aggregated_zookeeper_log>
+    <backup_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </backup_log>
+    <blob_storage_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </blob_storage_log>
+    <crash_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </crash_log>
+    <delta_lake_metadata_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </delta_lake_metadata_log>
+    <iceberg_metadata_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </iceberg_metadata_log>
+    <query_thread_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </query_thread_log>
+    <s3queue_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </s3queue_log>
+    <zookeeper_connection_log>
+        <ttl>event_time + INTERVAL 1 DAY DELETE</ttl>
+    </zookeeper_connection_log>
+    <!-- 文件日志每天轮转，保留 3 份归档，避免默认的大文件积累。 -->
+    <logger>
+        <level>information</level>
+        <rotation>daily</rotation>
+        <size>10M</size>
+        <count>3</count>
+    </logger>
+</clickhouse>

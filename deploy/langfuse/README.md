@@ -73,3 +73,11 @@ docker compose --env-file .langfuse/compose.env -f deploy/langfuse/compose.yaml 
 ## 日常聊天的 Trace
 
 部署完成不会自动开启日常聊天导出。按 [Tracing 配置](../../src/tracing/README.md) 设置 `.everything/langfuse.env` 后重启 Agent。exporter 从实时事件流生成 OTEL spans，通过本服务的 OTLP 入口上传；日常导出和 Evaluation 的 Experiment 上传相互独立。默认仅上传元数据，清除 Agent 本地数据不会删除 Langfuse 中的 traces。
+
+## ClickHouse 日志保留
+
+Compose 只读挂载 `clickhouse/logs.xml`，用于个人电脑部署：系统日志按事件时间保留 1 天（OpenTelemetry 日志使用 `finish_date`）；关闭数据库内部堆栈采样日志 `trace_log`。Langfuse 的业务 Trace、评分和数据集不受此规则影响。TTL 由后台合并执行，过期数据不会精确到秒删除。
+
+已有系统日志表需要单独执行 `ALTER TABLE system.<日志表> MODIFY TTL event_time + INTERVAL 1 DAY`（OpenTelemetry 使用 `finish_date`）；XML 配置保证后续创建的表使用相同保留期。关闭 `trace_log` 不会自动删除已有表，清理时可单独删除 `system.trace_log` 及其轮转归档表。
+
+文件日志使用 information 级别，每天或达到 10 MB 时轮转，每类最多保留 3 份归档（活跃日志另计）。这不是 ClickHouse 总空间上限。配置变更后重启 ClickHouse；首次增加挂载时需重新创建容器。清理历史日志只操作 `system` 日志表及 `/var/log/clickhouse-server`，不要删除数据卷或 Langfuse 业务表。

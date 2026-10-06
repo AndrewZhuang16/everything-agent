@@ -128,6 +128,8 @@ services:
     volumes:
       - langfuse_clickhouse_data:/var/lib/clickhouse
       - langfuse_clickhouse_logs:/var/log/clickhouse-server
+      # 个人部署：系统日志保留 1 天，关闭内部堆栈采样，限制文件日志大小。
+      - ./clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
       interval: 5s
