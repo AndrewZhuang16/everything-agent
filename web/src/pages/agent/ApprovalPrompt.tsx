@@ -1,6 +1,6 @@
 import { ShieldAlert } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import type { PendingApproval } from "../../agent-api";
+import type { PendingApproval } from "../../apis/agent-api";
 
 interface ApprovalPromptProps {
   approvals: PendingApproval[];

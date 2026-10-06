@@ -12,20 +12,9 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  loadAgent,
-  clearModelApiKey,
-  clearEmbeddingApiKey,
-  clearAllAgentData,
-  saveAgentConfig,
-  resetRuntimeConfig,
-  rebuildEmbeddingIndex,
-  cancelEmbeddingIndexRebuild,
-  type AgentProvider,
-  type EmbeddingProvider,
-  type AgentSettings,
-  type RetrievalMode,
-} from "../../agent-api";
+import { loadAgent } from "../../apis/agent-api";
+import { clearModelApiKey, clearEmbeddingApiKey, saveAgentConfig, resetRuntimeConfig, rebuildEmbeddingIndex, cancelEmbeddingIndexRebuild, type AgentProvider, type EmbeddingProvider, type AgentSettings, type RetrievalMode } from "../../apis/config-api";
+import { clearAllAgentData } from "../../apis/data-api";
 import { withMinimumDuration } from "../../lib/minimum-duration";
 import { SaveMessage } from "../../components/SaveMessage";
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";

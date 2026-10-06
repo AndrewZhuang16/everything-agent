@@ -5,7 +5,8 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import App from "../src/App";
 
 const api = vi.hoisted(() => ({ loadAgent: vi.fn(), loadContextUsage: vi.fn(), memoryAction: vi.fn(), runAgent: vi.fn(), subscribeBackgroundEvents: vi.fn() }));
-vi.mock("../src/agent-api", () => api);
+vi.mock("../src/apis/agent-api", () => api);
+vi.mock("../src/apis/memory-api", () => api);
 vi.mock("../src/pages/agent/AgentHarnessCanvas", () => ({ AgentHarnessCanvas: ({ nodeStates, activeEdges }: { nodeStates: Record<string, string>; activeEdges: Set<string> }) => (
   <>
     <output data-testid="graph-states">{JSON.stringify(nodeStates)}</output>

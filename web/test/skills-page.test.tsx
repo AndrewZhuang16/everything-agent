@@ -5,7 +5,7 @@ import { SkillsPage } from "../src/pages/skills/SkillsPage";
 
 const stylePath = new URL("../src/index.css", import.meta.url);
 
-vi.mock("../src/agent-api", () => ({
+vi.mock("../src/apis/skills-api", () => ({
   loadSkills: vi.fn(async () => ({ skills: [] })),
   saveSkill: vi.fn(),
   deleteSkill: vi.fn(),

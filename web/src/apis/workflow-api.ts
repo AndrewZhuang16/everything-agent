@@ -1,3 +1,4 @@
+import { requestJson, responseError } from "./request-json";
 export type NodeKind = "fn" | "tool" | "llm" | "agent";
 
 export interface WorkflowNode {
@@ -92,7 +93,7 @@ export async function runLocalWorkflow(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ file, input }),
   });
-  if (!response.ok || !response.body) throw new Error(await responseError(response));
+  if (!response.ok || !response.body) throw await responseError(response);
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -126,18 +127,3 @@ export async function runLocalWorkflow(
   return result;
 }
 
-async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
-  if (!response.ok) throw new Error(await responseError(response));
-  return response.json() as Promise<T>;
-}
-
-async function responseError(response: Response): Promise<string> {
-  const text = await response.text();
-  try {
-    const value = JSON.parse(text) as { error?: string };
-    return value.error || text;
-  } catch {
-    return text || `请求失败（${response.status}）`;
-  }
-}

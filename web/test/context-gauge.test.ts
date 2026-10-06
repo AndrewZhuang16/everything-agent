@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { describe, expect, it } from "vitest";
-import { readContextGauge } from "../src/context-gauge";
-import type { ContextUsage } from "../src/agent-api";
+import { readContextGauge } from "../src/pages/agent/context-gauge";
+import type { ContextUsage } from "../src/apis/agent-api";
 
 function usage(estimatedInputTokens: number, overrides: Partial<ContextUsage> = {}): ContextUsage {
   return {

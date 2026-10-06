@@ -1,4 +1,4 @@
-import type { AgentEvent, CompactionRecord } from "../../agent-api";
+import type { AgentEvent, CompactionRecord } from "../../apis/agent-api";
 
 export interface CompactionView extends Partial<CompactionRecord> {
   compactionId: string;

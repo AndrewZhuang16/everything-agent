@@ -1,6 +1,6 @@
 import { AlertMessage } from "../../components/AlertMessage";
 import { CompactionNotice, updateCompactionViews, type CompactionView } from "./CompactionNotice";
-import { advanceHarnessMemory } from "../../harness-playback";
+import { advanceHarnessMemory } from "./harness-playback";
 import {
   Bot,
   CircleStop,
@@ -18,26 +18,13 @@ import {
   Wrench,
 } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-  loadAgent,
-  loadContextUsage,
-  memoryAction,
-  runAgent,
-  settleApproval,
-  subscribeBackgroundEvents,
-  type AgentBootstrap,
-  type AgentEvent,
-  type AgentTurnResult,
-  type ChatLogEntry,
-  type ContextUsage,
-  type PendingApproval,
-  type SessionSummary,
-} from "../../agent-api";
-import { shouldSubmitAgentComposer } from "../../agent-composer";
+import { loadAgent, loadContextUsage, runAgent, settleApproval, subscribeBackgroundEvents, type AgentBootstrap, type AgentEvent, type AgentTurnResult, type ContextUsage, type PendingApproval } from "../../apis/agent-api";
+import { memoryAction, type ChatLogEntry, type SessionSummary } from "../../apis/memory-api";
+import { shouldSubmitAgentComposer } from "./agent-composer";
 import { ApprovalPrompt } from "./ApprovalPrompt";
-import { createEdgePlayback } from "../../edge-playback";
+import { createEdgePlayback } from "./edge-playback";
 import { withMinimumDuration } from "../../lib/minimum-duration";
-import type { VisualNodeState } from "../../visual-node-state";
+import type { VisualNodeState } from "../../lib/visual-node-state";
 import { AgentHarnessCanvas } from "./AgentHarnessCanvas";
 import { ChatMarkdown } from "../../components/ChatMarkdown";
 import { ContextGauge } from "../../components/ContextGauge";

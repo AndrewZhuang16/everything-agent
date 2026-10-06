@@ -1,14 +1,7 @@
 import { AlertMessage } from "../../components/AlertMessage";
 import { ArrowLeft, Database, Play, RefreshCw, Table2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  databaseSqlNeedsConfirmation,
-  loadDatabase,
-  runDatabaseSql,
-  type DatabaseDashboard,
-  type DatabaseQueryResult,
-  type DatabaseTable,
-} from "../../agent-api";
+import { databaseSqlNeedsConfirmation, loadDatabase, runDatabaseSql, type DatabaseDashboard, type DatabaseQueryResult, type DatabaseTable } from "../../apis/database-api";
 import { MINIMUM_FEEDBACK_DURATION_MS, withMinimumDuration } from "../../lib/minimum-duration";
 import { Button } from "../../components/ui/button";
 import {

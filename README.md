@@ -166,6 +166,8 @@ flowchart TD
 | `src/workflows/` | 可编辑、执行的本地工作流 |
 | `deploy/langfuse/`、`mock-data/` | 可选服务部署与模拟数据工具 |
 
+前端 `web/src/apis/` 按业务管理 API：`agent-api.ts` 负责初始化、聊天、审批、后台事件和上下文用量；配置、记忆、技能、工具、轨迹、数据库和数据清理分别放在对应的 `*-api.ts`，工作流与评估也有独立模块。请求函数和对应类型放在同一个业务文件，页面直接引用，不通过统一转发入口。`request-json.ts` 统一处理 JSON 请求与错误响应（包括配置强制保存的 `canForce` 标记），流式接口复用错误解析。`pages/agent/` 和 `pages/workflow/` 分别收纳对应页面及专用逻辑；组件保留在 `components/`，跨页面工具和节点展示状态放在 `lib/`。
+
 ## 常见问题
 
 **启动时提示 Node.js、SQLite 或原生模块错误？**

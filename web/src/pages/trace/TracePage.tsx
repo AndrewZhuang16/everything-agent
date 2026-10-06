@@ -1,7 +1,7 @@
 import { AlertMessage } from "../../components/AlertMessage";
 import { ChevronRight, FileJson, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { loadTraces, loadTrace, type TraceFile, type TraceDashboard } from "../../agent-api";
+import { loadTraces, loadTrace, type TraceFile, type TraceDashboard } from "../../apis/trace-api";
 import { MINIMUM_FEEDBACK_DURATION_MS, withMinimumDuration } from "../../lib/minimum-duration";
 import { Button } from "../../components/ui/button";
 import { PageHeading } from "../../components/PageHeading";

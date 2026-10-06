@@ -3,8 +3,8 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
 import { ToolsPage } from "../src/pages/tools/ToolsPage";
-import { loadTools, saveTools, type ToolsCatalog } from "../src/agent-api";
-vi.mock("../src/agent-api", () => ({ loadTools: vi.fn(), saveTools: vi.fn() }));
+import { loadTools, saveTools, type ToolsCatalog } from "../src/apis/tools-api";
+vi.mock("../src/apis/tools-api", () => ({ loadTools: vi.fn(), saveTools: vi.fn() }));
 vi.mock("../src/lib/minimum-duration", () => ({ withMinimumDuration: (task: () => unknown) => task() }));
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 it.each([false, true])("日历开关独立保存，失败时保持原状态：%s", async (failure) => {

@@ -1,7 +1,7 @@
 import { AlertMessage } from "../../components/AlertMessage";
 import { ArrowRight, Check, CircleAlert, LoaderCircle, Play, Sparkles } from "lucide-react";
-import type { GraphExecutionResult, WaveResult, Workflow } from "../../workflow-api";
-import type { VisualNodeState } from "../../visual-node-state";
+import type { GraphExecutionResult, WaveResult, Workflow } from "../../apis/workflow-api";
+import type { VisualNodeState } from "../../lib/visual-node-state";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 

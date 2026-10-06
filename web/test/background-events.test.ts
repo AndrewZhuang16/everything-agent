@@ -1,5 +1,5 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { subscribeBackgroundEvents } from "../src/agent-api";
+import { subscribeBackgroundEvents } from "../src/apis/agent-api";
 
 afterEach(() => vi.unstubAllGlobals());
 

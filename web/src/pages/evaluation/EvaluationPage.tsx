@@ -6,9 +6,9 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { evaluationRequest } from '../../evaluation-api';
+import { evaluationRequest } from '../../apis/evaluation-api';
 import { withMinimumDuration } from '../../lib/minimum-duration';
-import type { EvaluationDashboard } from '../../evaluation-api';
+import type { EvaluationDashboard } from '../../apis/evaluation-api';
 
 const labels: Record<string, string> = { queued: '排队中', running: '执行中', waiting_approval: '等待审批', completed: '执行完成', failed: '失败', cancelled: '已取消', interrupted: '进程中断', pending: '待同步', synced: '已同步' };
 /** Radix Select 不允许用空字符串作为选项值，未选择数据集时用该占位值表示“尚未选择”。 */

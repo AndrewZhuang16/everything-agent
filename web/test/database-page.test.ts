@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { databaseSqlNeedsConfirmation, loadDatabase, runDatabaseSql } from "../src/agent-api";
+import { databaseSqlNeedsConfirmation, loadDatabase, runDatabaseSql } from "../src/apis/database-api";
 
 const pagePath = fileURLToPath(new URL("../src/pages/database/DatabasePage.tsx", import.meta.url));
 const stylePath = fileURLToPath(new URL("../src/index.css", import.meta.url));

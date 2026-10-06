@@ -3,8 +3,8 @@ import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { beforeEach, expect, it, vi } from "vitest";
 import { TracePage } from "../src/pages/trace/TracePage";
-import { loadTraces, loadTrace } from "../src/agent-api";
-vi.mock("../src/agent-api", () => ({ loadTraces: vi.fn(), loadTrace: vi.fn() }));
+import { loadTraces, loadTrace } from "../src/apis/trace-api";
+vi.mock("../src/apis/trace-api", () => ({ loadTraces: vi.fn(), loadTrace: vi.fn() }));
 (globalThis as Record<string, unknown>).IS_REACT_ACT_ENVIRONMENT = true;
 beforeEach(() => vi.resetAllMocks());
 it("列表按游标翻页并直接展示原有可折叠 JSONL 文件", async () => {

@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const page = fileURLToPath(new URL("../src/pages/tools/ToolsPage.tsx", import.meta.url));
-const api = fileURLToPath(new URL("../src/agent-api.ts", import.meta.url));
+const api = fileURLToPath(new URL("../src/apis/tools-api.ts", import.meta.url));
 const styles = fileURLToPath(new URL("../src/index.css", import.meta.url));
 
 describe("Tools 页面", () => {

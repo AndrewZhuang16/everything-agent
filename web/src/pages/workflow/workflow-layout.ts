@@ -1,4 +1,4 @@
-import type { Workflow } from "./workflow-api";
+import type { Workflow } from "../../apis/workflow-api";
 
 export interface PositionedNode {
   id: string;

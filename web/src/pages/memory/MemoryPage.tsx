@@ -2,10 +2,9 @@ import { AlertMessage } from "../../components/AlertMessage";
 import { RUNTIME_SYSTEM_PROMPT } from "../../../../src/agent-runtime/system-prompt.ts";
 import { Database, FileText, RefreshCw, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  loadAgent, loadMemory, memoryAction, saveSystemPrompt,
-  type MemoryDashboard, type SemanticMemory, type SessionReadResult, type SessionRecallResult, type SessionSearchResult,
-} from "../../agent-api";
+import { loadAgent } from "../../apis/agent-api";
+import { loadMemory, memoryAction, type MemoryDashboard, type SemanticMemory, type SessionReadResult, type SessionRecallResult, type SessionSearchResult } from "../../apis/memory-api";
+import { saveSystemPrompt } from "../../apis/config-api";
 import { MINIMUM_FEEDBACK_DURATION_MS, withMinimumDuration } from "../../lib/minimum-duration";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";

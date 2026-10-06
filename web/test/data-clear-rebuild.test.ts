@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clearAllAgentData } from "../src/agent-api";
+import { clearAllAgentData } from "../src/apis/data-api";
 
 afterEach(() => vi.unstubAllGlobals());
 

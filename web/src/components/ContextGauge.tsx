@@ -1,5 +1,5 @@
-import type { ContextUsage } from "../agent-api";
-import { readContextGauge } from "../context-gauge";
+import type { ContextUsage } from "../apis/agent-api";
+import { readContextGauge } from "../pages/agent/context-gauge";
 import {
   Tooltip,
   TooltipContent,

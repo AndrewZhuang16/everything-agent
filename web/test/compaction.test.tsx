@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CompactionNotice, updateCompactionViews } from "../src/pages/agent/CompactionNotice";
-import { advanceHarnessMemory } from "../src/harness-playback";
+import { advanceHarnessMemory } from "../src/pages/agent/harness-playback";
 import { agentHarnessGraph } from "../../src/agent-graph/harness-graph.ts";
 
 it("压缩节点和动态边来自真实拓扑，失败仍可明确展示安全降级", () => {

@@ -1,7 +1,7 @@
 import { AlertMessage } from "../../components/AlertMessage";
 import { BookOpen, CheckCircle2, FileCode2, LoaderCircle, Plus, RefreshCw, Save, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { deleteSkill, loadSkills, saveSkill, type AgentSkill } from "../../agent-api";
+import { deleteSkill, loadSkills, saveSkill, type AgentSkill } from "../../apis/skills-api";
 import {
   MINIMUM_FEEDBACK_DURATION_MS,
   withMinimumDuration,

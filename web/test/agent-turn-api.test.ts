@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
-import { loadTrace, runAgent } from "../src/agent-api";
+import { loadTrace } from "../src/apis/trace-api";
+import { runAgent } from "../src/apis/agent-api";
 
 afterEach(() => vi.unstubAllGlobals());
 

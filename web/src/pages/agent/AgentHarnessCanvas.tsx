@@ -1,6 +1,6 @@
 import { useId } from "react";
-import type { Workflow } from "../../workflow-api";
-import type { VisualNodeState } from "../../visual-node-state";
+import type { Workflow } from "../../apis/workflow-api";
+import type { VisualNodeState } from "../../lib/visual-node-state";
 
 interface AgentHarnessCanvasProps {
   workflow: Workflow;

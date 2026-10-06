@@ -5,7 +5,8 @@ import { afterEach, expect, it, vi } from "vitest";
 import { ConfigPage } from "../src/pages/config/ConfigPage";
 
 const api = vi.hoisted(() => ({ loadAgent: vi.fn(), saveAgentConfig: vi.fn() }));
-vi.mock("../src/agent-api", async (original) => ({ ...await original<object>(), ...api }));
+vi.mock("../src/apis/agent-api", async (original) => ({ ...await original<object>(), ...api }));
+vi.mock("../src/apis/config-api", async (original) => ({ ...await original<object>(), ...api }));
 vi.mock("../src/lib/minimum-duration", () => ({ withMinimumDuration: (operation: () => unknown) => operation() }));
 let root: Root | undefined;
 let container: HTMLDivElement | undefined;

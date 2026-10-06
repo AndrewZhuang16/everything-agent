@@ -1,4 +1,4 @@
-import type { ContextUsage } from "./agent-api";
+import type { ContextUsage } from "../../apis/agent-api";
 
 /** 圆环的三档水位；颜色只作用于弧线，中心数字始终使用前景色。 */
 export type ContextGaugeLevel = "normal" | "warn" | "critical";

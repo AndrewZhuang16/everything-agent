@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { advanceHarnessMemory } from "../src/harness-playback";
+import { advanceHarnessMemory } from "../src/pages/agent/harness-playback";
 
 describe("记忆流程事件映射", () => {
   it("无需检索时不点亮召回节点", () => {

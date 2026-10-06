@@ -5,7 +5,7 @@ import { afterEach, expect, it, vi } from "vitest";
 import { WorkflowPage } from "../src/pages/workflow/WorkflowPage";
 
 const api = vi.hoisted(() => ({ loadLocalWorkflow: vi.fn(), saveLocalWorkflow: vi.fn(), runLocalWorkflow: vi.fn() }));
-vi.mock("../src/workflow-api", () => api);
+vi.mock("../src/apis/workflow-api", () => api);
 vi.mock("../src/pages/workflow/GraphCanvas", () => ({ GraphCanvas: () => <div>拓扑</div> }));
 afterEach(() => { vi.clearAllMocks(); vi.useRealTimers(); });
 

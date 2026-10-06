@@ -2,7 +2,7 @@ import { AlertMessage } from "../../components/AlertMessage";
 import { CheckCircle2, Clock3, Info, KeyRound, LockKeyhole, Search, Terminal, Wrench } from "lucide-react";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { loadTools, saveTools, type AgentTool, type ToolsCatalog } from "../../agent-api";
+import { loadTools, saveTools, type AgentTool, type ToolsCatalog } from "../../apis/tools-api";
 import { withMinimumDuration } from "../../lib/minimum-duration";
 import { PageHeading } from "../../components/PageHeading";
 import { Badge } from "../../components/ui/badge";

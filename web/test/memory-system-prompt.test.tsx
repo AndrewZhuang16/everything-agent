@@ -6,7 +6,8 @@ import { MemoryPage } from "../src/pages/memory/MemoryPage";
 import { RUNTIME_SYSTEM_PROMPT } from "../../src/agent-runtime/system-prompt.ts";
 
 const api = vi.hoisted(() => ({ loadAgent: vi.fn(), loadMemory: vi.fn(), memoryAction: vi.fn(), saveSystemPrompt: vi.fn() }));
-vi.mock("../src/agent-api", () => api);
+vi.mock("../src/apis/agent-api", () => api);
+vi.mock("../src/apis/memory-api", () => api);
 
 it("Consolidation 后展示只读运行时提示词，不混入用户规则或提供保存入口", async () => {
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });

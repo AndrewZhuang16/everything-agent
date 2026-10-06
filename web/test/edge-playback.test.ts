@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createEdgePlayback } from "../src/edge-playback";
+import { createEdgePlayback } from "../src/pages/agent/edge-playback";
 
 describe("活动边播放队列", () => {
   beforeEach(() => {

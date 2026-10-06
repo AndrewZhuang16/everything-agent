@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { shouldSubmitAgentComposer } from "../src/agent-composer";
+import { shouldSubmitAgentComposer } from "../src/pages/agent/agent-composer";
 
 describe("Agent 聊天输入框", () => {
   it("中文输入法正在选词时，回车只确认候选词而不发送消息", () => {

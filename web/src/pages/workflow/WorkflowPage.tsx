@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { SaveMessage } from "../../components/SaveMessage";
 import { MINIMUM_FEEDBACK_DURATION_MS, withMinimumDuration } from "../../lib/minimum-duration";
 import { PageHeading } from "../../components/PageHeading";
-import type { VisualNodeState } from "../../visual-node-state";
+import type { VisualNodeState } from "../../lib/visual-node-state";
 import {
   loadLocalWorkflow,
   runLocalWorkflow,
@@ -11,7 +11,7 @@ import {
   type GraphExecutionResult,
   type WaveResult,
   type Workflow,
-} from "../../workflow-api";
+} from "../../apis/workflow-api";
 import { CodeEditor } from "./CodeEditor";
 import { GraphCanvas } from "./GraphCanvas";
 import { ResultPanel, RunPanel } from "./RunPanel";

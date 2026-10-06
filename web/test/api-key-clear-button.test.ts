@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const configPage = fileURLToPath(new URL("../src/pages/config/ConfigPage.tsx", import.meta.url));
-const agentApi = fileURLToPath(new URL("../src/agent-api.ts", import.meta.url));
+const agentApi = fileURLToPath(new URL("../src/apis/config-api.ts", import.meta.url));
 
 describe("API Key 清除入口", () => {
   it("使用 shadcn AlertDialog 二次确认后立即清除密钥", async () => {

@@ -4,10 +4,10 @@ import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { EvaluationPage } from '../src/pages/evaluation/EvaluationPage';
 import { MINIMUM_FEEDBACK_DURATION_MS } from '../src/lib/minimum-duration';
-import type { EvaluationDashboard } from '../src/evaluation-api';
+import type { EvaluationDashboard } from '../src/apis/evaluation-api';
 
 const { request } = vi.hoisted(() => ({ request: vi.fn() }));
-vi.mock('../src/evaluation-api', () => ({ evaluationRequest: request }));
+vi.mock('../src/apis/evaluation-api', () => ({ evaluationRequest: request }));
 let container: HTMLDivElement; let root: ReturnType<typeof createRoot>;
 const dashboard: EvaluationDashboard = { configured: true, error: '', baseUrl: 'http://localhost:3300', projectId: 'p', webhookUrl: 'http://evaluation-gateway/trigger', approvals: [], runs: [{
   id: 'run', name: '真实 Experiment', datasetId: 'dataset', datasetName: '测试集', datasetVersion: '2026-09-20T00:00:00Z', memorySnapshot: false, terminalEnabled: false, createdAt: '2026-09-20T00:00:00Z', status: 'completed', items: [{ id: 'item', input: '问题', expectedOutput: '期望', output: ['回答'], traceId: 'trace', observationId: 'span', status: 'completed', sync: 'synced', events: [], scores: [], toolCalls: 1, inputTokens: null, outputTokens: null, approvalDenied: false }],
