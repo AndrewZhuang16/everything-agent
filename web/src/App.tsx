@@ -1,6 +1,6 @@
 import { EvaluationPage } from "./pages/evaluation/EvaluationPage";
 import { Activity, FlaskConical, Bot, BookOpen, Brain, ChevronLeft, ChevronRight, Database, GitBranch, Settings, Sparkles, Wrench } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "./components/ui/button";
 import { AgentPage } from "./pages/agent/AgentPage";
 import { ConfigPage } from "./pages/config/ConfigPage";
@@ -13,9 +13,42 @@ import { WorkflowPage } from "./pages/workflow/WorkflowPage";
 
 type Page = "evaluation" | "agent" | "workflow" | "skills" | "tools" | "memory" | "database" | "traces" | "config";
 
+/** URL 仅接受已知页面；空地址和无效地址默认展示 Agent。 */
+function readPage(): Page {
+  const value = window.location.hash.slice(2);
+  switch (value) {
+    case "evaluation": case "agent": case "workflow": case "skills":
+    case "tools": case "memory": case "database": case "traces": case "config":
+      return window.location.hash.startsWith("#/") ? value : "agent";
+    default:
+      return "agent";
+  }
+}
+
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [page, setPage] = useState<Page>("agent");
+  const [page, updatePage] = useState<Page>(readPage);
+
+  useEffect(() => {
+    const syncPage = () => {
+      // 默认入口使用替换导航，避免后退时再次进入空地址。
+      if (!window.location.hash) {
+        const url = new URL(window.location.href);
+        url.hash = "/agent";
+        window.history.replaceState(window.history.state, "", url);
+      }
+      updatePage(readPage());
+    };
+    window.addEventListener("hashchange", syncPage);
+    // 初始化与订阅之间的地址变化也需要同步。
+    syncPage();
+    return () => window.removeEventListener("hashchange", syncPage);
+  }, []);
+
+  const setPage = (nextPage: Page) => {
+    window.location.hash = `/${nextPage}`;
+    updatePage(nextPage);
+  };
 
   const pageContent = {
     agent: null,
