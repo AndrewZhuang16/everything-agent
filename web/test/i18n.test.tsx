@@ -69,8 +69,12 @@ it("点击切换按钮即时更新文案并保留同一表单节点和草稿", a
   await act(async () => root.render(<I18nProvider i18n={i18n}><EditablePanel /></I18nProvider>));
   const input = host.querySelector("input")!;
   expect(host.textContent).toContain("消息内容");
+  expect(host.querySelector("button")!.textContent).toContain("English");
+  expect(host.querySelector("button")!.title).toBe("Switch language");
   await act(async () => host.querySelector("button")!.click());
   expect(host.textContent).toContain("Message content");
+  expect(host.querySelector("button")!.textContent).toContain("中文");
+  expect(host.querySelector("button")!.title).toBe("切换语言");
   expect(host.querySelector("button")!.getAttribute("aria-label")).toBe("Switch language");
   expect(host.querySelector("input")).toBe(input);
   expect(input.value).toBe("尚未保存的原文");
