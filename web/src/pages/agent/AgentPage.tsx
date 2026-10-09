@@ -638,7 +638,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
           description={t`发送消息，观察记忆召回、上下文组装、模型推理与工具执行。`}
           actions={
             <div className="agent-intro-actions flex flex-col items-end gap-2.5">
-              <div className="flex flex-wrap items-center justify-end gap-2.5">
+              <div className="flex flex-wrap items-center justify-end gap-2.5 mr-0.5">
                 <LanguageSwitcher />
                 {(!bootstrap.settings.agentModel.keyConfigured ||
                   !bootstrap.settings.smallModel.keyConfigured) && (
