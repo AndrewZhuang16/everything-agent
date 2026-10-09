@@ -395,10 +395,6 @@ msgstr "不可用"
 msgid "与个人助理对话"
 msgstr "与个人助理对话"
 
-#: web/src/pages/agent/AgentPage.tsx
-msgid "与助理对话，实时查看执行过程。"
-msgstr "与助理对话，实时查看执行过程。"
-
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。"
 msgstr "两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。"
@@ -633,6 +629,10 @@ msgstr "压缩已取消或超时"
 #: web/src/presentation-i18n.ts
 msgid "去重 / 合并 / 冲突 / 清理"
 msgstr "去重 / 合并 / 冲突 / 清理"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
+msgstr "发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
 
 #: web/src/pages/config/ConfigPage.tsx
 #: web/src/pages/database/DatabasePage.tsx

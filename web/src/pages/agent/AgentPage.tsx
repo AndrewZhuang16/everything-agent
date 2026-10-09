@@ -635,7 +635,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
         <PageHeading
           eyebrow={t`个人助理 / 实时执行`}
           title="Agent"
-          description={t`与助理对话，实时查看执行过程。`}
+          description={t`发送消息，观察记忆召回、上下文组装、模型推理与工具执行。`}
           actions={
             <div className="agent-intro-actions flex flex-col items-end gap-2.5">
               <div className="flex flex-wrap items-center justify-end gap-2.5">
