@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
@@ -20,7 +22,7 @@ it.each([true, false])("编辑权限=%s 时页面保持选择和运行入口，�
   document.body.append(container);
   const root = createRoot(container);
   try {
-    await act(async () => root.render(<WorkflowPage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><WorkflowPage /></I18nProvider>));
     const editor = container.querySelector<HTMLTextAreaElement>('[aria-label="工作流代码"]')!;
     expect(editor.readOnly).toBe(!editable);
     expect(container.textContent).toContain(editable ? "src/workflows/" : "dist-server/src/workflows/");
@@ -51,7 +53,7 @@ it.each([true, false])("重新读取成功=%s 时显示统一加载动效并在�
   const container = document.createElement("div");
   const root = createRoot(container);
   try {
-    await act(async () => root.render(<WorkflowPage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><WorkflowPage /></I18nProvider>));
     expect(container.querySelector('[role="status"]')).toBeNull();
     if (success) api.loadLocalWorkflow.mockResolvedValueOnce({ ...loaded, source: "最新代码" });
     else api.loadLocalWorkflow.mockRejectedValueOnce(new Error("读取失败"));

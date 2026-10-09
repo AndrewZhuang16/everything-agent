@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 /** 请求 JSON；HTTP 错误保留服务端错误信息和强制保存标记，网络及解析错误直接抛出。 */
 export async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
@@ -14,7 +15,7 @@ export async function responseError(response: Response): Promise<Error & { canFo
   } catch {
     value = null;
   }
-  const error: Error & { canForce?: boolean } = new Error(value?.error || text || `请求失败（${response.status}）`);
+  const error: Error & { canForce?: boolean } = new Error(value?.error || text || t`请求失败（${response.status}）`);
   if (typeof value?.canForce === "boolean") error.canForce = value.canForce;
   return error;
 }

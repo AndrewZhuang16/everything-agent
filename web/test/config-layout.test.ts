@@ -39,7 +39,7 @@ describe("配置页布局", () => {
     const styles = await readFile(styleSheet, "utf8");
 
     expect(page).toMatch(
-      /<AlertTitle className="flex items-center gap-2">\s*配置仅存储在当前项目中，不会上传或共享\s*<Badge\s+variant="success">\s*<ShieldCheck size=\{12\} \/>\s*仅存储在本地\s*<\/Badge>\s*<\/AlertTitle>/,
+      /<AlertTitle className="flex items-center gap-2">\s*<Trans>\s*配置仅存储在当前项目中，不会上传或共享\s*<\/Trans><Badge\s+variant="success">\s*<ShieldCheck size=\{12\} \/><Trans>\s*仅存储在本地\s*<\/Trans><\/Badge>\s*<\/AlertTitle>/,
     );
     expect(styles).toContain('.config-local-alert [data-slot="alert-description"] { margin-top: 5px; }');
   });
@@ -60,10 +60,10 @@ describe("配置页布局", () => {
     expect(page).toContain("恢复默认运行值");
     expect(page).toMatch(/variant="secondary"\s+loading=\{resettingRuntime\}/);
     expect(page).not.toContain("runtimeMessage");
-    expect(page).toContain('setSaveMessage("运行配置已恢复默认值。")');
+    expect(page).toContain('setSaveMessage(msg`运行配置已恢复默认值。`)');
     expect(page).toContain("运行配置已恢复默认值。");
     expect(page).not.toContain('className="config-field-wide" label="Model Context Window（tokens）"');
-    expect(page).toMatch(/<div className="config-index-copy">[\s\S]*"尚未建立索引"[\s\S]*<\/div>\s*<div className="config-index-action">[\s\S]*重建索引[\s\S]*<\/div>/);
+    expect(page).toMatch(/<div className="config-index-copy">[\s\S]*`尚未建立索引`[\s\S]*<\/div>\s*<div className="config-index-action">[\s\S]*重建索引[\s\S]*<\/div>/);
     expect(page).toContain('loading={rebuildingEmbedding}');
     expect(page).toContain("withMinimumDuration(rebuildEmbeddingIndex)");
     expect(styles).toContain(".config-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }");
@@ -86,8 +86,9 @@ describe("配置页布局", () => {
     const page = await readFile(configPage, "utf8");
     const styles = await readFile(styleSheet, "utf8");
 
-    expect(page).toContain('const [saveMessage, setSaveMessage] = useState("")');
-    expect(page).toContain('setSaveMessage(`${sectionLabel(section)}保存成功，下一回合立即生效。`)');
+    expect(page).toContain('const [saveMessage, setSaveMessage] = useState<UiMessage>("")');
+    expect(page).toContain("模型连接配置保存成功，下一回合立即生效。");
+    expect(page).toContain("检索配置保存成功，下一回合立即生效。");
     expect(page).toContain("setClearMessage(\"\");");
     expect(page).toContain("清理完成。数据库、会话、记忆和运行记录已删除");
     expect(page).toMatch(/if \(result\.embeddingRebuild\)[\s\S]*?setClearMessage\(""\);[\s\S]*?setSaveMessage\([\s\S]*?向量索引已自动重建/);

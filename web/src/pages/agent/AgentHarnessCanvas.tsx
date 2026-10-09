@@ -1,3 +1,7 @@
+import { translatePresentation } from "../../presentation-i18n";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useId } from "react";
 import type { Workflow } from "../../apis/workflow-api";
 import type { VisualNodeState } from "../../lib/visual-node-state";
@@ -10,16 +14,17 @@ interface AgentHarnessCanvasProps {
 
 /** 展示服务端 Graph 提供的业务节点与边，后台关系不推断为聊天执行状态。 */
 export function AgentHarnessCanvas({ workflow, nodeStates, activeEdges }: AgentHarnessCanvasProps) {
+  useLingui();
   const markerId = useId().replaceAll(":", "");
   const nodes = workflow.nodes.filter((node) => node.id !== "START" && node.id !== "END");
   const positions = new Map(nodes.map((node, index) => [node.id, node.presentation ?? { x: 24 + index % 5 * 220, y: 85 + Math.floor(index / 5) * 105 }]));
   return <div className="business-graph-scroll">
-      <svg viewBox="0 19 1110 872" className="agent-harness-svg" role="img" aria-label="Agent 与 Memory 业务流程图">
+      <svg viewBox="0 19 1110 872" className="agent-harness-svg" role="img" aria-label={t`Agent 与 Memory 业务流程图`}>
         <defs><marker id={markerId} viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" className="arrow-head" /></marker></defs>
         <rect x="1" y="20" width="1108" height="527" rx="16" className="agent-loop-box" />
         <text x="17" y="47" className="agent-loop-label">Memory Retrieval &amp; Agent Loop</text>
         <rect x="1" y="570" width="1108" height="170" rx="16" className="agent-loop-box" />
-        <text x="17" y="595" className="agent-loop-label">后台写入 · 独立串行队列，不阻塞回复</text>
+        <text x="17" y="595" className="agent-loop-label"><Trans>后台写入 · 独立串行队列，不阻塞回复</Trans></text>
         <rect x="1" y="760" width="1108" height="130" rx="16" className="agent-loop-box" />
         <text x="17" y="785" className="agent-loop-label">Consolidation / Dreaming</text>
         {workflow.edges.map((edge) => {
@@ -57,11 +62,11 @@ export function AgentHarnessCanvas({ workflow, nodeStates, activeEdges }: AgentH
             const mid = (x1 + x2) / 2;
             path = `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`; lx = mid; ly = (y1 + y2) / 2 - 7;
           }
-          return <g key={key} data-edge={key}><path d={path} className={`agent-edge ${activeEdges.has(key) ? "active" : ""}`} markerEnd={`url(#${markerId})`} /><text x={lx} y={ly} textAnchor="middle" className="harness-edge-label">{edge.label}</text></g>;
+          return <g key={key} data-edge={key}><path d={path} className={`agent-edge ${activeEdges.has(key) ? "active" : ""}`} markerEnd={`url(#${markerId})`} /><text x={lx} y={ly} textAnchor="middle" className="harness-edge-label">{translatePresentation(edge.label)}</text></g>;
         })}
         {nodes.map((node) => {
           const position = positions.get(node.id)!;
-          return <g key={node.id} className={`agent-node ${nodeStates[node.id] ?? "idle"}`} data-node={node.id}><title>{`${node.label}：${node.presentation?.subtitle ?? ""}`}</title><rect x={position.x} y={position.y} width="164" height="50" rx="9" /><text x={position.x + 10} y={position.y + 21} className="agent-node-title">{node.label}</text><text x={position.x + 10} y={position.y + 39} className="agent-node-subtitle">{node.presentation?.subtitle}</text></g>;
+          return <g key={node.id} className={`agent-node ${nodeStates[node.id] ?? "idle"}`} data-node={node.id}><title>{`${translatePresentation(node.label)}: ${translatePresentation(node.presentation?.subtitle)}`}</title><rect x={position.x} y={position.y} width="164" height="50" rx="9" /><text x={position.x + 10} y={position.y + 21} className="agent-node-title">{translatePresentation(node.label)}</text><text x={position.x + 10} y={position.y + 39} className="agent-node-subtitle">{translatePresentation(node.presentation?.subtitle)}</text></g>;
         })}
       </svg>
   </div>;

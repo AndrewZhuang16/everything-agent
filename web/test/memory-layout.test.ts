@@ -12,10 +12,10 @@ describe("Memory 页面布局", () => {
       readFile(styleSheet, "utf8"),
     ]);
 
-    expect(page).toMatch(/<PageHeading eyebrow="SQLite \/ Lexical \+ Dense" title="Memory" description="Semantic Memory、Session Recall、会话日志与整理状态。" descriptionActions=\{<Button size="sm" className="memory-refresh"[^\n]*刷新数据/);
+    expect(page).toMatch(/<PageHeading eyebrow="SQLite \/ Lexical \+ Dense" title="Memory" description=\{t`Semantic Memory、Session Recall、会话日志与整理状态。`\} descriptionActions=\{<Button size="sm" className="memory-refresh"[^\n]*刷新数据/);
     expect(page).not.toContain('<Button variant="outline" size="sm" className="memory-refresh"');
     expect(styles).toContain(".memory-refresh { flex: 0 0 auto;");
-    expect(page).toContain('if (await reload(MINIMUM_FEEDBACK_DURATION_MS)) setSaveMessage("已刷新")');
+    expect(page).toContain('if (await reload(MINIMUM_FEEDBACK_DURATION_MS)) setSaveMessage(msg`已刷新`)');
     expect(page).toContain("onClick={() => void refresh()}");
     expect(page).toContain("<SaveMessage message={saveMessage} setMessage={setSaveMessage} />");
   });

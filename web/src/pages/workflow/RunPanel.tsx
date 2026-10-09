@@ -1,3 +1,6 @@
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { AlertMessage } from "../../components/AlertMessage";
 import { ArrowRight, Check, CircleAlert, LoaderCircle, Play, Sparkles } from "lucide-react";
 import type { GraphExecutionResult, WaveResult, Workflow } from "../../apis/workflow-api";
@@ -19,6 +22,7 @@ interface RunPanelProps {
 }
 
 export function RunPanel(props: RunPanelProps) {
+  useLingui();
   const { workflow, input, running, runError, result, waves, nodeStates, elapsed, onInput, onRun } = props;
   const shownWaves = result?.waves ?? waves;
 
@@ -33,14 +37,14 @@ export function RunPanel(props: RunPanelProps) {
                 value={input}
                 onChange={(event) => onInput(event.target.value)}
                 onKeyDown={(event) => { if (event.key === "Enter" && !running) onRun(); }}
-                placeholder="输入一个任务，例如：帮我规划今天的工作"
+                placeholder={t`输入一个任务，例如：帮我规划今天的工作`}
               />
             </div>
             <Button className="run-button" onClick={onRun} loading={running}>
-              <Play size={15} fill="currentColor" />执行工作流
-            </Button>
+              <Play size={15} fill="currentColor" /><Trans>执行工作流
+            </Trans></Button>
           </div>
-          <p className="mt-3 text-xs text-[var(--muted-foreground)]">图展示真实拓扑，下面的卡片按 Engine 的 wave_start 事件展示节点如何并发发生。代码在本地 Node.js 进程执行；当前示例节点不会产生外部写操作。</p>
+          <p className="mt-3 text-xs text-[var(--muted-foreground)]"><Trans>图展示真实拓扑，下面的卡片按 Engine 的 wave_start 事件展示节点如何并发发生。代码在本地 Node.js 进程执行；当前示例节点不会产生外部写操作。</Trans></p>
       </div>
 
       <div className="run-analysis-scroll px-4 pb-4 sm:px-5 sm:pb-5">
@@ -48,10 +52,10 @@ export function RunPanel(props: RunPanelProps) {
             const maxMs = Math.max(1, ...wave.nodes.map((node) => node.ms));
             return (
               <div key={wave.index} className="wave-section">
-                <div className="wave-heading">
+                <div className="wave-heading"><Trans>
                   Wave {wave.index}<span>·</span>{wave.nodes.length} 个节点
-                  {wave.nodes.some((node) => node.ms > 0) && <><span>·</span>{(maxMs / 1000).toFixed(2)} 秒</>}
-                </div>
+                  {wave.nodes.some((node) => node.ms > 0) && <><Trans><span>·</span>{(maxMs / 1000).toFixed(2)} 秒</Trans></>}
+                </Trans></div>
                 <div className="wave-grid">
                   {wave.nodes.map((node) => {
                     const definition = workflow.nodes.find((item) => item.id === node.id);
@@ -64,10 +68,10 @@ export function RunPanel(props: RunPanelProps) {
                             {state === "running" ? <LoaderCircle className="animate-spin text-[var(--primary)]" size={14} /> : state === "error" ? <CircleAlert className="text-red-600" size={14} /> : <Check size={14} className={state === "done" ? "text-emerald-600" : "text-[var(--muted-foreground)]"} />}
                             {definition?.label || node.id}
                           </div>
-                          <span className="time-chip">{state === "running" ? `${(ms / 1000).toFixed(1)}s` : node.ms ? `${node.ms}ms` : "等待"}</span>
+                          <span className="time-chip">{state === "running" ? `${(ms / 1000).toFixed(1)}s` : node.ms ? `${node.ms}ms` : t`等待`}</span>
                         </div>
                         <div className="wave-track"><i style={{ width: state === "running" ? "72%" : node.ms ? `${Math.max(8, node.ms / maxMs * 100)}%` : "0%" }} /></div>
-                        <div className="min-h-4 text-[11px] text-[var(--muted-foreground)]">{node.error ? `错误：${node.error}` : node.keys.length ? `写入：${node.keys.join("、")}` : `类型：${definition?.kind ?? "fn"}`}</div>
+                        <div className="min-h-4 text-[11px] text-[var(--muted-foreground)]">{node.error ? t`错误：${node.error}` : node.keys.length ? t`写入：${node.keys.join("、")}` : t`类型：${definition?.kind ?? "fn"}`}</div>
                       </div>
                     );
                   })}
@@ -83,23 +87,24 @@ export function RunPanel(props: RunPanelProps) {
 }
 
 export function ResultPanel({ result }: { result: GraphExecutionResult | null }) {
+  useLingui();
   return (
       <section className="mt-7 pb-10">
-        <div className="section-title"><span>最后结果</span>{result && <span className="text-[var(--muted-foreground)] normal-case tracking-normal">共 {result.totalMs}ms</span>}</div>
+        <div className="section-title"><span><Trans>最后结果</Trans></span>{result && <span className="text-[var(--muted-foreground)] normal-case tracking-normal"><Trans>共 {result.totalMs}ms</Trans></span>}</div>
         <div className={`result-card ${!result ? "empty" : ""}`}>
           {result ? (
             <>
               <div className="result-icon"><Sparkles size={16} /></div>
               <div className="min-w-0 flex-1">
-                <div className={`mb-1.5 flex items-center gap-2 text-xs font-semibold ${result.status === "completed" ? "text-emerald-700" : "text-red-600"}`}><Check size={14} />{result.status === "completed" ? "执行完成" : `执行${result.status === "stalled" ? "停滞" : "失败"}`}</div>
-                <p className="text-[14px] leading-7 text-[var(--foreground)]">{String(result.state.finalAnswer ?? "工作流已完成，请在状态详情中查看输出。")}</p>
+                <div className={`mb-1.5 flex items-center gap-2 text-xs font-semibold ${result.status === "completed" ? "text-emerald-700" : "text-red-600"}`}><Check size={14} />{result.status === "completed" ? t`执行完成` : result.status === "stalled" ? t`执行停滞` : t`执行失败`}</div>
+                <p className="text-[14px] leading-7 text-[var(--foreground)]">{String(result.state.finalAnswer ?? t`工作流已完成，请在状态详情中查看输出。`)}</p>
                 <details className="mt-3 text-xs text-[var(--muted-foreground)]">
-                  <summary className="cursor-pointer select-none hover:text-[var(--primary)]">查看完整状态</summary>
+                  <summary className="cursor-pointer select-none hover:text-[var(--primary)]"><Trans>查看完整状态</Trans></summary>
                   <pre className="state-output">{JSON.stringify(result.state, null, 2)}</pre>
                 </details>
               </div>
             </>
-          ) : <p>执行工作流后，最终结果会显示在这里。</p>}
+          ) : <p><Trans>执行工作流后，最终结果会显示在这里。</Trans></p>}
         </div>
       </section>
   );

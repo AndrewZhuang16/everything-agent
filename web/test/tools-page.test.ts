@@ -47,6 +47,6 @@ describe("Tools 页面", () => {
 
 it("终端弹窗展示当前工作区和沙箱信息", async () => {
   const source = await readFile(page, "utf8");
-  expect(source).toContain("<dt>当前工作区</dt>");
-  expect(source).toContain("<dt>沙箱</dt>");
+  expect(source).toContain("<dt><Trans>当前工作区</Trans></dt>");
+  expect(source).toContain("<dt><Trans>沙箱</Trans></dt>");
 });

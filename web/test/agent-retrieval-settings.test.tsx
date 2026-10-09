@@ -1,3 +1,5 @@
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -7,14 +9,14 @@ import { ConfigPage } from "../src/pages/config/ConfigPage";
 const source = readFileSync(fileURLToPath(new URL("../src/pages/config/ConfigPage.tsx", import.meta.url)), "utf8");
 
 it("配置首次加载时不提前渲染会改变状态的按钮", () => {
-  const html = renderToStaticMarkup(<ConfigPage />);
+  const html = renderToStaticMarkup(<I18nProvider i18n={i18n}><ConfigPage /></I18nProvider>);
 
   expect(html).toContain("正在加载配置…");
   expect(html).not.toContain('data-slot="button"');
 });
 
 it("召回模式和最低相似度位于原配置页，模板不再提供输入", () => {
-  const retrieval = source.slice(source.indexOf("Memory Retrieval"), source.indexOf("运行参数"));
+  const retrieval = source.slice(source.indexOf("Memory Retrieval"), source.indexOf('<Card className="config-card config-runtime-card">'));
   expect(retrieval).toContain("Retrieval Mode");
   expect(retrieval).toContain("Minimum Similarity");
   expect(retrieval).toContain("Hybrid（RRF + MMR）");

@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -30,7 +32,7 @@ beforeEach(async () => {
   } : action === "consolidate" ? { status: "skipped", reason: "no_semantic_memory" } : null);
   container = document.createElement("div"); document.body.append(container);
   root = createRoot(container);
-  await act(async () => root.render(createElement(AgentPage, { onOpenConfig: openConfig })));
+  await act(async () => root.render(createElement(I18nProvider, { i18n }, createElement(AgentPage, { onOpenConfig: openConfig }))));
 });
 afterEach(async () => { await act(async () => root.unmount()); container.remove(); });
 

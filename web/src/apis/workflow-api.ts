@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { requestJson, responseError } from "./request-json";
 export type NodeKind = "fn" | "tool" | "llm" | "agent";
 
@@ -111,7 +112,7 @@ export async function runLocalWorkflow(
     };
     if (message.type === "event" && message.kind && message.event) onEvent(message.kind, message.event);
     if (message.type === "result" && message.result) result = message.result;
-    if (message.type === "error") throw new Error(message.error || "本地 Engine 执行失败");
+    if (message.type === "error") throw new Error(message.error || t`本地 Engine 执行失败`);
   };
 
   while (true) {
@@ -123,7 +124,7 @@ export async function runLocalWorkflow(
     if (done) break;
   }
   consumeLine(buffer);
-  if (!result) throw new Error("本地 Engine 未返回执行结果");
+  if (!result) throw new Error(t`本地 Engine 未返回执行结果`);
   return result;
 }
 

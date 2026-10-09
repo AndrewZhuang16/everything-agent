@@ -1,3 +1,5 @@
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ToolsPage } from "../src/pages/tools/ToolsPage";
@@ -18,7 +20,7 @@ it.each(["get_current_time", "search_web", "manage_calendar"])("保存 %s 时另
   // 终端开关与弹窗、loading、savingTools、message、error。增删状态时必须同步这里。
   const values = [catalog, true, true, "", false, false, false, false, new Set([savingTool]), "", ""];
   for (const value of values) useState.mockReturnValueOnce([value, vi.fn()]);
-  const html = renderToStaticMarkup(<ToolsPage />);
+  const html = renderToStaticMarkup(<I18nProvider i18n={i18n}><ToolsPage /></I18nProvider>);
   const switches = html.match(/<button[^>]*role="switch"[^>]*>/g)!;
   for (const button of switches) {
     expect(button).toContain('aria-checked="true"');

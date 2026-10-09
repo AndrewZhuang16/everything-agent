@@ -1,3 +1,6 @@
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { Check, Code2, RefreshCw } from "lucide-react";
 import { useMemo, useRef } from "react";
 import { Button } from "../../components/ui/button";
@@ -16,6 +19,7 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor(props: CodeEditorProps) {
+  useLingui();
   const { editable, code, error, workflowFiles, selectedFile, switching, refreshing, onChange, onSelect, onReset } = props;
   const gutterRef = useRef<HTMLDivElement>(null);
   const lineNumbers = useMemo(() => code.split("\n").map((_, index) => index + 1), [code]);
@@ -25,12 +29,12 @@ export function CodeEditor(props: CodeEditorProps) {
       <div className="panel-header">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <Code2 size={15} />
-          <span>工作流代码</span>
-          <label className="workflow-picker" title="选择工作流">
+          <span><Trans>工作流代码</Trans></span>
+          <label className="workflow-picker" title={t`选择工作流`}>
             <Check size={11} />
-            <span>已连接本地 Engine ·</span>
+            <span><Trans>已连接本地 Engine ·</Trans></span>
             <select
-              aria-label="本地工作流文件"
+              aria-label={t`本地工作流文件`}
               value={selectedFile}
               disabled={switching || workflowFiles.length === 0}
               onChange={(event) => onSelect(event.target.value)}
@@ -41,17 +45,17 @@ export function CodeEditor(props: CodeEditorProps) {
             </select>
           </label>
         </div>
-        <Button variant="ghost" size="sm" className="icon-button" loading={refreshing} disabled={switching} onClick={onReset} title="从本地文件重新读取">
-          <RefreshCw size={14} />
+        <Button variant="ghost" size="sm" className="icon-button" loading={refreshing} disabled={switching} onClick={onReset} title={t`从本地文件重新读取`}>
+          <RefreshCw size={14} /><Trans>
           重新读取
-        </Button>
+        </Trans></Button>
       </div>
       <div className="code-shell">
         <div ref={gutterRef} className="line-numbers" aria-hidden="true">
           {lineNumbers.map((line) => <div key={line}>{line}</div>)}
         </div>
         <textarea
-          aria-label="工作流代码"
+          aria-label={t`工作流代码`}
           readOnly={!editable}
           className="code-input"
           value={code}
@@ -64,7 +68,7 @@ export function CodeEditor(props: CodeEditorProps) {
       </div>
       <div className={`editor-footer ${error ? "text-red-600" : "text-emerald-700"}`}>
         <span className={`signal ${error ? "bg-red-500" : "bg-emerald-500"}`} />
-        {error || (editable ? "已保存到本地，拓扑来自 Graph.describe()" : "生产环境只读，修改请在开发环境完成后重新构建")}
+        {error || (editable ? t`已保存到本地，拓扑来自 Graph.describe()` : t`生产环境只读，修改请在开发环境完成后重新构建`)}
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { requestJson, responseError } from "./request-json";
 import type { Workflow } from "./workflow-api";
 import type { AgentProvider, AgentSettings } from "./config-api";
@@ -157,7 +158,7 @@ export async function runAgent(
     };
     if (message.type === "event" && message.kind && message.event) onEvent(message.kind, message.event);
     if (message.type === "result" && message.result) result = message.result;
-    if (message.type === "error") throw new Error(message.error || "Agent 执行失败");
+    if (message.type === "error") throw new Error(message.error || t`Agent 执行失败`);
   };
 
   while (true) {
@@ -169,7 +170,7 @@ export async function runAgent(
     if (done) break;
   }
   consumeLine(buffer);
-  if (!result) throw new Error("本地 Agent 未返回执行结果");
+  if (!result) throw new Error(t`本地 Agent 未返回执行结果`);
   return result;
 }
 

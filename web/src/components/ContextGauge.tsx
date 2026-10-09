@@ -1,3 +1,7 @@
+import { formatLocale } from "../i18n";
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import type { ContextUsage } from "../apis/agent-api";
 import { readContextGauge } from "../pages/agent/context-gauge";
 import {
@@ -18,9 +22,10 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
  * 不显示 0%。
  */
 export function ContextGauge({ usage }: { usage: ContextUsage | null }) {
+  useLingui();
   const reading = readContextGauge(usage);
   if (!reading) return null;
-  const label = `上下文占用 ${reading.percent}%`;
+  const label = t`上下文占用 ${reading.percent}%`;
   return (
     <TooltipProvider>
       <Tooltip>
@@ -56,9 +61,9 @@ export function ContextGauge({ usage }: { usage: ContextUsage | null }) {
           </span>
         </TooltipTrigger>
         <TooltipContent className="grid gap-0.5 border border-border bg-popover text-popover-foreground" side="top" align="center" role="tooltip">
-          <span className="font-semibold">上下文窗口：</span>
-          <span>{reading.percent}% 已用（剩余 {Math.max(0, 100 - reading.percent)}%）</span>
-          <span>已用 {new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(reading.usedTokens).toLowerCase()} 标记，共 {new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(reading.availableTokens).toLowerCase()}</span>
+          <span className="font-semibold"><Trans>上下文窗口：</Trans></span>
+          <span><Trans>{reading.percent}% 已用（剩余 {Math.max(0, 100 - reading.percent)}%）</Trans></span>
+          <span><Trans>已用 {new Intl.NumberFormat(formatLocale(), { notation: "compact", maximumFractionDigits: 1 }).format(reading.usedTokens).toLowerCase()} 标记，共 {new Intl.NumberFormat(formatLocale(), { notation: "compact", maximumFractionDigits: 1 }).format(reading.availableTokens).toLowerCase()}</Trans></span>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

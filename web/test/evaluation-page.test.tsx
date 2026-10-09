@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
@@ -57,7 +59,7 @@ async function enterName(value: string) {
   });
 }
 it('本地启动可临时填写 Experiment 名称前缀，留空时不提交名称', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   const trigger = container.querySelector('[role="combobox"]');
   expect(trigger).not.toBeNull();
   expect(trigger!.textContent).toContain('选择数据集');
@@ -82,19 +84,19 @@ it('本地启动可临时填写 Experiment 名称前缀，留空时不提交名�
   expect(starts().at(-1)).toEqual({ action: 'start', datasetName: '测试集' });
 });
 it('本地启动只提供名称输入，不提供 terminal 与 memorySnapshot 开关', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expect(container.querySelector('input[type="checkbox"]')).toBeNull();
   expect(container.querySelectorAll('input').length).toBe(1);
   expect(container.textContent).toContain('memorySnapshot');
   expect(container.textContent).toContain('terminal');
 });
 it('执行完成但没有评分时明确等待，不宣称质量通过', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expect(container.textContent).toContain('执行完成不代表质量通过'); expect(container.textContent).toContain('等待平台评分');
   await click('刷新评分'); expect(request).toHaveBeenCalledWith('', { action: 'refresh', runId: 'run' });
 });
 it.each([false, true])('刷新评分显示独立加载反馈并在结束后恢复，失败=%s', async (failed) => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   if (failed) request.mockRejectedValueOnce(new Error('评分刷新失败'));
   const button = [...container.querySelectorAll('button')].find(item => item.textContent?.includes('刷新评分'))!;
   await click('刷新评分');
@@ -115,18 +117,18 @@ it.each([false, true])('刷新评分显示独立加载反馈并在结束后恢�
 });
 it('审批请求携带 Experiment 和用例身份，离开页面不取消后台运行', async () => {
   const waiting = structuredClone(dashboard); waiting.runs[0]!.status = 'running'; waiting.approvals = [{ id: 'approval', runId: 'run', itemId: 'item', command: 'git push', reason: '外部写入' }]; request.mockResolvedValue(waiting);
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expect(container.textContent).toContain('git push'); await click('拒绝');
   expect(request).toHaveBeenCalledWith('', { action: 'approve', runId: 'run', itemId: 'item', approvalId: 'approval', approved: false });
-  await act(async () => root.render(null)); expect(request.mock.calls.some(([, body]) => body?.action === 'cancel')).toBe(false);
+  await act(async () => root.render(<I18nProvider i18n={i18n}>{null}</I18nProvider>)); expect(request.mock.calls.some(([, body]) => body?.action === 'cancel')).toBe(false);
 });
 it('连接失败展示错误，不把失败伪装为空数据集', async () => {
-  await act(async () => root.render(<EvaluationPage />)); request.mockRejectedValueOnce(new Error('平台断开')); await connectToPlatform(); expectErrorFeedback('平台断开'); expect(container.textContent).not.toContain('平台连接正常'); expect(container.querySelector('[role="combobox"]')?.textContent).toContain('选择数据集');
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>)); request.mockRejectedValueOnce(new Error('平台断开')); await connectToPlatform(); expectErrorFeedback('平台断开'); expect(container.textContent).not.toContain('平台连接正常'); expect(container.querySelector('[role="combobox"]')?.textContent).toContain('选择数据集');
 });
 it('复制的是 Authorization 值，能够直接粘贴到平台请求头字段', async () => {
   const writeText = vi.fn(async () => {});
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   await openGuide();
   request.mockResolvedValueOnce({ Authorization: 'Bearer dedicated-test-token' });
   await clickInDialog('复制 authorization 值');
@@ -136,7 +138,7 @@ it('复制的是 Authorization 值，能够直接粘贴到平台请求头字段'
 it('复制成功的提示用浮层展示并自动消失，不在页面里占位', async () => {
   const writeText = vi.fn(async () => {});
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   await openGuide();
   request.mockResolvedValueOnce({ Authorization: 'Bearer dedicated-test-token' });
   await clickInDialog('复制 authorization 值');
@@ -152,7 +154,7 @@ it('复制成功的提示用浮层展示并自动消失，不在页面里占位'
 });
 it('复制失败通过错误浮层反馈，不显示成功文案', async () => {
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: vi.fn(async () => { throw new Error('剪贴板不可用'); }) } });
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   await openGuide();
   request.mockResolvedValueOnce({ Authorization: 'Bearer dedicated-test-token' });
   await clickInDialog('复制 authorization 值');
@@ -171,7 +173,7 @@ async function connectToPlatform() {
   await act(async () => vi.advanceTimersByTimeAsync(MINIMUM_FEEDBACK_DURATION_MS));
 }
 it('连接平台期间按钮转圈并禁用，最短反馈时长后给出成功提示', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expect(connectButton().spinning).toBe(false);
   let release: (value: unknown) => void = () => {};
   request.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
@@ -191,7 +193,7 @@ it('连接平台期间按钮转圈并禁用，最短反馈时长后给出成功�
   expect(container.querySelector('[role="alert"]')).toBeNull();
 });
 it('连接平台失败时停止动画，错误浮层到时清除', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   request.mockRejectedValueOnce(new Error('平台断开'));
   await connectToPlatform();
   expect(connectButton().spinning).toBe(false);
@@ -210,7 +212,7 @@ it('相同轮询错误只提示一次，用户再次连接时仍可得到错误�
   const unconfigured = structuredClone(dashboard);
   unconfigured.configured = false; unconfigured.error = '缺少 Langfuse 项目 ID 或 API 凭证';
   request.mockResolvedValue(unconfigured);
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expectErrorFeedback(unconfigured.error);
   await act(async () => vi.advanceTimersByTimeAsync(2_500));
   expect(container.querySelector('[role="status"]')).toBeNull();
@@ -223,7 +225,7 @@ it('相同轮询错误只提示一次，用户再次连接时仍可得到错误�
 
 it('页面常驻展示数据集 Metadata 默认值与 Experiment 采用的配置，平台步骤只在弹窗出现', async () => {
   const data = structuredClone(dashboard); data.runs[0]!.terminalEnabled = true; request.mockResolvedValue(data);
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   expect(container.textContent).toContain('{"terminal":false,"memorySnapshot":false}');
   expect(container.textContent).toContain('{"name":"Everything Agent"}');
   expect(container.textContent).toContain('terminal：true');
@@ -241,7 +243,7 @@ it('页面常驻展示数据集 Metadata 默认值与 Experiment 采用的配置
   expect([...document.querySelectorAll('details')].some(item => item.textContent?.includes('按下面的顺序在 Langfuse 界面完成一次性配置'))).toBe(false);
 });
 it('配置说明提供可直接使用的回调地址、Default config 与请求头字段', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   await openGuide();
   const dialog = document.querySelector('[role="alertdialog"]')!;
   for (const text of [dashboard.webhookUrl, '{"name":"Everything Agent"}', 'authorization']) {
@@ -249,13 +251,13 @@ it('配置说明提供可直接使用的回调地址、Default config 与请求�
   }
 });
 it('运行区提示列出用例输入支持的三种写法', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   const launch = container.querySelector('[aria-label="数据集与实验"]')!;
   const note = [...launch.querySelectorAll('p')].find(item => item.textContent?.includes('输入支持字符串'));
-  expect(note?.textContent).toBe('输入支持字符串、{ prompt } 或 { turns: ["第一轮", "第二轮"] }。');
+  expect(note?.textContent).toBe('输入支持字符串、{ prompt } 或 { turns: ["Turn 1", "Turn 2"] }。');
 });
 it('平台启动说明与 Langfuse v4 实际界面一致，不残留不存在的老文案', async () => {
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   await openGuide();
   for (const current of ['Run experiment', 'Experiments', 'Default config', 'Sign requests', 'Run remote dataset run']) expect(document.body.textContent).toContain(current);
   for (const outdated of ['Start Experiment', 'Custom Experiment', 'Default payload']) expect(document.body.textContent).not.toContain(outdated);
@@ -264,7 +266,7 @@ it('Experiment 记录每页十条，翻页及轮询保留选中 Experiment', asy
   const data = structuredClone(dashboard);
   data.runs = Array.from({ length: 12 }, (_, i) => ({ ...structuredClone(dashboard.runs[0]!), id: String(i), name: `Experiment 记录-${i}` }));
   request.mockResolvedValue(data);
-  await act(async () => root.render(<EvaluationPage />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><EvaluationPage /></I18nProvider>));
   const records = () => container.querySelector('[aria-label="Experiment 记录"]')!;
   expect(records().querySelectorAll('button[aria-pressed]').length).toBe(10);
   await click('下一页');

@@ -1,3 +1,6 @@
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { Braces, Cpu, GitBranch, Wrench } from "lucide-react";
 import { useId, useMemo } from "react";
 import { layoutWorkflow } from "./workflow-layout";
@@ -10,12 +13,6 @@ interface GraphCanvasProps {
   activeEdges: Set<string>;
 }
 
-const kindLabel: Record<NodeKind, string> = {
-  llm: "模型调用",
-  tool: "工具",
-  agent: "Agent Loop",
-  fn: "函数",
-};
 
 const kindIcon = {
   llm: Cpu,
@@ -25,6 +22,13 @@ const kindIcon = {
 };
 
 export function GraphCanvas({ workflow, nodeStates, activeEdges }: GraphCanvasProps) {
+  useLingui();
+  const kindLabel: Record<NodeKind, string> = {
+    llm: t`模型调用`,
+    tool: t`工具`,
+    agent: "Agent Loop",
+    fn: t`函数`,
+  };
   const layout = useMemo(() => layoutWorkflow(workflow), [workflow]);
   const displayWidth = Math.min(layout.width, 1120);
   const displayHeight = Math.round(layout.height * displayWidth / layout.width);
@@ -35,10 +39,10 @@ export function GraphCanvas({ workflow, nodeStates, activeEdges }: GraphCanvasPr
     <section className="panel overflow-hidden">
       <div className="panel-header">
         <div>
-          <div className="flex items-center gap-2"><GitBranch size={15} /> 动态拓扑</div>
-          <p className="mt-1 text-[11px] font-normal text-[var(--muted-foreground)]">由当前代码生成 · 节点会随执行状态实时变化</p>
+          <div className="flex items-center gap-2"><GitBranch size={15} /><Trans> 动态拓扑</Trans></div>
+          <p className="mt-1 text-[11px] font-normal text-[var(--muted-foreground)]"><Trans>由当前代码生成 · 节点会随执行状态实时变化</Trans></p>
         </div>
-        <span className="status-pill">{workflow.nodes.length} 个节点 · {workflow.edges.length} 条边</span>
+        <span className="status-pill"><Trans>{workflow.nodes.length} 个节点 · {workflow.edges.length} 条边</Trans></span>
       </div>
       <div className="graph-scroll">
         <svg
@@ -46,7 +50,7 @@ export function GraphCanvas({ workflow, nodeStates, activeEdges }: GraphCanvasPr
           className="graph-svg"
           style={{ width: displayWidth, height: displayHeight }}
           role="img"
-          aria-label="工作流动态图"
+          aria-label={t`工作流动态图`}
         >
           <defs>
             <marker id={markerId} viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">

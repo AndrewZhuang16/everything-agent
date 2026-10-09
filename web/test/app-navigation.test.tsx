@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -31,16 +33,16 @@ const activePage = () => host.querySelector(".nav-item.active")?.textContent;
 
 it("从当前 URL 恢复页面，刷新后仍停留在该页面", async () => {
   window.history.replaceState(null, "", "/#/memory");
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
   expect(activePage()).toBe("Memory");
   await act(async () => root.unmount());
   root = createRoot(host);
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
   expect(activePage()).toBe("Memory");
 });
 
 it("导航同步 URL，响应历史导航，并保持 Agent 挂载", async () => {
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
   const agent = host.querySelector(".agent-main-content");
   await act(async () => [...host.querySelectorAll("button")].find(button => button.textContent === "Tools")!.click());
   expect(window.location.hash).toBe("#/tools");
@@ -55,14 +57,14 @@ it("导航同步 URL，响应历史导航，并保持 Agent 挂载", async () =>
 
 it.each(["", "#/unknown"])("空地址或未知页面 %s 回到 Agent", async (hash) => {
   window.history.replaceState(null, "", "/" + hash);
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
   expect(activePage()).toBe("Agent");
 });
 
 it("根地址替换为 Agent 地址，保留查询参数且不增加历史记录", async () => {
   window.history.replaceState({ source: "entry" }, "", "/?mode=local");
   const historyLength = window.history.length;
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
   expect(window.location.hash).toBe("#/agent");
   expect(window.location.search).toBe("?mode=local");
   expect(window.history.length).toBe(historyLength);

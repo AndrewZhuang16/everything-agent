@@ -13,7 +13,7 @@ describe("全局数据清理入口", () => {
 
   it("清理范围与保留范围分成两行展示", async () => {
     expect(await readFile(configPage, "utf8")).toMatch(
-      /索引和全部 Traces。\s*<br \/>\s*保留 <code>\.everything\/EVERYTHING\.md<\/code>/,
+      /索引和全部 Traces。\s*<\/Trans><br \/><Trans>\s*保留 <code>\.everything\/EVERYTHING\.md<\/code>/,
     );
   });
 });

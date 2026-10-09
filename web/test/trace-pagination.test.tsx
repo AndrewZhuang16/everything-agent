@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -12,7 +14,7 @@ it("列表按游标翻页并直接展示原有可折叠 JSONL 文件", async () 
   vi.mocked(loadTrace).mockResolvedValue({ files: [{ path: "trace.jsonl", records: [{ version: 3 as const, traceId: "a", type: "turn_started", timestamp: "today" }] }] });
   const host = document.createElement("div"); document.body.append(host); const root = createRoot(host);
   try {
-    await act(async () => root.render(<TracePage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><TracePage /></I18nProvider>));
     expect(host.querySelector(".trace-file-list > details.trace-file[open] strong")?.textContent).toBe("trace.jsonl");
     expect(host.querySelector("details.trace-record")?.hasAttribute("open")).toBe(false);
     expect([...host.querySelectorAll("button")].some((b) => b.textContent?.includes("3000 条"))).toBe(false);
@@ -35,7 +37,7 @@ it("当前页自动合并文件，关联事件去重并保持原有文件与事�
   ] }).mockResolvedValueOnce({ files: [{ path: "2026-09-16/2-run.jsonl", records: [record, { ...record, eventId: "earlier", timestamp: "2026-09-16T00:00:00" }] }] });
   const host = document.createElement("div"); const root = createRoot(host);
   try {
-    await act(async () => root.render(<TracePage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><TracePage /></I18nProvider>));
     expect(loadTrace).toHaveBeenCalledTimes(2);
     expect([...host.querySelectorAll(".trace-file-summary strong")].map((node) => node.textContent)).toEqual(["2026-09-16/10-run.jsonl", "2026-09-16/2-run.jsonl"]);
     const records = host.querySelectorAll(".trace-file")[1]!.querySelectorAll(".trace-record");
@@ -51,7 +53,7 @@ it("翻页详情失败时保留当前页，重试成功后支持返回上一页"
   const host = document.createElement("div"); const root = createRoot(host);
   const button = (label: string) => [...host.querySelectorAll("button")].find((node) => node.textContent?.trim() === label)!;
   try {
-    await act(async () => root.render(<TracePage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><TracePage /></I18nProvider>));
     await act(async () => button("下一页").click());
     expect(host.textContent).toContain("第 1 页");
     expect(host.textContent).toContain("first.jsonl");
@@ -76,7 +78,7 @@ it("翻页加载期间禁用导航，刷新成功后回到第一页", async () =
   const host = document.createElement("div"); const root = createRoot(host);
   const button = (label: string) => [...host.querySelectorAll("button")].find(node => node.textContent?.trim() === label)!;
   try {
-    await act(async () => root.render(<TracePage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><TracePage /></I18nProvider>));
     await act(async () => button("下一页").click());
     expect(button("下一页").disabled).toBe(true);
     expect(button("上一页").disabled).toBe(true);

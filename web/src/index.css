@@ -201,7 +201,7 @@ button:disabled { cursor: not-allowed; }
    把右侧 Dock 的边界挤离视口边缘，收起聊天区时固定定位的按钮位置就会跟着偏移。 */
 .agent-page-layout { --agent-canvas-min-width: 850px; --agent-main-min-width: calc(var(--agent-canvas-min-width) + 2 * var(--page-padding-inline)); display: grid; height: 100vh; grid-template-columns: minmax(var(--agent-main-min-width), 1fr) 420px; overflow-x: auto; overflow-y: hidden; background: transparent; transition: grid-template-columns 180ms ease; }
 .agent-main-column { min-width: 0; overflow-y: auto; padding: var(--page-padding-top) var(--page-padding-inline) var(--page-padding-bottom); }
-.agent-intro-actions { display: flex; flex: 0 0 auto; align-items: center; flex-direction: row; gap: 10px; }
+.agent-intro-actions { flex: 0 0 auto; }
 .consolidation-action { display: inline-flex; min-height: 40px; align-items: center; justify-content: flex-end; gap: 10px; border: 1px solid var(--border); border-radius: 11px; background: var(--card); padding: 4px; box-shadow: 0 1px 2px #1a1f2c08; }
 .consolidation-action:not(:has(.consolidation-status)) { border-color: transparent; background: transparent; box-shadow: none; }
 .consolidation-button { min-width: 116px; }
@@ -744,7 +744,7 @@ button:disabled { cursor: not-allowed; }
   .agent-main-content { height: auto; overflow: visible; }
   .agent-page-layout { height: auto; min-height: 100vh; grid-template-columns: minmax(0, 1fr); }
   .agent-main-column { overflow: visible; }
-  .agent-intro-actions { width: 100%; align-items: stretch; }
+  .agent-intro-actions { width: 100%; }
   .consolidation-action { width: 100%; align-items: center; justify-content: space-between; }
   .consolidation-status { max-width: none; }
   .agent-chat-dock { height: 85dvh; min-height: 480px; border-top: 1px solid var(--border); border-left: 0; }

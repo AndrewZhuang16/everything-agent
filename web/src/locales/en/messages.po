@@ -1,0 +1,1986 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2026-10-09 19:21+0800\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid " · 已保留必要内容，超过 30% 目标"
+msgstr " · Required content retained; above the 30% target"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid " · 结果已截断"
+msgstr " · Results truncated"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid " System Prompt · 只读"
+msgstr " System Prompt · Read only"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid " 保存 Skill"
+msgstr " Save Skill"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid " 停止"
+msgstr " Stop"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid " 删除"
+msgstr " Delete"
+
+#: web/src/pages/memory/MemoryPage.tsx
+#: web/src/pages/trace/TracePage.tsx
+msgid " 刷新数据"
+msgstr " Refresh data"
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid " 动态拓扑"
+msgstr " Live topology"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid " 发送"
+msgstr " Send"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid " 新建 Skill"
+msgstr " New Skill"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid " 新建对话"
+msgstr " New chat"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid " 配置就绪"
+msgstr " Ready"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid " 配置模型后开始"
+msgstr " Configure models to start"
+
+#. placeholder {0}: result.lastInsertRowid
+#: web/src/pages/database/DatabasePage.tsx
+msgid "，新增 ID {0}"
+msgstr ", inserted ID {0}"
+
+#. placeholder {0}: item.source
+#. placeholder {1}: local(item.createdAt)
+#. placeholder {2}: local(item.updatedAt)
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "{0} · 创建 {1} · 更新 {2}"
+msgstr "{0} · Created {1} · Updated {2}"
+
+#. placeholder {0}: item.model ?? t`模型尚未返回`
+#. placeholder {1}: item.toolCalls
+#. placeholder {2}: item.inputTokens ?? '—'
+#. placeholder {3}: item.outputTokens ?? '—'
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "{0} · 工具 {1} 次 · 输入 {2} / 输出 {3} tokens"
+msgstr "{0} · {1} tool calls · Input {2} / Output {3} tokens"
+
+#. placeholder {0}: local(result.session.updatedAt)
+#. placeholder {1}: result.returnedMessageCount
+#. placeholder {2}: result.totalMessageCount
+#. placeholder {3}: result.isComplete ? t`完整 Session` : t`部分范围`
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "{0} · 返回 {1}/{2} · {3}"
+msgstr "{0} · Returned {1}/{2} · {3}"
+
+#. placeholder {0}: item.completedBatches
+#. placeholder {1}: item.totalBatches
+#. placeholder {2}: item.unresolvedConflicts
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "{0} / {1} · 冲突 {2}"
+msgstr "{0} / {1} · Conflicts {2}"
+
+#. placeholder {0}: skills.length
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "{0} 个"
+msgstr "{0}"
+
+#. placeholder {0}: workflow.nodes.length
+#. placeholder {1}: workflow.edges.length
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "{0} 个节点 · {1} 条边"
+msgstr "{0} nodes · {1} edges"
+
+#. placeholder {0}: result.skill.path
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "{0} 已保存，下一轮 Agent 立即生效。"
+msgstr "{0} saved. Available on the next Agent turn."
+
+#. placeholder {0}: file.records.length
+#: web/src/pages/trace/TracePage.tsx
+msgid "{0} 条"
+msgstr "{0} records"
+
+#. placeholder {0}: session.messageCount
+#: web/src/pages/agent/AgentPage.tsx
+msgid "{0} 条记录"
+msgstr "{0} records"
+
+#. placeholder {0}: table.count.toLocaleString(formatLocale())
+#. placeholder {1}: table.rows.length
+#: web/src/pages/database/DatabasePage.tsx
+msgid "{0} 行 · 当前显示 {1} 行，最新在前"
+msgstr "{0} rows · Showing {1}, newest first"
+
+#. placeholder {0}: result.rows.length
+#. placeholder {1}: result.truncated ? t` · 结果已截断` : ""
+#: web/src/pages/database/DatabasePage.tsx
+msgid "{0} 行{1}"
+msgstr "{0} rows{1}"
+
+#. placeholder {0}: reading.percent
+#. placeholder {1}: Math.max(0, 100 - reading.percent)
+#: web/src/components/ContextGauge.tsx
+msgid "{0}% 已用（剩余 {1}%）"
+msgstr "{0}% used ({1}% remaining)"
+
+#. placeholder {0}: (item.ms / 1000).toFixed(1)
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "{0}秒"
+msgstr "{0}s"
+
+#. placeholder {0}: run.items.length
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "{finishedCount} / {0} 条用例已结束"
+msgstr "{finishedCount} / {0} cases finished"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "{label} 不能为空"
+msgstr "{label} is required"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "{syncedCount} 条"
+msgstr "{syncedCount} cases"
+
+#: web/src/App.tsx
+msgid "<0/>本地 Engine 已连接"
+msgstr "<0/>Local Engine connected"
+
+#. placeholder {0}: (maxMs / 1000).toFixed(2)
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "<0>·</0>{0} 秒"
+msgstr "<0>·</0>{0}s"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "<0>Default config</0> 填 <1>{defaultConfigJson}</1>"
+msgstr "Set <0>Default config</0> to <1>{defaultConfigJson}</1>"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "<0>Enabled</0> 打开，否则实验无法触发。"
+msgstr "Turn <0>Enabled</0> on to allow experiments to start."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "<0>run_terminal</0> 的执行边界由 Sandbox 配置决定，需要先设置工作区根目录。"
+msgstr "<0>run_terminal</0> uses the Sandbox settings. Configure a workspace root first."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "<0>Sign requests</0> 保持关闭，我们的网关只校验 authorization，不校验 x-langfuse-signature。"
+msgstr "Keep <0>Sign requests</0> off. The gateway validates authorization only, not x-langfuse-signature."
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "<0>Skill 文件是唯一事实来源。</0> 页面直接读写 <1>.everything/skills/<skill-name>/SKILL.md</1>；Agent 只接收名称和描述，决定使用后通过 <2>read_skill</2> 读取完整指令。"
+msgstr "<0>Skill files are the source of truth.</0> This page reads and writes <1>.everything/skills/<skill-name>/SKILL.md</1> directly. The Agent receives names and descriptions, then loads full instructions through <2>read_skill</2> when needed."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "<0>工具注册表是运行时事实来源。</0> 固定内置工具始终可用；开关保存在 <1>.everything/config.json</1>，Tavily 凭证保存在 <2>.everything/.env</2>，密钥不会返回浏览器。"
+msgstr "<0>The tool registry is the runtime source of truth.</0> Fixed built-in tools are always available. Switches are saved in <1>.everything/config.json</1>, and Tavily credentials in <2>.everything/.env</2>. Secret keys are never returned to the browser."
+
+#. placeholder {0}: editable ? t`下方编辑器直接读写` : t`生产环境只读查看`
+#. placeholder {1}: editable ? "src/workflows/" : "dist-server/src/workflows/"
+#. placeholder {2}: selectedFile || "…"
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "<0>本地代码是事实来源。</0> {0} <1>{1}{2}</1>；拓扑来自 <2>Graph.describe()</2>，执行过程来自本地 <3>runGraph()</3> 的 observer 事件。"
+msgstr "<0>Local code is the source of truth.</0> {0} <1>{1}{2}</1>. Topology comes from <2>Graph.describe()</2>, and execution from the local <3>runGraph()</3> observer events."
+
+#: web/src/presentation-i18n.ts
+msgid "70% 触发 · 30% 软目标"
+msgstr "70% trigger · 30% target"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Agent Model 与 Small Model 使用完全独立的连接配置。"
+msgstr "Agent Model and Small Model use completely independent connections."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Agent Model 与 Small Model 的 API Key 都会被清除，其他连接配置保持不变。"
+msgstr "API keys for both Agent Model and Small Model will be cleared. Other connection settings will be preserved."
+
+#: web/src/pages/agent/AgentHarnessCanvas.tsx
+msgid "Agent 与 Memory 业务流程图"
+msgstr "Agent and Memory process diagram"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Agent 最大迭代"
+msgstr "Maximum Agent iterations"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Agent 最大迭代（轮）"
+msgstr "Maximum Agent iterations (turns)"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "Agent 加载失败：{loadError}"
+msgstr "Failed to load Agent: {loadError}"
+
+#: web/src/apis/agent-api.ts
+msgid "Agent 执行失败"
+msgstr "Agent execution failed"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "Agent 能力 / 受控执行"
+msgstr "Agent capabilities / Controlled execution"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "Agent 能力 / 按需加载"
+msgstr "Agent capabilities / On-demand loading"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Anthropic 暂不提供原生 Embedding。切换 Provider 后请填写对应密钥并重建索引。"
+msgstr "Anthropic does not currently provide native embeddings. Enter the corresponding key and rebuild the index after changing providers."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "authorization 值已复制，请在 Langfuse 添加请求头。"
+msgstr "Authorization value copied. Add it as a request header in Langfuse."
+
+#: web/src/presentation-i18n.ts
+msgid "Dense · 相似度过滤"
+msgstr "Dense · Similarity filter"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "Embedding API Key 已清除，检索模式已切回 lexical-only。"
+msgstr "Embedding API key cleared. Retrieval mode switched to lexical-only."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "Enter 发送 · Shift + Enter 换行"
+msgstr "Enter to send · Shift + Enter for a new line"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "EVERYTHING.md 已保存"
+msgstr "EVERYTHING.md saved"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 名称："
+msgstr "Experiment name:"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 名称前缀，默认 Everything Agent；最终名称自动附加运行 ID 短码。留空表示不发送 config。"
+msgstr "Experiment name prefix. Defaults to Everything Agent; a short run ID is appended. Leave blank to omit config."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 名称前缀（可选）"
+msgstr "Experiment name prefix (optional)"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 记录"
+msgstr "Experiment history"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 记录分页"
+msgstr "Experiment history pagination"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Experiment 详情"
+msgstr "Experiment details"
+
+#: web/src/presentation-i18n.ts
+msgid "FTS5 + BM25 · 排除当前会话"
+msgstr "FTS5 + BM25 · Excludes current session"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Langfuse Experiment 配置说明"
+msgstr "Langfuse Experiment setup guide"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Langfuse 数据集"
+msgstr "Langfuse dataset"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "Langfuse 连接"
+msgstr "Langfuse connection"
+
+#: web/src/presentation-i18n.ts
+msgid "manage_memory · 返回任务 ID"
+msgstr "manage_memory · Task ID"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "SELECT 直接执行 · INSERT / UPDATE / DELETE 需要确认"
+msgstr "SELECT runs directly · INSERT / UPDATE / DELETE require confirmation"
+
+#: web/src/presentation-i18n.ts
+msgid "Semantic Facts · 上下文预算"
+msgstr "Semantic Facts · Context budget"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "Semantic Memory、Session Recall、会话日志与整理状态。"
+msgstr "Semantic Memory, Session Recall, chat logs, and consolidation status."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "session_search 单条正文上限，默认 8,192；超出部分用 contentCursor 经 session_read 读全。"
+msgstr "Maximum text per session_search result. Defaults to 8,192; read the rest with contentCursor via session_read."
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "Skill 已删除。"
+msgstr "Skill deleted."
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "SQL 查询"
+msgstr "SQL query"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "Tavily API Key 已清除，search_web 已停用。"
+msgstr "Tavily API key cleared. search_web disabled."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "Tavily 配置"
+msgstr "Tavily settings"
+
+#: web/src/pages/trace/TracePage.tsx
+msgid "Trace 分页"
+msgstr "Trace pagination"
+
+#. placeholder {0}: wave.index
+#. placeholder {1}: wave.nodes.length
+#. placeholder {2}: wave.nodes.some((node) => node.ms > 0) && <><Trans><span>·</span>{(maxMs / 1000).toFixed(2)} 秒</Trans></>
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "Wave {0}<0>·</0>{1} 个节点{2}"
+msgstr "Wave {0}<0>·</0>{1} nodes{2}"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+#: web/src/pages/trace/TracePage.tsx
+msgid "上一页"
+msgstr "Previous"
+
+#. placeholder {0}: reading.percent
+#: web/src/components/ContextGauge.tsx
+msgid "上下文占用 {0}%"
+msgstr "Context usage {0}%"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "上下文压缩失败，保留原上下文"
+msgstr "Context compaction failed; original context retained"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "上下文已压缩"
+msgstr "Context compacted"
+
+#: web/src/components/ContextGauge.tsx
+msgid "上下文窗口："
+msgstr "Context window:"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "上方开关为本次运行读取的数据集配置；terminal 为 true 表示数据集允许终端，实际可用性取决于日常配置与沙箱。执行完成不代表质量通过。"
+msgstr "These switches show the dataset settings read for this run. terminal=true permits terminal use, subject to regular tool settings and sandbox availability. Completed execution does not imply quality approval."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+#: web/src/pages/trace/TracePage.tsx
+msgid "下一页"
+msgstr "Next"
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "下方编辑器直接读写"
+msgstr "The editor below reads and writes"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "不可撤销"
+msgstr "Irreversible"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "不可用"
+msgstr "Unavailable"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "与个人助理对话"
+msgstr "Chat with your personal assistant"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。"
+msgstr "Both settings apply to all cases in the dataset and are read by local and platform launches. Omitted values default to false."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "个人助理 / 实时执行"
+msgstr "Personal assistant / Live execution"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "为 <0>search_web</0> 配置只读网页搜索凭证，密钥只会保存在本机。"
+msgstr "Configure read-only web search credentials for <0>search_web</0>. Keys are stored only on this computer."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "事实超出上下文预算，请调整 Model Context Window"
+msgstr "Facts exceed the context budget. Adjust Model Context Window."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "仅 macOS"
+msgstr "macOS only"
+
+#: web/src/presentation-i18n.ts
+msgid "仅 macOS；首次使用需要系统自动化权限，每次写入需要确认"
+msgstr "macOS only; requires Automation permission on first use and confirmation for every write"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "仅允许单条语句，最多返回 200 行；不允许 DDL。"
+msgstr "One statement only, up to 200 rows. DDL is not allowed."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "仅存储在本地"
+msgstr "Stored locally"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "仅负责 retrieval gate。"
+msgstr "Used only for the retrieval gate."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "仅配置 Experiment 名称前缀"
+msgstr "Configure the Experiment name prefix only"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "仅限小写英文字母、数字和连字符；修改后会重命名目录。"
+msgstr "Lowercase letters, digits, and hyphens only. Changing the name renames the directory."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "仍然保存"
+msgstr "Save anyway"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "从 Langfuse 管理平台触发 Experiment"
+msgstr "Trigger an Experiment from Langfuse"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "从头读取"
+msgstr "Read from the beginning"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "从本地文件重新读取"
+msgstr "Reload from the local file"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "何时以及为什么使用这个 Skill"
+msgstr "When and why to use this Skill"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "作用于该数据集全部用例"
+msgstr "Applies to all cases in this dataset"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "保存 EVERYTHING.md"
+msgstr "Save EVERYTHING.md"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "保存 Sandbox 配置"
+msgstr "Save Sandbox settings"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "保存 Tavily 配置"
+msgstr "Save Tavily settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "保存检索配置"
+msgstr "Save retrieval settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "保存模型连接配置"
+msgstr "Save model connections"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "保存运行参数"
+msgstr "Save runtime settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "保留 <0>.everything/EVERYTHING.md</0>、<1>.everything/skills</1>、<2>.everything/config.json</2> 和 <3>.everything/.env</3> 密钥。"
+msgstr "Preserve <0>.everything/EVERYTHING.md</0>, <1>.everything/skills</1>, <2>.everything/config.json</2>, and <3>.everything/.env</3> keys."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "停止生成"
+msgstr "Stop generating"
+
+#: web/src/pages/agent/ApprovalPrompt.tsx
+msgid "允许本次"
+msgstr "Allow once"
+
+#: web/src/presentation-i18n.ts
+msgid "全量事实与分批"
+msgstr "Snapshot and batches"
+
+#. placeholder {0}: data?.runs.length ?? 0
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "共 {0} 条"
+msgstr "{0} total"
+
+#. placeholder {0}: result.totalMs
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "共 {0}ms"
+msgstr "{0}ms total"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "关闭"
+msgstr "Close"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "内容"
+msgstr "Content"
+
+#: web/src/presentation-i18n.ts
+msgid "内置"
+msgstr "Built-in"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "内置工具"
+msgstr "Built-in tools"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "最低相似度说明"
+msgstr "Minimum similarity help"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "最后结果"
+msgstr "Final result"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "最近 Session"
+msgstr "Recent sessions"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "写下 Agent 使用此 Skill 时必须遵循的步骤、边界和输出要求…"
+msgstr "Describe the steps, boundaries, and output requirements the Agent must follow when using this Skill…"
+
+#. placeholder {0}: node.keys.join("、")
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "写入：{0}"
+msgstr "Writes: {0}"
+
+#. placeholder {0}: result.changes
+#. placeholder {1}: result.lastInsertRowid === null ? "" : t`，新增 ID ${result.lastInsertRowid}`
+#: web/src/pages/database/DatabasePage.tsx
+msgid "写入成功，影响 {0} 行{1}"
+msgstr "Write succeeded; {0} rows affected{1}"
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "函数"
+msgstr "Function"
+
+#: web/src/components/LanguageSwitcher.tsx
+msgid "切换语言"
+msgstr "Switch language"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "创建新 Skill"
+msgstr "Create a Skill"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "删除会话"
+msgstr "Delete session"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "删除数据库、Session、Chat Log、Semantic Memory、Session Recall 索引和全部 Traces。"
+msgstr "Delete the database, Sessions, Chat Log, Semantic Memory, Session Recall index, and all Traces."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "删除记忆"
+msgstr "Delete memory"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "刷新"
+msgstr "Refresh"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "刷新数据"
+msgstr "Refresh data"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "刷新评分／重试同步"
+msgstr "Refresh scores / Retry sync"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "单次 session_search 总额，按 Model Context Window 的 25% 自动派生，不可编辑。"
+msgstr "Total session_search budget, derived automatically as 25% of Model Context Window. Read only."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "单次模型输出"
+msgstr "Maximum model output"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "单次模型输出（tokens）"
+msgstr "Maximum model output (tokens)"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "危险区域"
+msgstr "Danger zone"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "历史对话"
+msgstr "Chat history"
+
+#. placeholder {0}: sessionRailCollapsed ? ( <ChevronDown size={14} /> ) : ( <ChevronUp size={14} /> )
+#: web/src/pages/agent/AgentPage.tsx
+msgid "历史对话 {0}"
+msgstr "Chat history {0}"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "历史超过分批上限"
+msgstr "History exceeds the batch limit"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "压缩已取消或超时"
+msgstr "Compaction cancelled or timed out"
+
+#: web/src/presentation-i18n.ts
+msgid "去重 / 合并 / 冲突 / 清理"
+msgstr "Deduplicate / Merge / Resolve / Clean"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
+msgstr "Send a message and watch memory retrieval, context assembly, model reasoning, and tool execution."
+
+#: web/src/pages/config/ConfigPage.tsx
+#: web/src/pages/database/DatabasePage.tsx
+#: web/src/pages/skills/SkillsPage.tsx
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "取消"
+msgstr "Cancel"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "取消运行"
+msgstr "Cancel run"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "取消重建"
+msgstr "Cancel rebuild"
+
+#: web/src/presentation-i18n.ts
+msgid "受控调用 · 参数验证"
+msgstr "Controlled calls · Validation"
+
+#: web/src/presentation-i18n.ts
+msgid "可用工具与参数"
+msgstr "Available tools and parameters"
+
+#: web/src/App.tsx
+msgid "可视化Agent控制台"
+msgstr "Visual Agent console"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "同步成功："
+msgstr "Synced:"
+
+#: web/src/pages/agent/AgentHarnessCanvas.tsx
+msgid "后台写入 · 独立串行队列，不阻塞回复"
+msgstr "Background writes · Independent serial queue; replies stay responsive"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "向量索引"
+msgstr "Vector index"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "启用"
+msgstr "Enable"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "启用 Embedding 后，Semantic Memory 正文会发送到对应远程服务；Session 历史不会生成向量。"
+msgstr "Enabling embeddings sends Semantic Memory content to the selected remote service. Session history is not embedded."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "命中点初始单侧窗口，默认 5。"
+msgstr "Initial window on each side of a match. Defaults to 5."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "命令只能写入该工作区，其中的 <0>.git</0> 与 <1>.everything</1> 不可写，出站网络默认切断。"
+msgstr "Commands can write only to the workspace. <0>.git</0> and <1>.everything</1> are protected, and outbound networking is disabled by default."
+
+#: web/src/pages/agent/ApprovalPrompt.tsx
+msgid "命令需要确认"
+msgstr "Command requires confirmation"
+
+#. placeholder {0}: item.syncError
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "回传失败：{0}"
+msgstr "Sync failed: {0}"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "固定内置能力"
+msgstr "Fixed built-in capability"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "固定启用"
+msgstr "Always enabled"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "图展示真实拓扑，下面的卡片按 Engine 的 wave_start 事件展示节点如何并发发生。代码在本地 Node.js 进程执行；当前示例节点不会产生外部写操作。"
+msgstr "The graph shows the actual topology. Cards below show concurrency using Engine wave_start events. Code runs in the local Node.js process; the current example nodes do not perform external writes."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "在 Langfuse 以下位置填写配置，示例均为默认值。"
+msgstr "Configure the following fields in Langfuse. Examples show default values."
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "填写右侧内容并保存到本地"
+msgstr "Complete the editor on the right and save locally"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "填写完整后即可保存"
+msgstr "Complete all fields to save"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "复制 authorization 值"
+msgstr "Copy authorization value"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "外部集成"
+msgstr "External integrations"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "失败"
+msgstr "Failed"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "字段数"
+msgstr "Columns"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "完成"
+msgstr "Done"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "完整 Session"
+msgstr "Complete Session"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "定义一个可复用能力"
+msgstr "Define a reusable capability"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "实际输出"
+msgstr "Actual output"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "对话记录保存在本地"
+msgstr "Chat history is stored locally"
+
+#: web/src/presentation-i18n.ts
+msgid "小模型 · 代码验证检索意图"
+msgstr "Small model · Validated retrieval"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "尚无 Experiment。从平台或本页启动后，记录会显示在这里。"
+msgstr "No Experiments yet. Start one here or on the platform to see it listed."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "尚未建立索引"
+msgstr "No index yet"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "尚未配置"
+msgstr "Not configured"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "展开 <0>Advanced Options</0> → <1>Custom headers</1>：名称填 <2>authorization</2>，值用下方按钮复制后粘贴，最后保存。"
+msgstr "Expand <0>Advanced Options</0> → <1>Custom headers</1>. Enter <2>authorization</2> as the name, paste the value copied using the button below, and save."
+
+#: web/src/App.tsx
+msgid "展开侧边栏"
+msgstr "Expand sidebar"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "展开对话列表"
+msgstr "Expand chat list"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "展开聊天区"
+msgstr "Expand chat panel"
+
+#: web/src/pages/config/ConfigPage.tsx
+#: web/src/presentation-i18n.ts
+msgid "工作区根目录"
+msgstr "Workspace root"
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "工作流 / 可视化执行"
+msgstr "Workflow / Visual execution"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "工作流代码"
+msgstr "Workflow code"
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "工作流动态图"
+msgstr "Live workflow graph"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "工作流已完成，请在状态详情中查看输出。"
+msgstr "Workflow completed. View the output in the state details."
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "工具"
+msgstr "Tool"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "工具执行失败"
+msgstr "Tool execution failed"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "工具执行完成"
+msgstr "Tool execution completed"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "工具配置已保存，下一回合立即生效。"
+msgstr "Tool settings saved. Changes take effect on the next turn."
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "已与本地文件同步"
+msgstr "Synced with the local file"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "已保存"
+msgstr "Saved"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "已保存到本地，拓扑来自 Graph.describe()"
+msgstr "Saved locally; topology comes from Graph.describe()"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "已停用"
+msgstr "Disabled"
+
+#: web/src/pages/database/DatabasePage.tsx
+#: web/src/pages/memory/MemoryPage.tsx
+#: web/src/pages/trace/TracePage.tsx
+msgid "已刷新"
+msgstr "Refreshed"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "已取消"
+msgstr "Cancelled"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "已同步"
+msgstr "Synced"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "已启用"
+msgstr "Enabled"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "已存在目录的绝对路径。其中的 .git 与 .everything 不可写，出站网络默认切断。留空则终端能力不可用。"
+msgstr "Absolute path to an existing directory. .git and .everything are protected, and outbound networking is disabled by default. Leave blank to disable terminal access."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "已排队，等待整理"
+msgstr "Queued for consolidation"
+
+#. placeholder {0}: new Intl.NumberFormat(formatLocale(), { notation: "compact", maximumFractionDigits: 1 }).format(reading.usedTokens).toLowerCase()
+#. placeholder {1}: new Intl.NumberFormat(formatLocale(), { notation: "compact", maximumFractionDigits: 1 }).format(reading.availableTokens).toLowerCase()
+#: web/src/components/ContextGauge.tsx
+msgid "已用 {0} 标记，共 {1}"
+msgstr "{0} tokens used out of {1}"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "已索引 Session"
+msgstr "Indexed sessions"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "已索引消息"
+msgstr "Indexed messages"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "已请求取消，旧 active generation 保持可用。"
+msgstr "Cancellation requested. The previous active generation remains available."
+
+#. placeholder {0}: recall.returnedSessionCount
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "已返回 {0} 个"
+msgstr "{0} returned"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "已连接本地 Engine ·"
+msgstr "Local Engine connected ·"
+
+#. placeholder {0}: catalog.tavily.keyLast4
+#. placeholder {0}: settings.agentModel.keyLast4
+#. placeholder {0}: settings.embeddingKeyLast4
+#: web/src/pages/config/ConfigPage.tsx
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "已配置 ····{0}"
+msgstr "Configured ····{0}"
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "已重新读取"
+msgstr "Reloaded"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "平台评分"
+msgstr "Platform scores"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "平台连接正常"
+msgstr "Platform connected"
+
+#. placeholder {0}: result.datasets.length
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "平台连接正常，已发现 {0} 个数据集。"
+msgstr "Platform connected. Found {0} datasets."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "建议起点：OpenAI 0.30、BGE 0.45、Qwen3 0.50、GTE/Nomic 0.40、Multilingual-E5 0.80；需按数据校准。"
+msgstr "Suggested starting points: OpenAI 0.30, BGE 0.45, Qwen3 0.50, GTE/Nomic 0.40, Multilingual-E5 0.80. Calibrate against your data."
+
+#: web/src/pages/agent/AgentPage.tsx
+#: web/src/presentation-i18n.ts
+msgid "当前会话"
+msgstr "Current session"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "当前修改尚未保存，确认从本地重新读取？"
+msgstr "You have unsaved changes. Reload from the local file and discard them?"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "当前修改尚未保存，确认放弃修改？"
+msgstr "You have unsaved changes. Discard them?"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "当前工作区"
+msgstr "Current workspace"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "当前没有正在运行的重建任务。"
+msgstr "No index rebuild is currently running."
+
+#. placeholder {0}: catalog.terminal.unavailableReason
+#. placeholder {0}: settings.sandbox.unavailableReason
+#: web/src/pages/config/ConfigPage.tsx
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "当前环境无法建立沙箱：{0}"
+msgstr "Sandbox unavailable in this environment: {0}"
+
+#. placeholder {0}: settings.embeddingIndex.generationId?.slice(0, 8) ?? ""
+#: web/src/pages/config/ConfigPage.tsx
+msgid "当前配置已就绪 · {0}"
+msgstr "Ready for the current settings · {0}"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "待同步"
+msgstr "Pending sync"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "待确认操作"
+msgstr "Pending approvals"
+
+#. placeholder {0}: ((elapsed ?? 0) / 1_000).toFixed(0)
+#: web/src/pages/agent/AgentPage.tsx
+msgid "思考中… <0>{0}s</0>"
+msgstr "Thinking… <0>{0}s</0>"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "总行数"
+msgstr "Total rows"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "恢复默认运行值"
+msgstr "Restore runtime defaults"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "打开 Langfuse "
+msgstr "Open Langfuse "
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "打开 Langfuse Trace"
+msgstr "Open Langfuse Trace"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "打开数据集 → 进入 <0>Experiments</0> 标签页 → 右上角 <1>Run experiment</1> → 在 Run Experiment 弹窗里选 <2>via Webhook</2> 卡片。"
+msgstr "Open the dataset → <0>Experiments</0> tab → <1>Run experiment</1> at the top right → select <2>via Webhook</2> in the Run Experiment dialog."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "打开模型配置"
+msgstr "Open model settings"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "执行中"
+msgstr "Running"
+
+#. placeholder {0}: item.events.length
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "执行事件（{0}）"
+msgstr "Execution events ({0})"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "执行停滞"
+msgstr "Execution stalled"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "执行失败"
+msgstr "Execution failed"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "执行完成"
+msgstr "Completed"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "执行工作流"
+msgstr "Run workflow"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "执行工作流后，最终结果会显示在这里。"
+msgstr "The final result will appear here after running the workflow."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "批准本次操作"
+msgstr "Approve once"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "批次 / 未解决冲突"
+msgstr "Batches / Unresolved conflicts"
+
+#: web/src/presentation-i18n.ts
+msgid "批次进度 / 冲突 / 错误"
+msgstr "Progress / Conflicts / Errors"
+
+#: web/src/pages/agent/ApprovalPrompt.tsx
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "拒绝"
+msgstr "Reject"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "按下面的顺序在 Langfuse 界面完成一次性配置，之后即可触发评估。"
+msgstr "Complete this one-time setup in Langfuse, then trigger evaluations."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "按当前检索模式搜索"
+msgstr "Search using the current retrieval mode"
+
+#: web/src/pages/trace/TracePage.tsx
+msgid "按文件查看已脱敏的 JSONL 事件。"
+msgstr "Browse redacted JSONL events by file."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "排队中"
+msgstr "Queued"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "控制会话召回范围和模型上下文预算。"
+msgstr "Control session retrieval scope and model context budgets."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "提一个问题，或交给我一件要做的事。"
+msgstr "Ask a question or give me a task."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "搜索"
+msgstr "Search"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "搜索历史会话"
+msgstr "Search past sessions"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "搜索语义记忆"
+msgstr "Search semantic memory"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "摘要为空或不完整"
+msgstr "Summary is empty or incomplete"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "摘要未减少占用"
+msgstr "Summary did not reduce context usage"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "摘要模型调用失败"
+msgstr "Summary model call failed"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "摘要请求无可用额度"
+msgstr "No available budget for the summary request"
+
+#: web/src/App.tsx
+msgid "收起侧边栏"
+msgstr "Collapse sidebar"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "收起对话列表"
+msgstr "Collapse chat list"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "收起聊天区"
+msgstr "Collapse chat panel"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "数据库、会话、记忆、索引和运行记录都会被删除。EVERYTHING.md、Skills、config.json 与 .everything/.env 密钥、.everything/langfuse.env 连接配置将保留；如已完整配置 Embedding，清理后会自动重建向量索引。"
+msgstr "The database, sessions, memories, indexes, and traces will be deleted. EVERYTHING.md, Skills, config.json, .everything/.env keys, and .everything/langfuse.env connection settings will be preserved. A fully configured Embedding connection automatically rebuilds the vector index afterward."
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "数据库文件"
+msgstr "Database file"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "数据库视图"
+msgstr "Database view"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "数据集 Metadata"
+msgstr "Dataset metadata"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "数据集与实验"
+msgstr "Dataset and experiment"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "数据集版本："
+msgstr "Dataset version:"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "整个 <0>.everything/skills/{name}</0> 目录及其中的配套资源都会被删除，此操作无法撤销。"
+msgstr "The entire <0>.everything/skills/{name}</0> directory and its supporting resources will be deleted. This cannot be undone."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "整理失败，可手动重试"
+msgstr "Consolidation failed; retry manually"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "整理失败，等待重试"
+msgstr "Consolidation failed; awaiting retry"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "整理完成"
+msgstr "Consolidation completed"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "整理次数"
+msgstr "Consolidations"
+
+#: web/src/presentation-i18n.ts
+msgid "整理结果"
+msgstr "Consolidation result"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "整理超过 256 个子任务，请增加上下文预算"
+msgstr "Consolidation exceeds 256 subtasks. Increase the context budget."
+
+#. placeholder {0}: event.completedBatches ?? 0
+#. placeholder {1}: event.totalBatches ?? 0
+#: web/src/pages/agent/AgentPage.tsx
+msgid "整理进度 {0} / {1}"
+msgstr "Consolidation progress {0} / {1}"
+
+#. placeholder {0}: item.factsCreated
+#. placeholder {1}: item.factsUpdated
+#. placeholder {2}: item.factsDeleted
+#. placeholder {3}: item.factsMerged
+#. placeholder {4}: item.factsSkipped
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "新增 {0} / 更新 {1} / 删除 {2} / 合并 {3} / 跳过 {4}"
+msgstr "Created {0} / Updated {1} / Deleted {2} / Merged {3} / Skipped {4}"
+
+#: web/src/presentation-i18n.ts
+msgid "新增 / 更新 / 删除 / 合并 / 跳过"
+msgstr "Create / Update / Delete / Merge / Skip"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "新建"
+msgstr "New"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "新技能草稿"
+msgstr "New Skill draft"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "无法读取整理状态"
+msgstr "Unable to read consolidation status"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "日常记忆快照"
+msgstr "Regular memory snapshot"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "时间"
+msgstr "Time"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "普通表"
+msgstr "Regular tables"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "普通配置保存在 <0>.everything/config.json</0>，API Key 保存在 <1>.everything/.env</1>；保存后下一回合立即生效。"
+msgstr "Settings are saved in <0>.everything/config.json</0>, and API keys in <1>.everything/.env</1>. Changes take effect on the next turn."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "暂无 Semantic Memory，无需整理"
+msgstr "No Semantic Memory to consolidate"
+
+#: web/src/pages/trace/TracePage.tsx
+msgid "暂无运行记录。"
+msgstr "No traces yet."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "有什么可以帮你？"
+msgstr "How can I help?"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "有未保存的修改"
+msgstr "Unsaved changes"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "未保存的新 Skill"
+msgstr "Unsaved new Skill"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "未知"
+msgstr "unknown"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "未设置"
+msgstr "Not set"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "未配置"
+msgstr "Not configured"
+
+#: web/src/apis/agent-api.ts
+msgid "本地 Agent 未返回执行结果"
+msgstr "Local Agent returned no execution result"
+
+#: web/src/apis/workflow-api.ts
+msgid "本地 Engine 执行失败"
+msgstr "Local Engine execution failed"
+
+#: web/src/apis/workflow-api.ts
+msgid "本地 Engine 未返回执行结果"
+msgstr "Local Engine returned no execution result"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "本地 Skills"
+msgstr "Local Skills"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "本地 Web 服务需保持运行。平台评估器需在 Langfuse 中配置，目标为本次 Experiment 的根 Agent observation。未收到评分时显示等待评分，不推断通过。"
+msgstr "Keep the local web service running. Configure platform evaluators in Langfuse to target the root Agent observation of this Experiment. Missing scores are shown as awaiting scores, never assumed to pass."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "本地优先"
+msgstr "Local first"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "本地入口已就绪，点击连接平台检查"
+msgstr "Local endpoint ready. Connect to check the platform."
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "本地工作流文件"
+msgstr "Local workflow file"
+
+#: web/src/apis/data-api.ts
+msgid "本地数据已清理，但自动重建向量索引失败：{message}"
+msgstr "Local data cleared, but automatic vector index rebuild failed: {message}"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "本地运行 / 安全配置"
+msgstr "Local runtime / Safety settings"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "本轮运行已停止"
+msgstr "This turn was stopped"
+
+#. placeholder {0}: dashboard.traces.length
+#. placeholder {1}: files.length
+#: web/src/pages/trace/TracePage.tsx
+msgid "本页 {0} 条轨迹 · {1} 个文件"
+msgstr "This page: {0} traces · {1} files"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "查看 Agent 当前可用的工具，并配置允许修改的能力。"
+msgstr "View the Agent's available tools and configure adjustable capabilities."
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "查看完整状态"
+msgstr "View full state"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "查看所有普通持久化表，并使用受限 SQL Console 查询或修改数据。"
+msgstr "Browse persistent tables and query or modify data through the restricted SQL Console."
+
+#. placeholder {0}: recall.requestedLimit
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "查询上限 {0} 个会话"
+msgstr "Query limit: {0} sessions"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "查询结果"
+msgstr "Query results"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "查询返回 0 行"
+msgstr "Query returned 0 rows"
+
+#: web/src/presentation-i18n.ts
+msgid "校验并保存"
+msgstr "Validate and save"
+
+#: web/src/presentation-i18n.ts
+msgid "校验并提交"
+msgstr "Validate and commit"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "检查点保存失败"
+msgstr "Failed to save checkpoint"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "检测中"
+msgstr "Detecting"
+
+#: web/src/presentation-i18n.ts
+msgid "检索旧semantic memory"
+msgstr "Retrieve existing memories"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "检索模式将回到 FTS5 + BM25。"
+msgstr "Retrieval will switch back to FTS5 + BM25."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "检索配置保存成功，下一回合立即生效。"
+msgstr "Retrieval settings saved. Changes take effect on the next turn."
+
+#: web/src/presentation-i18n.ts
+msgid "模型 · 合并 / 更新 / 忘记"
+msgstr "Model · Merge / Update / Forget"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "模型尚未返回"
+msgstr "Model not returned yet"
+
+#: web/src/presentation-i18n.ts
+msgid "模型整理"
+msgstr "Model consolidation"
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "模型调用"
+msgstr "Model call"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "模型连接"
+msgstr "Model connections"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "模型连接 API Key 已清除。"
+msgstr "Model connection API keys cleared."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "模型连接配置保存成功，下一回合立即生效。"
+msgstr "Model connections saved. Changes take effect on the next turn."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "正在串行建立影子向量索引…"
+msgstr "Building a shadow vector index serially…"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "正在从本地读取 Skill 文件…"
+msgstr "Reading the local Skill file…"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "正在准备编辑器"
+msgstr "Preparing editor"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "正在加载 Agent Harness…"
+msgstr "Loading Agent Harness…"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "正在加载 Memory… {error}"
+msgstr "Loading Memory… {error}"
+
+#: web/src/pages/trace/TracePage.tsx
+msgid "正在加载…"
+msgstr "Loading…"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "正在加载配置…"
+msgstr "Loading settings…"
+
+#: web/src/pages/agent/CompactionNotice.tsx
+msgid "正在压缩上下文"
+msgstr "Compacting context"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "正在同步"
+msgstr "Syncing"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "正在整理"
+msgstr "Consolidating"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "正在清理本地数据，完成后将自动重建向量索引…"
+msgstr "Clearing local data; the vector index will rebuild automatically afterward…"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "正在清理本地数据…"
+msgstr "Clearing local data…"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "正在清除 API Key…"
+msgstr "Clearing API keys…"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "正在读取 Database…"
+msgstr "Reading Database…"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "正在读取工具目录…"
+msgstr "Reading tool catalog…"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "正在读取本地 Skills…"
+msgstr "Reading local Skills…"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "此回合未完成"
+msgstr "This turn is incomplete"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "此处仅配置名称，不填写 terminal 或 memorySnapshot。每次点击 Run 时该 config 可在 Run remote dataset run 弹窗里临时修改；本地启动在下方「数据集与实验」里填写同一个名称前缀，留空时同样使用默认值。"
+msgstr "Configure only the name here, not terminal or memorySnapshot. Each Run lets you temporarily edit config in the Run remote dataset run dialog. Local launches use the same prefix under Dataset and experiment below; leaving it blank also uses the default."
+
+#: web/src/presentation-i18n.ts
+msgid "每日首次使用 / 手动触发"
+msgstr "First daily use / Manual trigger"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "永久删除 {name}？"
+msgstr "Permanently delete {name}?"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "永久删除本地运行数据，此操作无法撤销。"
+msgstr "Permanently delete local runtime data. This cannot be undone."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "永久清除全部本地数据？"
+msgstr "Permanently clear all local data?"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "沙箱"
+msgstr "Sandbox"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "流式响应失败，已降级为普通请求。"
+msgstr "Streaming failed; fell back to a regular request."
+
+#: web/src/presentation-i18n.ts
+msgid "流式输出"
+msgstr "Streaming output"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "消息内容"
+msgstr "Message content"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "清晰描述使用时机，并把执行步骤与边界写进 Instructions。"
+msgstr "Explain when to use the Skill, and include its steps and boundaries in Instructions."
+
+#. placeholder {0}: result.embeddingRebuild.result.chunkCount
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清理完成，向量索引已自动重建并原子激活，共 {0} 个 chunks。EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。"
+msgstr "Cleanup complete. The vector index was rebuilt and atomically activated with {0} chunks. EVERYTHING.md, Skills, config.json, and .everything/.env keys were preserved."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清理完成。数据库、会话、记忆和运行记录已删除，EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。"
+msgstr "Cleanup complete. The database, sessions, memories, and traces were deleted. EVERYTHING.md, Skills, config.json, and .everything/.env keys were preserved."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清除 API Key"
+msgstr "Clear API keys"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清除 Embedding API Key？"
+msgstr "Clear Embedding API key?"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清除全部数据"
+msgstr "Clear all data"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清除全部本地数据"
+msgstr "Clear all local data"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "清除密钥"
+msgstr "Clear key"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "清除模型连接 API Key？"
+msgstr "Clear model connection API keys?"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "热更新"
+msgstr "Live updates"
+
+#: web/src/presentation-i18n.ts
+msgid "版本检查 · 直接替换旧事实"
+msgstr "Version checks · Replace facts"
+
+#: web/src/presentation-i18n.ts
+msgid "理解需求 · 决定下一步"
+msgstr "Reason and decide next steps"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "生产环境只读，修改请在开发环境完成后重新构建"
+msgstr "Read only in production. Make changes in development, then rebuild."
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "生产环境只读查看"
+msgstr "Read only in production"
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。"
+msgstr "Define Agent workflows in code and watch nodes, routes, parallel waves, and final results in real time."
+
+#. placeholder {0}: approval.itemId
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "用例 {0}"
+msgstr "Case {0}"
+
+#: web/src/presentation-i18n.ts
+msgid "用户常驻规则"
+msgstr "Persistent user rules"
+
+#: web/src/presentation-i18n.ts
+msgid "用户输入"
+msgstr "User input"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "用真实 Everything Agent 执行 Langfuse 数据集，独立保存评估会话和记忆。"
+msgstr "Run Langfuse datasets with the real Everything Agent, using isolated evaluation sessions and memory."
+
+#: web/src/pages/workflow/GraphCanvas.tsx
+msgid "由当前代码生成 · 节点会随执行状态实时变化"
+msgstr "Generated from current code · Nodes reflect execution state in real time"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "留空以保留已保存的值"
+msgstr "Leave blank to keep the saved value"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "留空会保留已保存的密钥。"
+msgstr "Leave blank to keep the saved key."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "留空保留已保存的独立密钥"
+msgstr "Leave blank to keep the saved independent key"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "留空时使用 Everything Agent"
+msgstr "Leave blank to use Everything Agent"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "留空返回最近 Session，或按当前模式检索"
+msgstr "Leave blank for recent sessions, or search using the current mode"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "真实环境评估"
+msgstr "Real environment evaluation"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "确认删除"
+msgstr "Confirm deletion"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "确认删除整个 Session？已提炼的长期记忆不会删除。"
+msgstr "Delete this entire Session? Extracted long-term memories will be preserved."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "确认彻底删除这条记忆？"
+msgstr "Permanently delete this memory?"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "确认执行"
+msgstr "Confirm execution"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "确认执行数据库写操作？"
+msgstr "Confirm database write?"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "确认永久删除"
+msgstr "Permanently delete"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "确认清除"
+msgstr "Confirm clearing"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "空白评估记忆"
+msgstr "Empty evaluation memory"
+
+#. placeholder {0}: cursors.length
+#: web/src/pages/trace/TracePage.tsx
+msgid "第 {0} 页"
+msgstr "Page {0}"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "第 {currentPage} / {pageCount} 页"
+msgstr "Page {currentPage} / {pageCount}"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "等待"
+msgstr "Waiting"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "等待审批"
+msgstr "Awaiting approval"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "等待平台评分／尚未配置评估器"
+msgstr "Awaiting platform scores / No evaluator configured"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "等待执行结果同步"
+msgstr "Awaiting execution result sync"
+
+#: web/src/pages/workflow/WorkflowPage.tsx
+msgid "等待有效的工作流代码…"
+msgstr "Waiting for valid workflow code…"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "等待配置"
+msgstr "Awaiting configuration"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "管理 Agent 可发现并按需读取的本地技能。"
+msgstr "Manage local Skills the Agent can discover and read on demand."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "管理模型连接、记忆检索与运行边界。"
+msgstr "Manage model connections, memory retrieval, and runtime boundaries."
+
+#. placeholder {0}: definition?.kind ?? "fn"
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "类型：{0}"
+msgstr "Type: {0}"
+
+#: web/src/presentation-i18n.ts
+msgid "系统提示词"
+msgstr "System prompt"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "系统提示词（只读）"
+msgstr "System prompt (read only)"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "索引就绪"
+msgstr "Index ready"
+
+#. placeholder {0}: result.result.chunkCount
+#: web/src/pages/config/ConfigPage.tsx
+msgid "索引已原子激活，共 {0} 个 chunks。"
+msgstr "Index atomically activated with {0} chunks."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "终端命令的执行边界。命令只能写入这个工作区，由操作系统沙箱强制。"
+msgstr "Terminal execution boundary. Commands can write only to this workspace, enforced by the OS sandbox."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "终端执行"
+msgstr "Terminal execution"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "给 Everything Agent 发消息…"
+msgstr "Message Everything Agent…"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "继续读取"
+msgstr "Read more"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "编辑"
+msgstr "Edit"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "编辑本地文件"
+msgstr "Editing local file"
+
+#. placeholder {0}: item.ms === undefined ? t`未知` : t`${(item.ms / 1000).toFixed(1)}秒`
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "耗时 {0}"
+msgstr "Duration {0}"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "耗时未知"
+msgstr "Duration unknown"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "获取 API Key"
+msgstr "Get API key"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "行数"
+msgstr "Rows"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "表"
+msgstr "Table"
+
+#: web/src/presentation-i18n.ts
+msgid "记忆任务入队"
+msgstr "Queue memory task"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "记忆内容"
+msgstr "Memory content"
+
+#: web/src/presentation-i18n.ts
+msgid "证据与版本校验 · 审计"
+msgstr "Evidence / Version checks / Audit"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "评分刷新／同步重试已完成，请查看最新评分与同步状态。"
+msgstr "Score refresh / Sync retry completed. Check the latest scores and sync status."
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "该表暂无数据"
+msgstr "No data in this table"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "请先完整配置 Agent Model 与 Small Model"
+msgstr "Fully configure both Agent Model and Small Model first"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "请到<0>配置页面的 Sandbox 区域</0>填写工作区根目录，保存后回到这里启用。"
+msgstr "Set the workspace root in <0>Settings → Sandbox</0>, save it, then return here to enable terminal access."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "请求固定 1024 维向量；维度不一致时直接失败。"
+msgstr "Requests fixed 1024-dimensional vectors. A dimension mismatch fails immediately."
+
+#. placeholder {0}: response.status
+#: web/src/apis/request-json.ts
+msgid "请求失败（{0}）"
+msgstr "Request failed ({0})"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "读取 Skills"
+msgstr "Read Skills"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "负责主 Agent 推理、工具调用、记忆写入与 consolidation。"
+msgstr "Handles primary Agent reasoning, tool calls, memory writes, and consolidation."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "输入"
+msgstr "Input"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "输入 Agent Model API Key"
+msgstr "Enter Agent Model API key"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "输入 Agent 模型 ID"
+msgstr "Enter Agent model ID"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "输入 Small Model API Key"
+msgstr "Enter Small Model API key"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "输入 Small 模型 ID"
+msgstr "Enter Small model ID"
+
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "输入一个任务，例如：帮我规划今天的工作"
+msgstr "Enter a task, e.g. help me plan today's work"
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "输入关键词查找相关内容，或留空查看最近活跃的会话。"
+msgstr "Enter keywords to find relevant content, or leave blank for recently active sessions."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "输入关键词查找相关记忆，或留空查看记忆列表。"
+msgstr "Enter keywords to find relevant memories, or leave blank to browse."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "输入支持字符串、{singleTurnShape} 或 {multiTurnShape}。"
+msgstr "Input supports a string, {singleTurnShape}, or {multiTurnShape}."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "输入新的会话标题"
+msgstr "Enter a new session title"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "输入独立 Embedding API Key"
+msgstr "Enter independent Embedding API key"
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "运行 SQL"
+msgstr "Run SQL"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "运行前配置"
+msgstr "Pre-run settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "运行参数"
+msgstr "Runtime settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "运行参数保存成功，下一回合立即生效。"
+msgstr "Runtime settings saved. Changes take effect on the next turn."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "运行暂停在这些外部写操作上，批准或拒绝后继续该用例。"
+msgstr "These cases are paused for external writes. Approve or reject to continue each case."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "运行配置已恢复默认值。"
+msgstr "Runtime defaults restored."
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "返回 Overview"
+msgstr "Back to Overview"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "还没有 Skill。点击“新建 Skill”开始。"
+msgstr "No Skills yet. Click “New Skill” to get started."
+
+#: web/src/pages/database/DatabasePage.tsx
+msgid "这条 SQL 会直接修改 state.db。执行成功后无法在页面中自动撤销。"
+msgstr "This SQL directly modifies state.db. Successful changes cannot be automatically undone here."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "进程中断"
+msgstr "Process interrupted"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "远程数据边界"
+msgstr "Remote data boundary"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "连接外部服务和本机应用；日历写入需要确认。"
+msgstr "Connect external services and local apps. Calendar writes require confirmation."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "连接平台"
+msgstr "Connect platform"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "选择 Experiment 查看用例详情。"
+msgstr "Select an Experiment to view its cases."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "选择 Langfuse 数据集后在本机启动 Experiment，执行过程与平台入口共用，需要审批时暂停该用例。"
+msgstr "Select a Langfuse dataset to start an Experiment locally. Both entry points share the same execution path; cases pause when approval is required."
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "选择一个会话继续聊天"
+msgstr "Select a session to continue chatting"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "选择工作流"
+msgstr "Select workflow"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "选择数据集"
+msgstr "Select dataset"
+
+#. placeholder {0}: recall.droppedSessionCount
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "部分结果已截断或省略（省略 {0} 个会话）。"
+msgstr "Some results were truncated or omitted ({0} sessions omitted)."
+
+#: web/src/pages/memory/MemoryPage.tsx
+msgid "部分范围"
+msgstr "Partial range"
+
+#: web/src/App.tsx
+msgid "配置"
+msgstr "Settings"
+
+#. placeholder {0}: tool.name
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "配置 {0}"
+msgstr "Configure {0}"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "配置 Semantic Memory 的词法、向量或混合检索。"
+msgstr "Configure lexical, vector, or hybrid retrieval for Semantic Memory."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "配置中心"
+msgstr "Settings"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "配置仅存储在当前项目中，不会上传或共享"
+msgstr "Settings stay in this project and are never uploaded or shared"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "配置刷新失败：{refreshError}"
+msgstr "Failed to refresh settings: {refreshError}"
+
+#. placeholder {0}: translateMessage(modelMessage)
+#: web/src/pages/config/ConfigPage.tsx
+msgid "配置加载失败：{0}"
+msgstr "Failed to load settings: {0}"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "配置就绪"
+msgstr "Ready"
+
+#. placeholder {0}: settings.embeddingIndex.generationId.slice(0, 8)
+#: web/src/pages/config/ConfigPage.tsx
+msgid "配置待重建 · 旧索引 {0} 仍可用"
+msgstr "Rebuild required · Previous index {0} remains available"
+
+#: web/src/pages/agent/AgentPage.tsx
+msgid "重命名会话"
+msgstr "Rename session"
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "重建索引"
+msgstr "Rebuild index"
+
+#: web/src/pages/workflow/CodeEditor.tsx
+msgid "重新读取"
+msgstr "Reload"
+
+#: web/src/pages/skills/SkillsPage.tsx
+msgid "重新读取 Skills"
+msgstr "Reload Skills"
+
+#. placeholder {0}: node.error
+#: web/src/pages/workflow/RunPanel.tsx
+msgid "错误：{0}"
+msgstr "Error: {0}"
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "随 Runtime 提供，不依赖外部服务。"
+msgstr "Provided by the Runtime with no external services."
+
+#: web/src/pages/tools/ToolsPage.tsx
+msgid "需要配置"
+msgstr "Configuration required"
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "预期结果"
+msgstr "Expected output"
+
+#. placeholder {0}: data?.webhookUrl
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "首次点击卡片上的 Configure，进入 <0>Set up remote experiment trigger in UI</0>：<1>URL</1> 填回调地址 <2>{0}</2>"
+msgstr "First, click Configure on the card to open <0>Set up remote experiment trigger in UI</0>. Set <1>URL</1> to the callback address <2>{0}</2>."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "默认 100 轮，每次新运行生效。"
+msgstr "Defaults to 100 iterations. Applies to each new run."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "默认 262,144，需容纳输入、单次输出预算及 512 tokens 安全余量。"
+msgstr "Defaults to 262,144. Must fit input, output budget, and a 512-token safety margin."
+
+#: web/src/pages/config/ConfigPage.tsx
+msgid "默认 32,768 tokens，每次新运行生效。"
+msgstr "Defaults to 32,768 tokens. Applies to each new run."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "默认 false，使用空白评估记忆；true 使用日常记忆快照。"
+msgstr "Defaults to false for empty evaluation memory; true uses a regular memory snapshot."
+
+#: web/src/pages/evaluation/EvaluationPage.tsx
+msgid "默认 false，全部用例关闭终端。设为 true 时，还需要日常工具配置启用终端且沙箱可用。"
+msgstr "Defaults to false, disabling terminal access for all cases. true also requires terminal access enabled in regular tool settings and an available sandbox."

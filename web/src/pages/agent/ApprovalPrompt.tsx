@@ -1,3 +1,6 @@
+import { useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { ShieldAlert } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import type { PendingApproval } from "../../apis/agent-api";
@@ -15,6 +18,7 @@ interface ApprovalPromptProps {
  * 判断；命令原文完整展示，不做省略，确认的依据必须看得见。
  */
 export function ApprovalPrompt({ approvals, busyId, onDecide }: ApprovalPromptProps) {
+  useLingui();
   if (approvals.length === 0) return null;
   return (
     <div className="mb-3 flex flex-col gap-2">
@@ -23,7 +27,7 @@ export function ApprovalPrompt({ approvals, busyId, onDecide }: ApprovalPromptPr
           key={approval.id}
           className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm"
           role="alertdialog"
-          aria-label="命令需要确认"
+          aria-label={t`命令需要确认`}
         >
           <div className="flex items-center gap-2 font-medium text-foreground">
             <ShieldAlert className="size-4 shrink-0 text-amber-600" aria-hidden />
@@ -40,17 +44,17 @@ export function ApprovalPrompt({ approvals, busyId, onDecide }: ApprovalPromptPr
               size="sm"
               disabled={busyId === approval.id}
               onClick={() => onDecide(approval.id, true)}
-            >
+            ><Trans>
               允许本次
-            </Button>
+            </Trans></Button>
             <Button
               size="sm"
               variant="destructive-outline"
               disabled={busyId === approval.id}
               onClick={() => onDecide(approval.id, false)}
-            >
+            ><Trans>
               拒绝
-            </Button>
+            </Trans></Button>
           </div>
         </div>
       ))}

@@ -1,3 +1,7 @@
+import { formatLocale, translateMessage, type UiMessage } from "../../i18n";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, ExternalLink, Copy, Play, Square, FlaskConical, PlugZap, ListChecks, SlidersHorizontal, BookOpen, ChevronRight, Clock3 } from 'lucide-react';
 import { PageHeading } from '../../components/PageHeading';
@@ -10,13 +14,15 @@ import { evaluationRequest } from '../../apis/evaluation-api';
 import { withMinimumDuration } from '../../lib/minimum-duration';
 import type { EvaluationDashboard } from '../../apis/evaluation-api';
 
-const labels: Record<string, string> = { queued: '排队中', running: '执行中', waiting_approval: '等待审批', completed: '执行完成', failed: '失败', cancelled: '已取消', interrupted: '进程中断', pending: '待同步', synced: '已同步' };
 /** Radix Select 不允许用空字符串作为选项值，未选择数据集时用该占位值表示“尚未选择”。 */
 const noDataset = 'none';
 /** 服务端对 Experiment 名称前缀的限制是 1–120 字符，这里同步限制输入长度。 */
 const maxNameLength = 120;
 /** 数据集 metadata 默认值，页面在两个分区里引用同一份文本，避免两处示例漂移。 */
 const datasetMetadataJson = '{"terminal":false,"memorySnapshot":false}';
+// 用变量插值展示 JSON 示例，避免将花括号当作 ICU 翻译语法。
+const singleTurnShape = "{ prompt }";
+const multiTurnShape = '{ turns: ["Turn 1", "Turn 2"] }';
 /** Remote experiment trigger 的 Default config 文本，同样只保留一份。 */
 const defaultConfigJson = '{"name":"Everything Agent"}';
 /** 提取错误文案：Error 对象只取 message，避免 String(error) 自带的「Error:」前缀让同一条提示出现两种写法。 */
@@ -25,6 +31,8 @@ function errorText(cause: unknown): string {
 }
 /** 真实评估控制台；运行留在服务端，离开页面不会取消 Experiment。 */
 export function EvaluationPage() {
+  useLingui();
+  const labels: Record<string, string> = { queued: t`排队中`, running: t`执行中`, waiting_approval: t`等待审批`, completed: t`执行完成`, failed: t`失败`, cancelled: t`已取消`, interrupted: t`进程中断`, pending: t`待同步`, synced: t`已同步` };
   const [data, setData] = useState<EvaluationDashboard>();
   const [datasets, setDatasets] = useState<{ id: string; name: string }[]>([]);
   const [dataset, setDataset] = useState('');
@@ -33,7 +41,7 @@ export function EvaluationPage() {
   const [selected, setSelected] = useState('');
   const [error, setError] = useState('');
   /** 操作反馈，交给 SaveMessage 浮层展示并在 2.5 秒后消失，不在页面里占位。 */
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<UiMessage>('');
   /** 浮层提示类型：成功默认绿色，错误使用与页面 alert 一致的红色警告样式。 */
   const [messageVariant, setMessageVariant] = useState<'success' | 'error'>('success');
   const [busy, setBusy] = useState(false);
@@ -54,7 +62,7 @@ export function EvaluationPage() {
     }
   }, [backgroundError, busy, message]);
   /** 设置浮层提示并同步其类型，避免上一次错误样式残留到下一次成功反馈上。 */
-  const showMessage = (text: string, variant: 'success' | 'error' = 'success') => { setMessageVariant(variant); setMessage(text); };
+  const showMessage = (text: UiMessage, variant: 'success' | 'error' = 'success') => { setMessageVariant(variant); setMessage(text); };
   useEffect(() => {
     let disposed = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -74,7 +82,7 @@ export function EvaluationPage() {
     try {
       const execute = async () => { await evaluationRequest('', body); return evaluationRequest<EvaluationDashboard>(); };
       setData(await (refreshing ? withMinimumDuration(execute) : execute()));
-      if (refreshing) showMessage('评分刷新／同步重试已完成，请查看最新评分与同步状态。');
+      if (refreshing) showMessage(msg`评分刷新／同步重试已完成，请查看最新评分与同步状态。`);
     }
     catch (cause) { showMessage(errorText(cause), 'error'); }
     finally { setBusy(false); if (refreshing) setRefreshingRunId(null); }
@@ -86,7 +94,7 @@ export function EvaluationPage() {
     try {
       const result = await withMinimumDuration(() => evaluationRequest<{ datasets: typeof datasets }>('/datasets'));
       setDatasets(result.datasets); setDataset(result.datasets[0]?.name ?? ''); setConnected(true);
-      showMessage(`平台连接正常，已发现 ${result.datasets.length} 个数据集。`);
+      showMessage(msg`平台连接正常，已发现 ${result.datasets.length} 个数据集。`);
     }
     catch (cause) {
       setConnected(false);
@@ -97,7 +105,7 @@ export function EvaluationPage() {
   };
   const copyHeaders = async () => {
     setMessage('');
-    try { const headers = await evaluationRequest<{ Authorization: string }>('/webhook-headers', {}); await navigator.clipboard.writeText(headers.Authorization); showMessage('authorization 值已复制，请在 Langfuse 添加请求头。'); }
+    try { const headers = await evaluationRequest<{ Authorization: string }>('/webhook-headers', {}); await navigator.clipboard.writeText(headers.Authorization); showMessage(msg`authorization 值已复制，请在 Langfuse 添加请求头。`); }
     catch (cause) { showMessage(errorText(cause), 'error'); }
   };
   const run = data?.runs.find(item => item.id === selected) ?? data?.runs[0];
@@ -109,89 +117,89 @@ export function EvaluationPage() {
   const finishedCount = run ? run.items.filter(item => ['completed', 'failed', 'cancelled'].includes(item.status)).length : 0;
   const syncedCount = run ? run.items.filter(item => item.sync === 'synced').length : 0;
   return <div className="content-wrap evaluation-page">
-    <PageHeading eyebrow="真实环境评估" title="Evaluation" description="用真实 Everything Agent 执行 Langfuse 数据集，独立保存评估会话和记忆。" />
+    <PageHeading eyebrow={t`真实环境评估`} title="Evaluation" description={t`用真实 Everything Agent 执行 Langfuse 数据集，独立保存评估会话和记忆。`} />
     <SaveMessage message={message} setMessage={setMessage} variant={messageVariant} />
 
-    <section className="eval-panel" aria-label="Langfuse 连接">
+    <section className="eval-panel" aria-label={t`Langfuse 连接`}>
       <header className="eval-panel-header">
         <span className="eval-panel-icon"><PlugZap size={15} /></span>
         <div className="eval-panel-heading">
-          <h2>Langfuse 连接</h2>
+          <h2><Trans>Langfuse 连接</Trans></h2>
           <p>
-            {connected ? '平台连接正常' : data?.configured ? '本地入口已就绪，点击连接平台检查' : '等待配置'}
+            {connected ? t`平台连接正常` : data?.configured ? t`本地入口已就绪，点击连接平台检查` : t`等待配置`}
             {data?.baseUrl && <code>{data.baseUrl}</code>}
           </p>
         </div>
         <div className="eval-panel-actions">
-          <Button variant="outline" disabled={busy} loading={connecting} onClick={() => void connect()}><RefreshCw size={14} />连接平台</Button>
-          {data?.configured && <a className="eval-link" href={projectUrl} target="_blank" rel="noreferrer">打开 Langfuse <ExternalLink size={14} /></a>}
+          <Button variant="outline" disabled={busy} loading={connecting} onClick={() => void connect()}><RefreshCw size={14} /><Trans>连接平台</Trans></Button>
+          {data?.configured && <a className="eval-link" href={projectUrl} target="_blank" rel="noreferrer"><Trans>打开 Langfuse </Trans><ExternalLink size={14} /></a>}
         </div>
       </header>
     </section>
 
-    <section className="eval-panel eval-panel-config" aria-label="运行前配置">
+    <section className="eval-panel eval-panel-config" aria-label={t`运行前配置`}>
       <header className="eval-panel-header">
         <span className="eval-panel-icon"><SlidersHorizontal size={15} /></span>
         <div className="eval-panel-heading">
-          <h2>运行前配置</h2>
-          <p>在 Langfuse 以下位置填写配置，示例均为默认值。</p>
+          <h2><Trans>运行前配置</Trans></h2>
+          <p><Trans>在 Langfuse 以下位置填写配置，示例均为默认值。</Trans></p>
         </div>
       </header>
       <div className="eval-panel-body">
         <div className="eval-config-grid">
           <article className="eval-config-card">
-            <header><h3>数据集 Metadata</h3><span>作用于该数据集全部用例</span></header>
+            <header><h3><Trans>数据集 Metadata</Trans></h3><span><Trans>作用于该数据集全部用例</Trans></span></header>
             <code className="eval-code-block p-3">{datasetMetadataJson}</code>
             <dl className="eval-field-list">
-              <div><dt>terminal</dt><dd>默认 false，全部用例关闭终端。设为 true 时，还需要日常工具配置启用终端且沙箱可用。</dd></div>
-              <div><dt>memorySnapshot</dt><dd>默认 false，使用空白评估记忆；true 使用日常记忆快照。</dd></div>
+              <div><dt>terminal</dt><dd><Trans>默认 false，全部用例关闭终端。设为 true 时，还需要日常工具配置启用终端且沙箱可用。</Trans></dd></div>
+              <div><dt>memorySnapshot</dt><dd><Trans>默认 false，使用空白评估记忆；true 使用日常记忆快照。</Trans></dd></div>
             </dl>
-            <p className="eval-config-footnote">两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。</p>
+            <p className="eval-config-footnote"><Trans>两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。</Trans></p>
           </article>
           <article className="eval-config-card">
-            <header><h3>Remote experiment trigger → Default config</h3><span>仅配置 Experiment 名称前缀</span></header>
+            <header><h3>Remote experiment trigger → Default config</h3><span><Trans>仅配置 Experiment 名称前缀</Trans></span></header>
             <code className="eval-code-block p-3">{defaultConfigJson}</code>
             <dl className="eval-field-list">
-              <div><dt>name</dt><dd>Experiment 名称前缀，默认 Everything Agent；最终名称自动附加运行 ID 短码。留空表示不发送 config。</dd></div>
+              <div><dt>name</dt><dd><Trans>Experiment 名称前缀，默认 Everything Agent；最终名称自动附加运行 ID 短码。留空表示不发送 config。</Trans></dd></div>
             </dl>
-            <p className="eval-config-footnote">此处仅配置名称，不填写 terminal 或 memorySnapshot。每次点击 Run 时该 config 可在 Run remote dataset run 弹窗里临时修改；本地启动在下方「数据集与实验」里填写同一个名称前缀，留空时同样使用默认值。</p>
+            <p className="eval-config-footnote"><Trans>此处仅配置名称，不填写 terminal 或 memorySnapshot。每次点击 Run 时该 config 可在 Run remote dataset run 弹窗里临时修改；本地启动在下方「数据集与实验」里填写同一个名称前缀，留空时同样使用默认值。</Trans></p>
           </article>
         </div>
       </div>
     </section>
 
-    <section className="eval-panel eval-launch" aria-label="数据集与实验">
+    <section className="eval-panel eval-launch" aria-label={t`数据集与实验`}>
       <header className="eval-panel-header">
         <span className="eval-panel-icon"><FlaskConical size={15} /></span>
         <div className="eval-panel-heading">
-          <h2>数据集与实验</h2>
+          <h2><Trans>数据集与实验</Trans></h2>
           {/* 说明保持标题块内的普通文本，与其余分区的标题块同高；入口按钮拆到标题块之外。 */}
-          <p>选择 Langfuse 数据集后在本机启动 Experiment，执行过程与平台入口共用，需要审批时暂停该用例。</p>
+          <p><Trans>选择 Langfuse 数据集后在本机启动 Experiment，执行过程与平台入口共用，需要审批时暂停该用例。</Trans></p>
         </div>
         {/* 入口是标题块的兄弟项：宽屏与标题、说明共用一条中线，放不下时整行换到标题块下方，不撑高说明行。 */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="eval-guide-trigger">Langfuse Experiment 配置说明</Button>
+            <Button variant="outline" className="eval-guide-trigger"><Trans>Langfuse Experiment 配置说明</Trans></Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="eval-guide-dialog">
             <AlertDialogHeader>
-              <AlertDialogTitle className="eval-guide-title">从 Langfuse 管理平台触发 Experiment</AlertDialogTitle>
-              <AlertDialogDescription className="eval-guide-note">按下面的顺序在 Langfuse 界面完成一次性配置，之后即可触发评估。</AlertDialogDescription>
+              <AlertDialogTitle className="eval-guide-title"><Trans>从 Langfuse 管理平台触发 Experiment</Trans></AlertDialogTitle>
+              <AlertDialogDescription className="eval-guide-note"><Trans>按下面的顺序在 Langfuse 界面完成一次性配置，之后即可触发评估。</Trans></AlertDialogDescription>
             </AlertDialogHeader>
             {/* 步骤编号由 CSS 计数器生成，正文仍是普通段落，长句可在窄屏内正常换行。 */}
             <div className="eval-steps">
-              <p><span>打开数据集 → 进入 <strong>Experiments</strong> 标签页 → 右上角 <strong>Run experiment</strong> → 在 Run Experiment 弹窗里选 <strong>via Webhook</strong> 卡片。</span></p>
-              <p><span>首次点击卡片上的 Configure，进入 <strong>Set up remote experiment trigger in UI</strong>：<strong>URL</strong> 填回调地址 <code className="eval-code-inline">{data?.webhookUrl}</code></span></p>
-              <p><span><strong>Default config</strong> 填 <code className="eval-code-inline">{defaultConfigJson}</code></span></p>
-              <p><span><strong>Sign requests</strong> 保持关闭，我们的网关只校验 authorization，不校验 x-langfuse-signature。</span></p>
-              <p><span><strong>Enabled</strong> 打开，否则实验无法触发。</span></p>
-              <p><span>展开 <strong>Advanced Options</strong> → <strong>Custom headers</strong>：名称填 <code className="eval-code-inline">authorization</code>，值用下方按钮复制后粘贴，最后保存。</span></p>
+              <p><span><Trans>打开数据集 → 进入 <strong>Experiments</strong> 标签页 → 右上角 <strong>Run experiment</strong> → 在 Run Experiment 弹窗里选 <strong>via Webhook</strong> 卡片。</Trans></span></p>
+              <p><span><Trans>首次点击卡片上的 Configure，进入 <strong>Set up remote experiment trigger in UI</strong>：<strong>URL</strong> 填回调地址 <code className="eval-code-inline">{data?.webhookUrl}</code></Trans></span></p>
+              <p><span><Trans><strong>Default config</strong> 填 <code className="eval-code-inline">{defaultConfigJson}</code></Trans></span></p>
+              <p><span><Trans><strong>Sign requests</strong> 保持关闭，我们的网关只校验 authorization，不校验 x-langfuse-signature。</Trans></span></p>
+              <p><span><Trans><strong>Enabled</strong> 打开，否则实验无法触发。</Trans></span></p>
+              <p><span><Trans>展开 <strong>Advanced Options</strong> → <strong>Custom headers</strong>：名称填 <code className="eval-code-inline">authorization</code>，值用下方按钮复制后粘贴，最后保存。</Trans></span></p>
             </div>
             <AlertDialogFooter className="eval-guide-footer">
-              <span>本地 Web 服务需保持运行。平台评估器需在 Langfuse 中配置，目标为本次 Experiment 的根 Agent observation。未收到评分时显示等待评分，不推断通过。</span>
+              <span><Trans>本地 Web 服务需保持运行。平台评估器需在 Langfuse 中配置，目标为本次 Experiment 的根 Agent observation。未收到评分时显示等待评分，不推断通过。</Trans></span>
               <div className="eval-guide-actions">
-                <AlertDialogCancel className="eval-copy-button" onClick={() => void copyHeaders()} disabled={!data?.configured}><Copy size={14} />复制 authorization 值</AlertDialogCancel>
-                <AlertDialogCancel>关闭</AlertDialogCancel>
+                <AlertDialogCancel className="eval-copy-button" onClick={() => void copyHeaders()} disabled={!data?.configured}><Copy size={14} /><Trans>复制 authorization 值</Trans></AlertDialogCancel>
+                <AlertDialogCancel><Trans>关闭</Trans></AlertDialogCancel>
               </div>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -200,28 +208,28 @@ export function EvaluationPage() {
       <div className="eval-panel-body">
         <div className="eval-launch-form">
           <div className="eval-field">
-            <span id="evaluation-dataset-label" className="eval-field-label">Langfuse 数据集</span>
+            <span id="evaluation-dataset-label" className="eval-field-label"><Trans>Langfuse 数据集</Trans></span>
             <Select value={dataset || noDataset} onValueChange={value => setDataset(value === noDataset ? '' : value)}>
-              <SelectTrigger aria-labelledby="evaluation-dataset-label" className="eval-control"><SelectValue placeholder="选择数据集" /></SelectTrigger>
-              <SelectContent><SelectItem value={noDataset}><span className="eval-option-placeholder">选择数据集</span></SelectItem>{datasets.map(item => <SelectItem key={item.id} value={item.name}>{item.name}</SelectItem>)}</SelectContent>
+              <SelectTrigger aria-labelledby="evaluation-dataset-label" className="eval-control"><SelectValue placeholder={t`选择数据集`} /></SelectTrigger>
+              <SelectContent><SelectItem value={noDataset}><span className="eval-option-placeholder"><Trans>选择数据集</Trans></span></SelectItem>{datasets.map(item => <SelectItem key={item.id} value={item.name}>{item.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="eval-field">
-            <span id="evaluation-name-label" className="eval-field-label">Experiment 名称前缀（可选）</span>
-            <Input aria-labelledby="evaluation-name-label" className="eval-control" value={name} maxLength={maxNameLength} spellCheck={false} placeholder="留空时使用 Everything Agent" onChange={event => setName(event.target.value)} />
+            <span id="evaluation-name-label" className="eval-field-label"><Trans>Experiment 名称前缀（可选）</Trans></span>
+            <Input aria-labelledby="evaluation-name-label" className="eval-control" value={name} maxLength={maxNameLength} spellCheck={false} placeholder={t`留空时使用 Everything Agent`} onChange={event => setName(event.target.value)} />
           </div>
           <Button className="h-10" disabled={busy || active || !connected || !dataset} onClick={() => void act({ action: 'start', datasetName: dataset, ...(name.trim() ? { name: name.trim() } : {}) })}><Play size={14} />Run Experiment</Button>
         </div>
-        <p className="eval-note pt-2">输入支持字符串、{'{ prompt }'} 或 {'{ turns: ["第一轮", "第二轮"] }'}。</p>
+        <p className="eval-note pt-2"><Trans>输入支持字符串、{singleTurnShape} 或 {multiTurnShape}。</Trans></p>
       </div>
     </section>
 
-    {Boolean(data?.approvals.length) && <section className="eval-panel eval-panel-approval" aria-label="待确认操作">
+    {Boolean(data?.approvals.length) && <section className="eval-panel eval-panel-approval" aria-label={t`待确认操作`}>
       <header className="eval-panel-header">
         <span className="eval-panel-icon"><ListChecks size={15} /></span>
         <div className="eval-panel-heading">
-          <h2>待确认操作</h2>
-          <p>运行暂停在这些外部写操作上，批准或拒绝后继续该用例。</p>
+          <h2><Trans>待确认操作</Trans></h2>
+          <p><Trans>运行暂停在这些外部写操作上，批准或拒绝后继续该用例。</Trans></p>
         </div>
       </header>
       <div className="eval-panel-body">
@@ -229,68 +237,68 @@ export function EvaluationPage() {
           {data!.approvals.map(approval => <article className="eval-approval" key={approval.id}>
             <div className="eval-approval-meta">
               <span>Experiment {approval.runId.slice(0, 8)}</span>
-              <span>用例 {approval.itemId}</span>
+              <span><Trans>用例 {approval.itemId}</Trans></span>
             </div>
             <p className="eval-approval-reason">{approval.reason}</p>
             <pre className="eval-pre eval-approval-command">{approval.command}</pre>
             {approval.detail && <p className="eval-approval-detail">{approval.detail}</p>}
-            <div className="eval-approval-actions">{[true, false].map(approved => <Button key={String(approved)} variant={approved ? 'default' : 'outline'} disabled={busy} onClick={() => void act({ action: 'approve', runId: approval.runId, itemId: approval.itemId, approvalId: approval.id, approved })}>{approved ? '批准本次操作' : '拒绝'}</Button>)}</div>
+            <div className="eval-approval-actions">{[true, false].map(approved => <Button key={String(approved)} variant={approved ? 'default' : 'outline'} disabled={busy} onClick={() => void act({ action: 'approve', runId: approval.runId, itemId: approval.itemId, approvalId: approval.id, approved })}>{approved ? t`批准本次操作` : t`拒绝`}</Button>)}</div>
           </article>)}
         </div>
       </div>
     </section>}
 
     <div className="eval-workspace">
-      <section className="eval-panel eval-runs" aria-label="Experiment 记录">
+      <section className="eval-panel eval-runs" aria-label={t`Experiment 记录`}>
         <header className="eval-runs-header">
-          <h2>Experiment 记录</h2>
-          <span className="eval-count">共 {data?.runs.length ?? 0} 条</span>
+          <h2><Trans>Experiment 记录</Trans></h2>
+          <span className="eval-count"><Trans>共 {data?.runs.length ?? 0} 条</Trans></span>
         </header>
         <div className="eval-panel-body">
-          {!data?.runs.length && <p className="eval-empty">尚无 Experiment。从平台或本页启动后，记录会显示在这里。</p>}
+          {!data?.runs.length && <p className="eval-empty"><Trans>尚无 Experiment。从平台或本页启动后，记录会显示在这里。</Trans></p>}
           {visibleRuns.map(item => <button type="button" aria-pressed={run?.id === item.id} key={item.id} className="eval-run" onClick={() => setSelected(item.id)}>
             <strong className="eval-run-name">{item.name}</strong>
             <span className="eval-run-meta">
               <span className="eval-run-dataset">{item.datasetName}</span>
               <span className={`eval-status eval-status-${item.status}`}>{labels[item.status]}</span>
             </span>
-            <time className="eval-run-time" dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString()}</time>
+            <time className="eval-run-time" dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString(formatLocale())}</time>
           </button>)}
         </div>
-        <nav className="eval-pagination" aria-label="Experiment 记录分页">
-          <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>上一页</Button>
-          <span className="eval-pagination-page">第 {currentPage} / {pageCount} 页</span>
-          <Button variant="outline" size="sm" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>下一页</Button>
+        <nav className="eval-pagination" aria-label={t`Experiment 记录分页`}>
+          <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}><Trans>上一页</Trans></Button>
+          <span className="eval-pagination-page"><Trans>第 {currentPage} / {pageCount} 页</Trans></span>
+          <Button variant="outline" size="sm" disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}><Trans>下一页</Trans></Button>
         </nav>
       </section>
 
-      <section className="eval-panel eval-detail" aria-label="Experiment 详情">
-        {!run ? <p className="eval-empty">选择 Experiment 查看用例详情。</p> : <>
+      <section className="eval-panel eval-detail" aria-label={t`Experiment 详情`}>
+        {!run ? <p className="eval-empty"><Trans>选择 Experiment 查看用例详情。</Trans></p> : <>
           <header className="eval-detail-header">
             <div className="eval-detail-heading">
               <h2>{run.name}</h2>
               <p>
                 <span className={`eval-status eval-status-${run.status}`}>{labels[run.status]}</span>
-                <span>{finishedCount} / {run.items.length} 条用例已结束</span>
-                <span>{run.memorySnapshot ? '日常记忆快照' : '空白评估记忆'}</span>
+                <span><Trans>{finishedCount} / {run.items.length} 条用例已结束</Trans></span>
+                <span>{run.memorySnapshot ? t`日常记忆快照` : t`空白评估记忆`}</span>
               </p>
             </div>
             <div className="eval-detail-actions">
               {['queued', 'running'].includes(run.status)
-                ? <Button variant="outline" disabled={busy} onClick={() => void act({ action: 'cancel', runId: run.id })}><Square size={14} />取消运行</Button>
-                : <Button variant="outline" disabled={busy} loading={refreshingRunId === run.id} onClick={() => void act({ action: 'refresh', runId: run.id })}><RefreshCw size={14} />刷新评分／重试同步</Button>}
+                ? <Button variant="outline" disabled={busy} onClick={() => void act({ action: 'cancel', runId: run.id })}><Square size={14} /><Trans>取消运行</Trans></Button>
+                : <Button variant="outline" disabled={busy} loading={refreshingRunId === run.id} onClick={() => void act({ action: 'refresh', runId: run.id })}><RefreshCw size={14} /><Trans>刷新评分／重试同步</Trans></Button>}
             </div>
           </header>
           <div className="eval-panel-body">
             {/* 冒号写在标签内，复制文本时仍能读成“terminal：true”。 */}
             <div className="eval-facts">
-              <p className="eval-fact-name"><span>Experiment 名称：</span><strong className="eval-fact-value">{run.name}</strong></p>
+              <p className="eval-fact-name"><span><Trans>Experiment 名称：</Trans></span><strong className="eval-fact-value">{run.name}</strong></p>
               <p><span>terminal：</span><code className="eval-fact-value">{String(run.terminalEnabled)}</code></p>
               <p><span>memorySnapshot：</span><code className="eval-fact-value">{String(run.memorySnapshot)}</code></p>
-              <p className="eval-fact-version"><span>数据集版本：</span><code className="eval-fact-value">{run.datasetVersion}</code></p>
-              <p><span>同步成功：</span><span className="eval-fact-value">{syncedCount} 条</span></p>
+              <p className="eval-fact-version"><span><Trans>数据集版本：</Trans></span><code className="eval-fact-value">{run.datasetVersion}</code></p>
+              <p><span><Trans>同步成功：</Trans></span><span className="eval-fact-value"><Trans>{syncedCount} 条</Trans></span></p>
             </div>
-            <p className="eval-note">上方开关为本次运行读取的数据集配置；terminal 为 true 表示数据集允许终端，实际可用性取决于日常配置与沙箱。执行完成不代表质量通过。</p>
+            <p className="eval-note"><Trans>上方开关为本次运行读取的数据集配置；terminal 为 true 表示数据集允许终端，实际可用性取决于日常配置与沙箱。执行完成不代表质量通过。</Trans></p>
             {(run.error || run.scoreError) && <p className="eval-error-text" role="alert">{run.error || run.scoreError}</p>}
             <div className="eval-items">
               {run.items.map(item => <details className="eval-item" key={item.id}>
@@ -298,30 +306,30 @@ export function EvaluationPage() {
                   <strong>{item.id}</strong>
                   <span className={`eval-status eval-status-${item.status}`}>{labels[item.status]}</span>
                   <span className={`eval-status eval-status-${item.sync}`}>{labels[item.sync]}</span>
-                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm leading-none text-muted-foreground tabular-nums" aria-label={`耗时 ${item.ms === undefined ? '未知' : `${(item.ms / 1000).toFixed(1)}秒`}`}><Clock3 size={14} className="block shrink-0" aria-hidden="true" /><span>{item.ms === undefined ? '—' : `${(item.ms / 1000).toFixed(1)}s`}</span></span>
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm leading-none text-muted-foreground tabular-nums" aria-label={t`耗时 ${item.ms === undefined ? t`未知` : t`${(item.ms / 1000).toFixed(1)}秒`}`}><Clock3 size={14} className="block shrink-0" aria-hidden="true" /><span>{item.ms === undefined ? '—' : `${(item.ms / 1000).toFixed(1)}s`}</span></span>
                 </summary>
                 <div className="eval-item-body">
-                  <p className="eval-run-metrics">{item.model ?? '模型尚未返回'} · 工具 {item.toolCalls} 次 · 输入 {item.inputTokens ?? '—'} / 输出 {item.outputTokens ?? '—'} tokens</p>
+                  <p className="eval-run-metrics"><Trans>{item.model ?? t`模型尚未返回`} · 工具 {item.toolCalls} 次 · 输入 {item.inputTokens ?? '—'} / 输出 {item.outputTokens ?? '—'} tokens</Trans></p>
                   {item.error && <p className="eval-error-text">{item.error}</p>}
-                  {item.syncError && <p className="eval-error-text">回传失败：{item.syncError}</p>}
+                  {item.syncError && <p className="eval-error-text"><Trans>回传失败：{item.syncError}</Trans></p>}
                   <div className="eval-value-grid">
-                    {([['输入', item.input], ['预期结果', item.expectedOutput ?? '未设置'], ['实际输出', item.output]] as const).map(([title, value]) => <section className="eval-value" key={title}>
+                    {([[t`输入`, item.input], [t`预期结果`, item.expectedOutput ?? t`未设置`], [t`实际输出`, item.output]] as const).map(([title, value]) => <section className="eval-value" key={title}>
                       <h3 className="eval-value-title">{title}</h3>
                       <pre className="eval-pre eval-value-body">{typeof value === 'string' ? value : JSON.stringify(value, null, 2)}</pre>
                     </section>)}
                   </div>
                   <section className="eval-scores">
-                    <h3 className="eval-value-title">平台评分</h3>
+                    <h3 className="eval-value-title"><Trans>平台评分</Trans></h3>
                     {!item.scores.length
-                      ? <p className="eval-scores-empty">{item.sync === 'synced' ? '等待平台评分／尚未配置评估器' : '等待执行结果同步'}</p>
+                      ? <p className="eval-scores-empty">{item.sync === 'synced' ? t`等待平台评分／尚未配置评估器` : t`等待执行结果同步`}</p>
                       : item.scores.map(score => <p key={score.id}>{score.name}：{String(score.value)} {score.comment && `· ${score.comment}`}</p>)}
 
                   </section>
-                  <a className="eval-link" href={`${projectUrl}/traces/${item.traceId}`} target="_blank" rel="noreferrer">打开 Langfuse Trace</a>
+                  <a className="eval-link" href={`${projectUrl}/traces/${item.traceId}`} target="_blank" rel="noreferrer"><Trans>打开 Langfuse Trace</Trans></a>
                   <details className="eval-events">
-                    <summary><ChevronRight className="eval-events-chevron" size={14} aria-hidden="true" />执行事件（{item.events.length}）</summary>
+                    <summary><ChevronRight className="eval-events-chevron" size={14} aria-hidden="true" /><Trans>执行事件（{item.events.length}）</Trans></summary>
                     <div className="eval-events-list">
-                      {item.events.map(event => <div className="eval-event" key={event.sequence}>{event.sequence}. {new Date(event.timestamp).toLocaleTimeString()} {event.kind} {JSON.stringify(event.data)}</div>)}
+                      {item.events.map(event => <div className="eval-event" key={event.sequence}>{event.sequence}. {new Date(event.timestamp).toLocaleTimeString(formatLocale())} {event.kind} {JSON.stringify(event.data)}</div>)}
                     </div>
                   </details>
                 </div>

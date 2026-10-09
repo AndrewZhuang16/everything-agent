@@ -1,3 +1,8 @@
+import { formatLocale } from "../../i18n";
+import { type UiMessage } from "../../i18n";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { AlertMessage } from "../../components/AlertMessage";
 import { ChevronRight, FileJson, RefreshCw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -11,12 +16,13 @@ const EMPTY_DASHBOARD: TraceDashboard = { traces: [], nextCursor: null };
 
 /** 按 JSONL 文件原样列出 Trace，不在页面中推导 Session 或回合结构。 */
 export function TracePage() {
+  useLingui();
   const [dashboard, setDashboard] = useState<TraceDashboard>(EMPTY_DASHBOARD);
   const [files, setFiles] = useState<TraceFile[]>([]);
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const requestNumber = useRef(0);
   const [error, setError] = useState("");
-  const [saveMessage, setSaveMessage] = useState("");
+  const [saveMessage, setSaveMessage] = useState<UiMessage>("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const reload = async (minimumDurationMs = 0, cursor?: string) => {
@@ -64,31 +70,31 @@ export function TracePage() {
     setSaveMessage("");
     setRefreshing(true);
     try {
-      if (await reload(MINIMUM_FEEDBACK_DURATION_MS)) setSaveMessage("已刷新");
+      if (await reload(MINIMUM_FEEDBACK_DURATION_MS)) setSaveMessage(msg`已刷新`);
     } finally {
       setRefreshing(false);
     }
   }
 
   return <div className="content-wrap trace-page">
-    <PageHeading eyebrow="JSONL traces" title="Traces" description="按文件查看已脱敏的 JSONL 事件。" descriptionActions={<Button size="sm" loading={refreshing} onClick={() => void refresh()}><RefreshCw size={14} /> 刷新数据</Button>} />
+    <PageHeading eyebrow="JSONL traces" title="Traces" description={t`按文件查看已脱敏的 JSONL 事件。`} descriptionActions={<Button size="sm" loading={refreshing} onClick={() => void refresh()}><RefreshCw size={14} /><Trans> 刷新数据</Trans></Button>} />
     <SaveMessage message={saveMessage} setMessage={setSaveMessage} />
     <AlertMessage message={error} />
-    {!loading && !error && dashboard.traces.length === 0 && <div className="panel trace-empty">No traces yet.</div>}
+    {!loading && !error && dashboard.traces.length === 0 && <div className="panel trace-empty"><Trans>暂无运行记录。</Trans></div>}
     <div className="trace-file-list" aria-busy={loading}>
       {files.map((file) => <details className="panel trace-file" open key={file.path}>
         <summary className="trace-file-summary">
           <ChevronRight className="trace-file-chevron" size={14} />
           <FileJson size={15} />
           <strong>{file.path}</strong>
-          <span>{file.records.length} 条</span>
+          <span><Trans>{file.records.length} 条</Trans></span>
         </summary>
         <div className="trace-record-list">
           {file.records.map((record, index) => <details className="trace-record" key={record.eventId ?? `${record.timestamp}-${index}`}>
             <summary>
               <ChevronRight className="trace-record-chevron" size={13} />
               <strong>{record.type}</strong>
-              <time dateTime={record.timestamp}>{record.timestamp}</time>
+              <time dateTime={record.timestamp}>{new Date(record.timestamp).toLocaleString(formatLocale())}</time>
               {record.sequence !== undefined && <span>#{record.sequence}</span>}
             </summary>
             <pre>{JSON.stringify(record, null, 2)}</pre>
@@ -96,14 +102,14 @@ export function TracePage() {
         </div>
       </details>)}
     </div>
-    <nav className="trace-pagination" aria-label="Trace 分页">
+    <nav className="trace-pagination" aria-label={t`Trace 分页`}>
       <span className="trace-pagination-summary" role="status">
-        {loading ? "正在加载…" : `本页 ${dashboard.traces.length} 条轨迹 · ${files.length} 个文件`}
+        {loading ? t`正在加载…` : t`本页 ${dashboard.traces.length} 条轨迹 · ${files.length} 个文件`}
       </span>
       <div className="trace-pagination-controls">
-        <Button variant="outline" size="sm" disabled={loading || cursors.length < 2} onClick={() => { const next = cursors.slice(0, -1); void reload(0, next.at(-1)).then((success) => { if (success) setCursors(next); }); }}>上一页</Button>
-        <span className="trace-pagination-page" aria-current="page">第 {cursors.length} 页</span>
-        <Button variant="outline" size="sm" disabled={loading || !dashboard.nextCursor} onClick={() => { const cursor = dashboard.nextCursor!; void reload(0, cursor).then((success) => { if (success) setCursors([...cursors, cursor]); }); }}>下一页</Button>
+        <Button variant="outline" size="sm" disabled={loading || cursors.length < 2} onClick={() => { const next = cursors.slice(0, -1); void reload(0, next.at(-1)).then((success) => { if (success) setCursors(next); }); }}><Trans>上一页</Trans></Button>
+        <span className="trace-pagination-page" aria-current="page"><Trans>第 {cursors.length} 页</Trans></span>
+        <Button variant="outline" size="sm" disabled={loading || !dashboard.nextCursor} onClick={() => { const cursor = dashboard.nextCursor!; void reload(0, cursor).then((success) => { if (success) setCursors([...cursors, cursor]); }); }}><Trans>下一页</Trans></Button>
       </div>
     </nav>
   </div>;

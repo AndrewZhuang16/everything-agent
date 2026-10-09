@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
@@ -16,7 +18,7 @@ it("Consolidation 后展示只读运行时提示词，不混入用户规则或�
   const container = document.createElement("div");
   const root = createRoot(container);
   try {
-    await act(async () => root.render(<MemoryPage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><MemoryPage /></I18nProvider>));
     const tabs = [...container.querySelectorAll(".memory-tabs button")];
     expect(tabs.slice(-2).map((button) => button.textContent)).toEqual(["Consolidation", "System Prompt"]);
     await act(async () => (tabs.at(-1) as HTMLButtonElement).click());

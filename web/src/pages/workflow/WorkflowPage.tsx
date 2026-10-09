@@ -1,3 +1,7 @@
+import { type UiMessage } from "../../i18n";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { GitBranch } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SaveMessage } from "../../components/SaveMessage";
@@ -18,8 +22,9 @@ import { ResultPanel, RunPanel } from "./RunPanel";
 
 /** 编辑、展示并执行本地工作流。 */
 export function WorkflowPage() {
+  useLingui();
   const [refreshing, setRefreshing] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<UiMessage>("");
   const [messageVariant, setMessageVariant] = useState<"success" | "error">("success");
   const [editable, setEditable] = useState(false);
   const [code, setCode] = useState("");
@@ -68,7 +73,7 @@ export function WorkflowPage() {
       applyLoadedWorkflow(await withMinimumDuration(() => loadLocalWorkflow(file), notify ? MINIMUM_FEEDBACK_DURATION_MS : 0));
       if (notify) {
         setMessageVariant("success");
-        setMessage("已重新读取");
+        setMessage(msg`已重新读取`);
       }
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
@@ -210,11 +215,11 @@ export function WorkflowPage() {
 
   return (
     <div className="content-wrap workflow-page">
-      <PageHeading eyebrow="工作流 / 可视化执行" title="Workflow" description="用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。" />
+      <PageHeading eyebrow={t`工作流 / 可视化执行`} title="Workflow" description={t`用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。`} />
       <SaveMessage message={message} setMessage={setMessage} variant={messageVariant} />
-      <div className="intro-note"><GitBranch size={16} /><p><strong>本地代码是事实来源。</strong> {editable ? "下方编辑器直接读写" : "生产环境只读查看"} <code>{editable ? "src/workflows/" : "dist-server/src/workflows/"}{selectedFile || "…"}</code>；拓扑来自 <code>Graph.describe()</code>，执行过程来自本地 <code>runGraph()</code> 的 observer 事件。</p></div>
+      <div className="intro-note"><GitBranch size={16} /><p><Trans><strong>本地代码是事实来源。</strong> {editable ? t`下方编辑器直接读写` : t`生产环境只读查看`} <code>{editable ? "src/workflows/" : "dist-server/src/workflows/"}{selectedFile || "…"}</code>；拓扑来自 <code>Graph.describe()</code>，执行过程来自本地 <code>runGraph()</code> 的 observer 事件。</Trans></p></div>
       <div className="workspace-grid">
-        {workflow ? <GraphCanvas workflow={workflow} nodeStates={nodeStates} activeEdges={activeEdges} /> : <div className="panel grid min-h-[580px] place-items-center text-sm text-[var(--muted-foreground)]">等待有效的工作流代码…</div>}
+        {workflow ? <GraphCanvas workflow={workflow} nodeStates={nodeStates} activeEdges={activeEdges} /> : <div className="panel grid min-h-[580px] place-items-center text-sm text-[var(--muted-foreground)]"><Trans>等待有效的工作流代码…</Trans></div>}
       </div>
       <div className="analysis-grid">
         <CodeEditor editable={editable} code={code} error={compileError} workflowFiles={workflowFiles} selectedFile={selectedFile} switching={switchingWorkflow || refreshing} refreshing={refreshing} onChange={setCode} onSelect={(file) => void selectWorkflow(file)} onReset={() => void reloadFromDisk(undefined, true)} />

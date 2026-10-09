@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
@@ -31,7 +33,7 @@ it("所有 Provider 按指定顺序展示，双模型与 Embedding 可分别保�
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => root!.render(<ConfigPage />));
+  await act(async () => root!.render(<I18nProvider i18n={i18n}><ConfigPage /></I18nProvider>));
   for (const label of ["Agent Model Provider", "Small Model Provider", "Embedding Provider"]) {
     const trigger = container.querySelector<HTMLButtonElement>(`[aria-label="${label}"]`)!;
     await act(async () => trigger.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })));

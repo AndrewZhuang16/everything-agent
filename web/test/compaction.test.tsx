@@ -1,3 +1,5 @@
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CompactionNotice, updateCompactionViews } from "../src/pages/agent/CompactionNotice";
@@ -29,13 +31,13 @@ it("压缩节点和动态边来自真实拓扑，失败仍可明确展示安全�
 
 it("聊天标记按压缩身份更新，展示前后水位、软目标与耗时", () => {
   const started = updateCompactionViews([], "compact_started", { compactionId: "c", beforeTokens: 7000, availableInputTokens: 10000 });
-  expect(renderToStaticMarkup(<CompactionNotice item={started[0]!} />)).toContain("正在压缩上下文");
+  expect(renderToStaticMarkup(<I18nProvider i18n={i18n}><CompactionNotice item={started[0]!} /></I18nProvider>)).toContain("正在压缩上下文");
   const done = updateCompactionViews(started, "compact_completed", { compactionId: "c", beforeTokens: 7000, afterTokens: 3500, availableInputTokens: 10000, ms: 1500, targetReached: false });
   expect(done).toHaveLength(1);
-  const html = renderToStaticMarkup(<CompactionNotice item={done[0]!} />);
+  const html = renderToStaticMarkup(<I18nProvider i18n={i18n}><CompactionNotice item={done[0]!} /></I18nProvider>);
   for (const text of ["上下文已压缩", "70%", "35%", "超过 30% 目标", "1.5s"]) expect(html).toContain(text);
   const failed = updateCompactionViews(started, "compact_failed", { compactionId: "c", beforeTokens: 7000, ms: 200, reasonCode: "persistence_failed" });
-  expect(renderToStaticMarkup(<CompactionNotice item={failed[0]!} />)).toContain("保留原上下文");
-  expect(renderToStaticMarkup(<CompactionNotice item={failed[0]!} />)).toContain("检查点保存失败");
+  expect(renderToStaticMarkup(<I18nProvider i18n={i18n}><CompactionNotice item={failed[0]!} /></I18nProvider>)).toContain("保留原上下文");
+  expect(renderToStaticMarkup(<I18nProvider i18n={i18n}><CompactionNotice item={failed[0]!} /></I18nProvider>)).toContain("检查点保存失败");
   expect(updateCompactionViews(done, "compact_started", {})).toBe(done);
 });

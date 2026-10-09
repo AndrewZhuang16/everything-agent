@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, it, vi } from "vitest";
@@ -18,7 +20,7 @@ it.each([false, true])("日历开关独立保存，失败时保持原状态：%s
   else vi.mocked(saveTools).mockResolvedValue({ ...catalog, ok: true, tools: [{ ...catalog.tools[0]!, enabled: true }] });
   const host = document.createElement("div"); document.body.append(host); const root = createRoot(host);
   try {
-    await act(async () => root.render(<ToolsPage />));
+    await act(async () => root.render(<I18nProvider i18n={i18n}><ToolsPage /></I18nProvider>));
     await act(async () => (host.querySelector('[role="switch"]') as HTMLButtonElement).click());
     expect(saveTools).toHaveBeenCalledWith(expect.objectContaining({ appleCalendarEnabled: true, getCurrentTimeEnabled: true, searchWebEnabled: false }));
     expect(host.querySelector('[role="switch"]')?.getAttribute("aria-checked")).toBe(String(!failure));

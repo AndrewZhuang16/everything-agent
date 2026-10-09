@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { requestJson } from "./request-json";
 import { rebuildEmbeddingIndex } from "./config-api";
 
@@ -20,7 +21,7 @@ export async function clearAllAgentData(rebuildEmbeddings = false): Promise<{
       embeddingRebuild = await rebuildEmbeddingIndex();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      throw new Error(`本地数据已清理，但自动重建向量索引失败：${message}`, { cause: error });
+      throw new Error(t`本地数据已清理，但自动重建向量索引失败：${message}`, { cause: error });
     }
   }
   return { ...cleared, embeddingRebuild };

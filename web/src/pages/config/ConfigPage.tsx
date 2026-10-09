@@ -1,3 +1,7 @@
+import { translateMessage, type UiMessage } from "../../i18n";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import {
   AlertTriangle,
   BrainCircuit,
@@ -58,6 +62,7 @@ type ConfigSection = "model" | "retrieval" | "runtime" | "sandbox";
 type NumericInputValue = number | "";
 
 export function ConfigPage() {
+  useLingui();
   const [settings, setSettings] = useState<AgentSettings | null>(null);
   const [agentProvider, setAgentProvider] =
     useState<AgentProvider>("openai-compatible");
@@ -94,12 +99,12 @@ export function ConfigPage() {
   const [savingSection, setSavingSection] = useState<ConfigSection | null>(
     null,
   );
-  const [saveMessage, setSaveMessage] = useState("");
-  const [modelMessage, setModelMessage] = useState("");
+  const [saveMessage, setSaveMessage] = useState<UiMessage>("");
+  const [modelMessage, setModelMessage] = useState<UiMessage>("");
   const [forceSection, setForceSection] = useState<ConfigSection | null>(null);
   const [resettingRuntime, setResettingRuntime] = useState(false);
   const [clearingData, setClearingData] = useState(false);
-  const [clearMessage, setClearMessage] = useState("");
+  const [clearMessage, setClearMessage] = useState<UiMessage>("");
   const agentKeyKnown = settings?.agentModel.provider === agentProvider;
   const embeddingKeyKnown = settings?.embeddingProvider === embeddingProvider;
   const smallKeyKnown = settings?.smallModel.provider === smallProvider;
@@ -164,8 +169,8 @@ export function ConfigPage() {
                   "Recall Entry Token Limit",
                 )
               : settings.sessionRecallEntryTokenLimit,
-          maxTokens: section === "runtime" ? requiredNumericValue(maxTokens, "单次模型输出") : settings.maxTokens,
-          maxIterations: section === "runtime" ? requiredNumericValue(maxIterations, "Agent 最大迭代") : settings.maxIterations,
+          maxTokens: section === "runtime" ? requiredNumericValue(maxTokens, t`单次模型输出`) : settings.maxTokens,
+          maxIterations: section === "runtime" ? requiredNumericValue(maxIterations, t`Agent 最大迭代`) : settings.maxIterations,
           modelContextWindow:
             section === "runtime"
               ? requiredNumericValue(modelContextWindow, "Model Context Window")
@@ -201,7 +206,9 @@ export function ConfigPage() {
         setSmallApiKey("");
       }
       if (section === "retrieval") setEmbeddingApiKey("");
-      setSaveMessage(`${sectionLabel(section)}保存成功，下一回合立即生效。`);
+      setSaveMessage(section === "model" ? msg`模型连接配置保存成功，下一回合立即生效。`
+        : section === "retrieval" ? msg`检索配置保存成功，下一回合立即生效。`
+        : msg`运行参数保存成功，下一回合立即生效。`);
     } catch (error) {
       const value = error as Error & { canForce?: boolean };
       setModelMessage(value.message);
@@ -213,7 +220,7 @@ export function ConfigPage() {
 
   async function clearSavedModelApiKeys() {
     setClearingModelKeys(true);
-    setModelMessage("正在清除 API Key…");
+    setModelMessage(msg`正在清除 API Key…`);
     try {
       await withMinimumDuration(async () => {
         const agentResult = await clearModelApiKey("agentModel");
@@ -222,7 +229,7 @@ export function ConfigPage() {
         setSettings(smallResult.settings);
         setAgentApiKey("");
         setSmallApiKey("");
-        setModelMessage("模型连接 API Key 已清除。");
+        setModelMessage(msg`模型连接 API Key 已清除。`);
       });
     } catch (error) {
       setModelMessage(error instanceof Error ? error.message : String(error));
@@ -256,7 +263,7 @@ export function ConfigPage() {
       const result = await withMinimumDuration(resetRuntimeConfig);
       setSettings(result.settings);
       applyRuntimeInputs(result.settings);
-      setSaveMessage("运行配置已恢复默认值。");
+      setSaveMessage(msg`运行配置已恢复默认值。`);
     } catch (error) {
       setModelMessage(error instanceof Error ? error.message : String(error));
     } finally {
@@ -274,8 +281,8 @@ export function ConfigPage() {
     setSaveMessage("");
     setClearMessage(
       shouldRebuildEmbeddings
-        ? "正在清理本地数据，完成后将自动重建向量索引…"
-        : "正在清理本地数据…",
+        ? msg`正在清理本地数据，完成后将自动重建向量索引…`
+        : msg`正在清理本地数据…`,
     );
     try {
       const result = await withMinimumDuration(() =>
@@ -285,12 +292,12 @@ export function ConfigPage() {
         setSettings(result.embeddingRebuild.settings);
         setClearMessage("");
         setSaveMessage(
-          `清理完成，向量索引已自动重建并原子激活，共 ${result.embeddingRebuild.result.chunkCount} 个 chunks。EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。`,
+          msg`清理完成，向量索引已自动重建并原子激活，共 ${result.embeddingRebuild.result.chunkCount} 个 chunks。EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。`,
         );
       } else {
         setClearMessage("");
         setSaveMessage(
-          "清理完成。数据库、会话、记忆和运行记录已删除，EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。",
+          msg`清理完成。数据库、会话、记忆和运行记录已删除，EVERYTHING.md、Skills、config.json 和 .everything/.env 密钥已保留。`,
         );
       }
     } catch (error) {
@@ -302,12 +309,12 @@ export function ConfigPage() {
 
   async function rebuildEmbeddings() {
     setRebuildingEmbedding(true);
-    setModelMessage("正在串行建立影子向量索引…");
+    setModelMessage(msg`正在串行建立影子向量索引…`);
     try {
       const result = await withMinimumDuration(rebuildEmbeddingIndex);
       setSettings(result.settings);
       setModelMessage(
-        `索引已原子激活，共 ${result.result.chunkCount} 个 chunks。`,
+        msg`索引已原子激活，共 ${result.result.chunkCount} 个 chunks。`,
       );
     } catch (error) {
       setModelMessage(error instanceof Error ? error.message : String(error));
@@ -320,8 +327,8 @@ export function ConfigPage() {
     const result = await cancelEmbeddingIndexRebuild();
     setModelMessage(
       result.cancelled
-        ? "已请求取消，旧 active generation 保持可用。"
-        : "当前没有正在运行的重建任务。",
+        ? msg`已请求取消，旧 active generation 保持可用。`
+        : msg`当前没有正在运行的重建任务。`,
     );
   }
 
@@ -330,22 +337,22 @@ export function ConfigPage() {
     setSettings(result.settings);
     setRetrievalMode(result.settings.retrievalMode);
     setEmbeddingApiKey("");
-    setModelMessage("Embedding API Key 已清除，检索模式已切回 lexical-only。");
+    setModelMessage(msg`Embedding API Key 已清除，检索模式已切回 lexical-only。`);
   }
 
   if (!settings) {
     return (
       <div className="content-wrap config-page">
         <PageHeading
-          eyebrow="本地运行 / 安全配置"
-          title="配置中心"
-          description="管理模型连接、记忆检索与运行边界。"
+          eyebrow={t`本地运行 / 安全配置`}
+          title={t`配置中心`}
+          description={t`管理模型连接、记忆检索与运行边界。`}
         />
         <div
           className={`panel ${modelMessage ? "error-panel" : "loading-panel"}`}
           role={modelMessage ? "alert" : "status"}
         >
-          {modelMessage ? `配置加载失败：${modelMessage}` : "正在加载配置…"}
+          {modelMessage ? t`配置加载失败：${translateMessage(modelMessage)}` : t`正在加载配置…`}
         </div>
       </div>
     );
@@ -354,24 +361,24 @@ export function ConfigPage() {
   return (
     <div className="content-wrap config-page">
       <PageHeading
-        eyebrow="本地运行 / 安全配置"
-        title="配置中心"
-        description="管理模型连接、记忆检索与运行边界。"
+        eyebrow={t`本地运行 / 安全配置`}
+        title={t`配置中心`}
+        description={t`管理模型连接、记忆检索与运行边界。`}
       />
       <SaveMessage message={saveMessage} setMessage={setSaveMessage} />
       <Alert variant="info" className="config-local-alert">
         <ShieldCheck />
-        <AlertTitle className="flex items-center gap-2">
+        <AlertTitle className="flex items-center gap-2"><Trans>
           配置仅存储在当前项目中，不会上传或共享
-          <Badge variant="success">
-            <ShieldCheck size={12} />
+          </Trans><Badge variant="success">
+            <ShieldCheck size={12} /><Trans>
             仅存储在本地
-          </Badge>
+          </Trans></Badge>
         </AlertTitle>
-        <AlertDescription>
+        <AlertDescription><Trans>
           普通配置保存在 <code>.everything/config.json</code>，API Key
           保存在 <code>.everything/.env</code>；保存后下一回合立即生效。
-        </AlertDescription>
+        </Trans></AlertDescription>
       </Alert>
 
       <div className="config-grid">
@@ -381,20 +388,20 @@ export function ConfigPage() {
               <Server size={18} />
             </div>
             <div>
-              <CardTitle>模型连接</CardTitle>
-              <CardDescription>
+              <CardTitle><Trans>模型连接</Trans></CardTitle>
+              <CardDescription><Trans>
                 Agent Model 与 Small Model 使用完全独立的连接配置。
-              </CardDescription>
+              </Trans></CardDescription>
             </div>
-            <Badge variant="outline">热更新</Badge>
+            <Badge variant="outline"><Trans>热更新</Trans></Badge>
           </CardHeader>
           <CardContent className="config-card-content">
             <div className="config-form-grid">
               <div className="config-field-wide">
                 <strong>Agent Model</strong>
-                <span className="field-help">
+                <span className="field-help"><Trans>
                   负责主 Agent 推理、工具调用、记忆写入与 consolidation。
-                </span>
+                </Trans></span>
               </div>
               <ConfigField label="Provider">
                 <Select
@@ -417,7 +424,7 @@ export function ConfigPage() {
                   value={agentModel}
                   onChange={(event) => setAgentModel(event.target.value)}
                   list="agent-model-list"
-                  placeholder="输入 Agent 模型 ID"
+                  placeholder={t`输入 Agent 模型 ID`}
                 />
                 <datalist id="agent-model-list">
                   {models.agentModel.map((value) => (
@@ -442,8 +449,8 @@ export function ConfigPage() {
                 label="API Key"
                 help={
                   agentKeyKnown && settings?.agentModel.keyConfigured
-                    ? `已配置 ····${settings.agentModel.keyLast4}`
-                    : "尚未配置"
+                    ? t`已配置 ····${settings.agentModel.keyLast4}`
+                    : t`尚未配置`
                 }
                 icon={<KeyRound size={13} />}
               >
@@ -453,14 +460,14 @@ export function ConfigPage() {
                   onChange={(event) => setAgentApiKey(event.target.value)}
                   placeholder={
                     agentKeyKnown && settings?.agentModel.keyConfigured
-                      ? "留空以保留已保存的值"
-                      : "输入 Agent Model API Key"
+                      ? t`留空以保留已保存的值`
+                      : t`输入 Agent Model API Key`
                   }
                 />
               </ConfigField>
               <div className="config-field-wide">
                 <strong>Small Model</strong>
-                <span className="field-help">仅负责 retrieval gate。</span>
+                <span className="field-help"><Trans>仅负责 retrieval gate。</Trans></span>
               </div>
               <ConfigField label="Provider">
                 <Select
@@ -483,7 +490,7 @@ export function ConfigPage() {
                   value={smallModel}
                   onChange={(event) => setSmallModel(event.target.value)}
                   list="small-model-list"
-                  placeholder="输入 Small 模型 ID"
+                  placeholder={t`输入 Small 模型 ID`}
                 />
                 <datalist id="small-model-list">
                   {models.smallModel.map((value) => (
@@ -508,8 +515,8 @@ export function ConfigPage() {
                 label="API Key"
                 help={
                   smallKeyKnown && settings?.smallModel.keyConfigured
-                    ? `已配置 ····${settings.smallModel.keyLast4}`
-                    : "尚未配置"
+                    ? t`已配置 ····${settings.smallModel.keyLast4}`
+                    : t`尚未配置`
                 }
                 icon={<KeyRound size={13} />}
               >
@@ -519,8 +526,8 @@ export function ConfigPage() {
                   onChange={(event) => setSmallApiKey(event.target.value)}
                   placeholder={
                     smallKeyKnown && settings?.smallModel.keyConfigured
-                      ? "留空以保留已保存的值"
-                      : "输入 Small Model API Key"
+                      ? t`留空以保留已保存的值`
+                      : t`输入 Small Model API Key`
                   }
                 />
               </ConfigField>
@@ -536,17 +543,17 @@ export function ConfigPage() {
                   !smallModel.trim()
                 }
               >
-                <Save size={14} />
+                <Save size={14} /><Trans>
                 保存模型连接配置
-              </Button>
+              </Trans></Button>
               {forceSection === "model" && (
                 <Button
                   variant="destructive-outline"
                   onClick={() => void saveSection("model", true)}
                   disabled={savingSection !== null}
-                >
+                ><Trans>
                   仍然保存
-                </Button>
+                </Trans></Button>
               )}
               {(settings?.agentModel.keyConfigured ||
                 settings?.smallModel.keyConfigured) && (
@@ -566,14 +573,14 @@ export function ConfigPage() {
             </div>
             <div>
               <CardTitle>Semantic Memory Retrieval</CardTitle>
-              <CardDescription>
+              <CardDescription><Trans>
                 配置 Semantic Memory 的词法、向量或混合检索。
-              </CardDescription>
+              </Trans></CardDescription>
             </div>
             <Badge
               variant={settings?.embeddingIndex.ready ? "success" : "outline"}
             >
-              {settings?.embeddingIndex.ready ? "索引就绪" : "本地优先"}
+              {settings?.embeddingIndex.ready ? t`索引就绪` : t`本地优先`}
             </Badge>
           </CardHeader>
           <CardContent className="config-card-content">
@@ -612,7 +619,7 @@ export function ConfigPage() {
                   }
                 />
               </ConfigField>
-              <ConfigField label="Embedding Provider" help="Anthropic 暂不提供原生 Embedding。切换 Provider 后请填写对应密钥并重建索引。">
+              <ConfigField label="Embedding Provider" help={t`Anthropic 暂不提供原生 Embedding。切换 Provider 后请填写对应密钥并重建索引。`}>
                 <Select value={embeddingProvider} onValueChange={(value) => {
                   setEmbeddingProvider(value as EmbeddingProvider);
                   setEmbeddingApiKey("");
@@ -632,7 +639,7 @@ export function ConfigPage() {
               </ConfigField>
               <ConfigField
                 label="Embedding Model"
-                help="请求固定 1024 维向量；维度不一致时直接失败。"
+                help={t`请求固定 1024 维向量；维度不一致时直接失败。`}
               >
                 <Input
                   value={embeddingModel}
@@ -644,8 +651,8 @@ export function ConfigPage() {
                 label="Embedding API Key"
                 help={
                   embeddingKeyKnown && settings?.embeddingKeyConfigured
-                    ? `已配置 ····${settings.embeddingKeyLast4}`
-                    : "尚未配置"
+                    ? t`已配置 ····${settings.embeddingKeyLast4}`
+                    : t`尚未配置`
                 }
                 icon={<KeyRound size={13} />}
               >
@@ -655,29 +662,29 @@ export function ConfigPage() {
                   onChange={(event) => setEmbeddingApiKey(event.target.value)}
                   placeholder={
                     embeddingKeyKnown && settings?.embeddingKeyConfigured
-                      ? "留空保留已保存的独立密钥"
-                      : "输入独立 Embedding API Key"
+                      ? t`留空保留已保存的独立密钥`
+                      : t`输入独立 Embedding API Key`
                   }
                 />
               </ConfigField>
             </div>
             <Alert variant="warning" className="mt-5">
               <AlertTriangle />
-              <AlertTitle>远程数据边界</AlertTitle>
-              <AlertDescription>
+              <AlertTitle><Trans>远程数据边界</Trans></AlertTitle>
+              <AlertDescription><Trans>
                 启用 Embedding 后，Semantic Memory
                 正文会发送到对应远程服务；Session 历史不会生成向量。
-              </AlertDescription>
+              </Trans></AlertDescription>
             </Alert>
             <div className="config-index-status">
               <div className="config-index-copy">
-                <strong>向量索引</strong>
+                <strong><Trans>向量索引</Trans></strong>
                 <span>
                   {settings?.embeddingIndex.ready
-                    ? `当前配置已就绪 · ${settings.embeddingIndex.generationId?.slice(0, 8)}`
+                    ? t`当前配置已就绪 · ${settings.embeddingIndex.generationId?.slice(0, 8) ?? ""}`
                     : settings?.embeddingIndex.generationId
-                      ? `配置待重建 · 旧索引 ${settings.embeddingIndex.generationId.slice(0, 8)} 仍可用`
-                      : "尚未建立索引"}
+                      ? t`配置待重建 · 旧索引 ${settings.embeddingIndex.generationId.slice(0, 8)} 仍可用`
+                      : t`尚未建立索引`}
                 </span>
               </div>
               <div className="config-index-action">
@@ -691,18 +698,18 @@ export function ConfigPage() {
                     !embeddingModel
                   }
                 >
-                  <RotateCcw size={14} />
+                  <RotateCcw size={14} /><Trans>
                   重建索引
-                </Button>
+                </Trans></Button>
                 {rebuildingEmbedding && (
                   <Button
                     variant="destructive-outline"
                     size="sm"
                     onClick={() => void cancelRebuild()}
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={14} /><Trans>
                     取消重建
-                  </Button>
+                  </Trans></Button>
                 )}
               </div>
             </div>
@@ -716,9 +723,9 @@ export function ConfigPage() {
                   embeddingMinimumSimilarity === ""
                 }
               >
-                <Save size={14} />
+                <Save size={14} /><Trans>
                 保存检索配置
-              </Button>
+              </Trans></Button>
               {settings?.embeddingKeyConfigured && (
                 <EmbeddingKeyClearDialog
                   onConfirm={() => void clearSavedEmbeddingKey()}
@@ -735,18 +742,18 @@ export function ConfigPage() {
             </div>
             <div>
               <CardTitle>Sandbox</CardTitle>
-              <CardDescription>
+              <CardDescription><Trans>
                 终端命令的执行边界。命令只能写入这个工作区，由操作系统沙箱强制。
-              </CardDescription>
+              </Trans></CardDescription>
             </div>
             <Badge variant={settings?.sandbox.unavailableReason ? "destructive" : "outline"}>
-              {settings?.sandbox.unavailableReason ? "不可用" : settings?.sandbox.kind ?? "检测中"}
+              {settings?.sandbox.unavailableReason ? t`不可用` : settings?.sandbox.kind ?? t`检测中`}
             </Badge>
           </CardHeader>
           <CardContent className="config-card-content">
             <ConfigField
-              label="工作区根目录"
-              help="已存在目录的绝对路径。其中的 .git 与 .everything 不可写，出站网络默认切断。留空则终端能力不可用。"
+              label={t`工作区根目录`}
+              help={t`已存在目录的绝对路径。其中的 .git 与 .everything 不可写，出站网络默认切断。留空则终端能力不可用。`}
             >
               <Input
                 value={sandboxWorkspaceRoot}
@@ -759,9 +766,9 @@ export function ConfigPage() {
             {settings?.sandbox.unavailableReason && (
               <Alert variant="warning">
                 <Info />
-                <AlertDescription>
+                <AlertDescription><Trans>
                   当前环境无法建立沙箱：{settings.sandbox.unavailableReason}
-                </AlertDescription>
+                </Trans></AlertDescription>
               </Alert>
             )}
             <div className="config-card-actions">
@@ -770,9 +777,9 @@ export function ConfigPage() {
                 loading={savingSection === "sandbox"}
                 disabled={savingSection !== null || !settings}
               >
-                <Save size={14} />
+                <Save size={14} /><Trans>
                 保存 Sandbox 配置
-              </Button>
+              </Trans></Button>
             </div>
           </CardContent>
         </Card>
@@ -783,17 +790,17 @@ export function ConfigPage() {
               <Gauge size={18} />
             </div>
             <div>
-              <CardTitle>运行参数</CardTitle>
-              <CardDescription>
+              <CardTitle><Trans>运行参数</Trans></CardTitle>
+              <CardDescription><Trans>
                 控制会话召回范围和模型上下文预算。
-              </CardDescription>
+              </Trans></CardDescription>
             </div>
           </CardHeader>
           <CardContent className="config-card-content">
             <div className="config-runtime-grid">
               <ConfigField
                 label="Session Search Window"
-                help="命中点初始单侧窗口，默认 5。"
+                help={t`命中点初始单侧窗口，默认 5。`}
               >
                 <Input
                   type="number"
@@ -809,7 +816,7 @@ export function ConfigPage() {
               </ConfigField>
               <ConfigField
                 label="Recall Entry Token Limit"
-                help="session_search 单条正文上限，默认 8,192；超出部分用 contentCursor 经 session_read 读全。"
+                help={t`session_search 单条正文上限，默认 8,192；超出部分用 contentCursor 经 session_read 读全。`}
               >
                 <Input
                   type="number"
@@ -825,7 +832,7 @@ export function ConfigPage() {
               </ConfigField>
               <ConfigField
                 label="Recall Token Limit"
-                help="单次 session_search 总额，按 Model Context Window 的 25% 自动派生，不可编辑。"
+                help={t`单次 session_search 总额，按 Model Context Window 的 25% 自动派生，不可编辑。`}
               >
                 <Input
                   type="number"
@@ -834,17 +841,17 @@ export function ConfigPage() {
                   disabled
                 />
               </ConfigField>
-              <ConfigField label="单次模型输出（tokens）" help="默认 32,768 tokens，每次新运行生效。">
+              <ConfigField label={t`单次模型输出（tokens）`} help={t`默认 32,768 tokens，每次新运行生效。`}>
                 <Input type="number" min={settings?.limits.maxTokens?.min ?? 1} max={settings?.limits.maxTokens?.max ?? 131072}
                   value={maxTokens} onChange={(event) => setMaxTokens(parseNumericInput(event.target.value))} />
               </ConfigField>
-              <ConfigField label="Agent 最大迭代（轮）" help="默认 100 轮，每次新运行生效。">
+              <ConfigField label={t`Agent 最大迭代（轮）`} help={t`默认 100 轮，每次新运行生效。`}>
                 <Input type="number" min={settings?.limits.maxIterations?.min ?? 1} max={settings?.limits.maxIterations?.max ?? 1000}
                   value={maxIterations} onChange={(event) => setMaxIterations(parseNumericInput(event.target.value))} />
               </ConfigField>
               <ConfigField
                 label="Model Context Window（tokens）"
-                help="默认 262,144，需容纳输入、单次输出预算及 512 tokens 安全余量。"
+                help={t`默认 262,144，需容纳输入、单次输出预算及 512 tokens 安全余量。`}
               >
                 <Input
                   type="number"
@@ -874,22 +881,21 @@ export function ConfigPage() {
                   ].includes("")
                 }
               >
-                <Save size={14} />
+                <Save size={14} /><Trans>
                 保存运行参数
-              </Button>
+              </Trans></Button>
               <Button
                 variant="secondary"
                 loading={resettingRuntime}
                 disabled={savingSection !== null || !settings}
                 onClick={() => void resetRuntime()}
               >
-                <RotateCcw size={14} />
+                <RotateCcw size={14} /><Trans>
                 恢复默认运行值
-              </Button>
+              </Trans></Button>
             </div>
           </CardContent>
         </Card>
-
 
 
         {modelMessage && (
@@ -898,7 +904,7 @@ export function ConfigPage() {
             variant={forceSection ? "warning" : "default"}
           >
             <Info />
-            <AlertDescription>{modelMessage}</AlertDescription>
+            <AlertDescription>{translateMessage(modelMessage)}</AlertDescription>
           </Alert>
         )}
 
@@ -908,32 +914,31 @@ export function ConfigPage() {
               <AlertTriangle size={18} />
             </div>
             <div>
-              <CardTitle>危险区域</CardTitle>
-              <CardDescription>
+              <CardTitle><Trans>危险区域</Trans></CardTitle>
+              <CardDescription><Trans>
                 永久删除本地运行数据，此操作无法撤销。
-              </CardDescription>
+              </Trans></CardDescription>
             </div>
-            <Badge variant="destructive">不可撤销</Badge>
+            <Badge variant="destructive"><Trans>不可撤销</Trans></Badge>
           </CardHeader>
           <CardContent className="config-danger-body">
             <div>
-              <strong>清除全部本地数据</strong>
-              <p>
+              <strong><Trans>清除全部本地数据</Trans></strong>
+              <p><Trans>
                 删除数据库、Session、Chat Log、Semantic Memory、Session Recall
                 索引和全部 Traces。
-                <br />
+                </Trans><br /><Trans>
                 保留 <code>.everything/EVERYTHING.md</code>、
                 <code>.everything/skills</code>、
-                <code>.everything/config.json</code> 和 <code>.everything/.env</code>{" "}
-                密钥。
-              </p>
+                <code>.everything/config.json</code> 和 <code>.everything/.env</code> 密钥。
+              </Trans></p>
             </div>
             <AllDataClearDialog
               disabled={clearingData}
               onConfirm={() => void clearAllData()}
             />
             {clearMessage && (
-              <span className="config-danger-message">{clearMessage}</span>
+              <span className="config-danger-message">{translateMessage(clearMessage)}</span>
             )}
           </CardContent>
         </Card>
@@ -947,7 +952,7 @@ function parseNumericInput(value: string): NumericInputValue {
 }
 
 function requiredNumericValue(value: NumericInputValue, label: string): number {
-  if (value === "") throw new TypeError(`${label} 不能为空`);
+  if (value === "") throw new TypeError(t`${label} 不能为空`);
   return value;
 }
 
@@ -961,11 +966,6 @@ function savedModelInput(value: AgentSettings["agentModel"]) {
   };
 }
 
-function sectionLabel(section: ConfigSection): string {
-  if (section === "model") return "模型连接配置";
-  if (section === "retrieval") return "检索配置";
-  return "运行参数";
-}
 
 function ConfigField({
   label,
@@ -1000,6 +1000,7 @@ function ConfigField({
 }
 
 function SimilarityHelp() {
+  useLingui();
   return (
     <TooltipProvider>
       <Tooltip>
@@ -1007,16 +1008,16 @@ function SimilarityHelp() {
           <button
             type="button"
             className="config-help"
-            aria-label="最低相似度说明"
+            aria-label={t`最低相似度说明`}
             aria-describedby="minimum-similarity-help"
           >
             ?
           </button>
         </TooltipTrigger>
-        <TooltipContent id="minimum-similarity-help" role="tooltip">
+        <TooltipContent id="minimum-similarity-help" role="tooltip"><Trans>
           建议起点：OpenAI 0.30、BGE 0.45、Qwen3 0.50、GTE/Nomic
           0.40、Multilingual-E5 0.80；需按数据校准。
-        </TooltipContent>
+        </Trans></TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
@@ -1029,49 +1030,51 @@ function ModelKeysClearDialog({
   disabled: boolean;
   onConfirm(): void;
 }) {
+  useLingui();
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive-outline" loading={disabled}>
-          <Trash2 size={14} />
+          <Trash2 size={14} /><Trans>
           清除 API Key
-        </Button>
+        </Trans></Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>清除模型连接 API Key？</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle><Trans>清除模型连接 API Key？</Trans></AlertDialogTitle>
+          <AlertDialogDescription><Trans>
             Agent Model 与 Small Model 的 API Key
             都会被清除，其他连接配置保持不变。
-          </AlertDialogDescription>
+          </Trans></AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>取消</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>确认清除</AlertDialogAction>
+          <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}><Trans>确认清除</Trans></AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
 function EmbeddingKeyClearDialog({ onConfirm }: { onConfirm(): void }) {
+  useLingui();
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive-outline">
-          <Trash2 size={14} />
+          <Trash2 size={14} /><Trans>
           清除 API Key
-        </Button>
+        </Trans></Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>清除 Embedding API Key？</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle><Trans>清除 Embedding API Key？</Trans></AlertDialogTitle>
+          <AlertDialogDescription><Trans>
             检索模式将回到 FTS5 + BM25。
-          </AlertDialogDescription>
+          </Trans></AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>取消</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>确认清除</AlertDialogAction>
+          <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}><Trans>确认清除</Trans></AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -1084,28 +1087,29 @@ function AllDataClearDialog({
   disabled: boolean;
   onConfirm(): void;
 }) {
+  useLingui();
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive-outline" loading={disabled}>
-          <Trash2 size={14} />
+          <Trash2 size={14} /><Trans>
           清除全部数据
-        </Button>
+        </Trans></Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>永久清除全部本地数据？</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle><Trans>永久清除全部本地数据？</Trans></AlertDialogTitle>
+          <AlertDialogDescription><Trans>
             数据库、会话、记忆、索引和运行记录都会被删除。EVERYTHING.md、Skills、config.json
             与 .everything/.env 密钥、.everything/langfuse.env 连接配置将保留；如已完整配置
             Embedding，清理后会自动重建向量索引。
-          </AlertDialogDescription>
+          </Trans></AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>取消</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogCancel><Trans>取消</Trans></AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}><Trans>
             确认永久删除
-          </AlertDialogAction>
+          </Trans></AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

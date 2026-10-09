@@ -13,3 +13,6 @@ dist-web/
 .langfuse/
 
 dist-server/
+
+# Lingui 编译产物由 Vite 按需生成，版本库只维护 PO 目录。
+web/src/locales/*/messages.js

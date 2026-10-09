@@ -1,3 +1,5 @@
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { renderToStaticMarkup } from "react-dom/server";
 import { readFile } from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
@@ -13,7 +15,7 @@ vi.mock("../src/apis/skills-api", () => ({
 
 describe("Skills 页面", () => {
   it("展示磁盘事实来源和结构化编辑器", async () => {
-    const html = renderToStaticMarkup(<SkillsPage />);
+    const html = renderToStaticMarkup(<I18nProvider i18n={i18n}><SkillsPage /></I18nProvider>);
     const source = await readFile(new URL("../src/pages/skills/SkillsPage.tsx", import.meta.url), "utf8");
 
     expect(html).toContain("Skills");
@@ -29,12 +31,12 @@ describe("Skills 页面", () => {
     const source = await readFile(new URL("../src/pages/skills/SkillsPage.tsx", import.meta.url), "utf8");
     const databaseSource = await readFile(new URL("../src/pages/database/DatabasePage.tsx", import.meta.url), "utf8");
 
-    expect(source).toContain('description="管理 Agent 可发现并按需读取的本地技能。" descriptionActions={<Button size="sm" disabled={saving} onClick={create}>');
+    expect(source).toContain('description={t`管理 Agent 可发现并按需读取的本地技能。`} descriptionActions={<Button size="sm" disabled={saving} onClick={create}>');
     expect(databaseSource).toContain('descriptionActions={<Button size="sm"');
   });
 
   it("初次读取时展示页面加载态，但按钮不闪现 loading 或禁用样式", () => {
-    const html = renderToStaticMarkup(<SkillsPage />);
+    const html = renderToStaticMarkup(<I18nProvider i18n={i18n}><SkillsPage /></I18nProvider>);
     const buttonTags = html.match(/<button[^>]*>/g) ?? [];
     const createButton = buttonTags[0] ?? "";
     const refreshButton = buttonTags.find((tag) => tag.includes('aria-label="重新读取 Skills"')) ?? "";

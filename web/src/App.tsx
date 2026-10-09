@@ -1,3 +1,7 @@
+import { i18n } from "./i18n";
+import { I18nProvider, useLingui } from "@lingui/react";
+import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { EvaluationPage } from "./pages/evaluation/EvaluationPage";
 import { Activity, FlaskConical, Bot, BookOpen, Brain, ChevronLeft, ChevronRight, Database, GitBranch, Settings, Sparkles, Wrench } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
@@ -26,6 +30,11 @@ function readPage(): Page {
 }
 
 export default function App() {
+  return <I18nProvider i18n={i18n}><AppContent /></I18nProvider>;
+}
+
+function AppContent() {
+  useLingui();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [page, updatePage] = useState<Page>(readPage);
 
@@ -67,8 +76,8 @@ export default function App() {
       <aside id="app-sidebar" className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="brand-row">
           <div className="brand-mark"><Sparkles size={15} /></div>
-          <div className="brand-copy"><strong>Everything Agent</strong><span>可视化Agent控制台</span></div>
-          <Button variant="ghost" size="icon-sm" className="panel-collapse-toggle sidebar-toggle" onClick={() => setSidebarOpen(false)} aria-label="收起侧边栏" aria-expanded={sidebarOpen} aria-controls="app-sidebar"><ChevronLeft size={16} /></Button>
+          <div className="brand-copy"><strong>Everything Agent</strong><span><Trans>可视化Agent控制台</Trans></span></div>
+          <Button variant="ghost" size="icon-sm" className="panel-collapse-toggle sidebar-toggle" onClick={() => setSidebarOpen(false)} aria-label={t`收起侧边栏`} aria-expanded={sidebarOpen} aria-controls="app-sidebar"><ChevronLeft size={16} /></Button>
         </div>
         <Button variant="ghost" className={`nav-item ${page === "workflow" ? "active" : ""}`} onClick={() => setPage("workflow")}><GitBranch size={15} /><span>Workflow</span></Button>
         <div className="nav-divider" aria-hidden="true" />
@@ -79,10 +88,10 @@ export default function App() {
         <Button variant="ghost" className={`nav-item mb-1 ${page === "database" ? "active" : ""}`} onClick={() => setPage("database")}><Database size={15} /><span>Database</span></Button>
         <Button variant="ghost" className={`nav-item mb-1 ${page === "traces" ? "active" : ""}`} onClick={() => setPage("traces")}><Activity size={15} /><span>Traces</span></Button>
         <Button variant="ghost" className={`nav-item mb-1 ${page === "evaluation" ? "active" : ""}`} onClick={() => setPage("evaluation")}><FlaskConical size={15} /><span>Evaluation</span></Button>
-        <Button variant="ghost" className={`nav-item mb-1 ${page === "config" ? "active" : ""}`} onClick={() => setPage("config")}><Settings size={15} /><span>配置</span></Button>
-        <div className="sidebar-note"><span className="signal bg-emerald-500" />本地 Engine 已连接</div>
+        <Button variant="ghost" className={`nav-item mb-1 ${page === "config" ? "active" : ""}`} onClick={() => setPage("config")}><Settings size={15} /><span><Trans>配置</Trans></span></Button>
+        <div className="sidebar-note"><Trans><span className="signal bg-emerald-500" />本地 Engine 已连接</Trans></div>
       </aside>
-      {!sidebarOpen && <Button variant="ghost" size="icon-sm" className="panel-collapse-toggle sidebar-reopen" onClick={() => setSidebarOpen(true)} aria-label="展开侧边栏" aria-expanded={sidebarOpen} aria-controls="app-sidebar"><ChevronRight size={16} /></Button>}
+      {!sidebarOpen && <Button variant="ghost" size="icon-sm" className="panel-collapse-toggle sidebar-reopen" onClick={() => setSidebarOpen(true)} aria-label={t`展开侧边栏`} aria-expanded={sidebarOpen} aria-controls="app-sidebar"><ChevronRight size={16} /></Button>}
 
       {/* 页面导航只隐藏 Agent，保留运行请求、事件订阅和会话状态。 */}
       <main className="main-content agent-main-content" hidden={page !== "agent"}>

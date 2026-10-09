@@ -1,3 +1,8 @@
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
+import { translateMessage, type UiMessage } from "../../i18n";
+import { useLingui } from "@lingui/react";
+import { msg, t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { AlertMessage } from "../../components/AlertMessage";
 import { CompactionNotice, updateCompactionViews, type CompactionView } from "./CompactionNotice";
 import { advanceHarnessMemory } from "./harness-playback";
@@ -41,7 +46,7 @@ interface ToolView {
   id: string;
   name: string;
   status: "running" | "done" | "error";
-  summary: string;
+  summary: UiMessage;
   args?: unknown;
   output?: unknown;
   ms?: number;
@@ -56,7 +61,7 @@ interface AssistantChatMessage {
   role: "assistant";
   content: string;
   pending: boolean;
-  error?: string;
+  error?: UiMessage;
   tools: ToolView[];
   startedAt?: number;
   /** 已结束回合使用固定耗时，不能随其他回合的刷新继续计时。 */
@@ -99,6 +104,7 @@ const idleStates: Record<string, VisualNodeState> = {
 };
 
 export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
+  useLingui();
   const [bootstrap, setBootstrap] = useState<AgentBootstrap | null>(null);
   const [chatCollapsed, setChatCollapsed] = useState(false);
   const [sessionRailCollapsed, setSessionRailCollapsed] = useState(true);
@@ -125,7 +131,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
     new Set(),
   );
   const resetMemoryPlaybackRef = useRef<(() => void) | null>(null);
-  const [consolidationStatus, setConsolidationStatus] = useState("");
+  const [consolidationStatus, setConsolidationStatus] = useState<UiMessage>("");
   const [consolidating, setConsolidating] = useState(false);
   const [semanticCount, setSemanticCount] = useState(0);
   const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null);
@@ -223,14 +229,14 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
       if (kind.startsWith("consolidation_")) {
         if (kind === "consolidation_started") {
           setConsolidating(true);
-          setConsolidationStatus("正在整理");
+          setConsolidationStatus(msg`正在整理`);
         }
         if (kind === "consolidation_batch_completed")
           setConsolidationStatus(
-            `整理进度 ${event.completedBatches} / ${event.totalBatches}`,
+            msg`整理进度 ${event.completedBatches ?? 0} / ${event.totalBatches ?? 0}`,
           );
         if (kind === "consolidation_retry")
-          setConsolidationStatus("整理失败，等待重试");
+          setConsolidationStatus(msg`整理失败，等待重试`);
         if (
           kind === "consolidation_completed" ||
           kind === "consolidation_failed"
@@ -238,8 +244,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
           setConsolidating(false);
           setConsolidationStatus(
             kind === "consolidation_completed"
-              ? "整理完成"
-              : "整理失败，可手动重试",
+              ? msg`整理完成`
+              : msg`整理失败，可手动重试`,
           );
         }
       }
@@ -311,16 +317,16 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
     setConsolidationStatus(
       task?.status === "failed" &&
         task.errorType === "ConsolidationContextLimitError"
-        ? "事实超出上下文预算，请调整 Model Context Window"
+        ? msg`事实超出上下文预算，请调整 Model Context Window`
         : task?.status === "failed" &&
             task.errorType === "ConsolidationBatchLimitError"
-          ? "整理超过 256 个子任务，请增加上下文预算"
+          ? msg`整理超过 256 个子任务，请增加上下文预算`
           : task
             ? ({
-                pending: "已排队，等待整理",
-                running: "正在整理",
-                completed: "整理完成",
-                failed: "整理失败，可手动重试",
+                pending: msg`已排队，等待整理`,
+                running: msg`正在整理`,
+                completed: msg`整理完成`,
+                failed: msg`整理失败，可手动重试`,
               }[task.status] ?? task.status)
             : "",
     );
@@ -331,7 +337,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
     setSemanticCount(count);
     if (count > 0)
       setConsolidationStatus((status) =>
-        status === "暂无 Semantic Memory，无需整理" ? "" : status,
+        status && typeof status !== "string" && status.id === msg`暂无 Semantic Memory，无需整理`.id
+          ? "" : status,
       );
   }
 
@@ -339,7 +346,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
     if (!consolidating) return;
     const timer = window.setInterval(() => {
       void refreshConsolidation().catch(() =>
-        setConsolidationStatus("无法读取整理状态"),
+        setConsolidationStatus(msg`无法读取整理状态`),
       );
     }, 2000);
     return () => window.clearInterval(timer);
@@ -362,7 +369,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
       ) {
         setConsolidating(false);
         setSemanticCount(0);
-        setConsolidationStatus("暂无 Semantic Memory，无需整理");
+        setConsolidationStatus(msg`暂无 Semantic Memory，无需整理`);
         return;
       }
       await refreshConsolidation();
@@ -376,8 +383,9 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
 
   const consolidationTone = consolidating
     ? "running"
-    : consolidationStatus === "整理完成" ||
-        consolidationStatus === "暂无 Semantic Memory，无需整理"
+    : consolidationStatus && typeof consolidationStatus !== "string" &&
+        (consolidationStatus.id === msg`整理完成`.id ||
+          consolidationStatus.id === msg`暂无 Semantic Memory，无需整理`.id)
       ? "success"
       : consolidationStatus
         ? "error"
@@ -423,7 +431,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
 
   async function renameActiveSession() {
     const active = sessions.find((item) => item.id === activeSessionId);
-    const title = window.prompt("输入新的会话标题", active?.title ?? "");
+    const title = window.prompt(t`输入新的会话标题`, active?.title ?? "");
     if (!title?.trim()) return;
     await memoryAction({
       action: "rename_session",
@@ -440,7 +448,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
   async function deleteActiveSession() {
     if (
       !activeSessionId ||
-      !window.confirm("确认删除整个 Session？已提炼的长期记忆不会删除。")
+      !window.confirm(t`确认删除整个 Session？已提炼的长期记忆不会删除。`)
     )
       return;
     const result = await memoryAction<{ sessions: SessionSummary[] }>({
@@ -561,7 +569,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
     } catch (error) {
       const elapsedMs = Math.max(0, Math.round(performance.now() - startedAt));
       const message = controller.signal.aborted
-        ? "本轮运行已停止"
+        ? msg`本轮运行已停止`
         : error instanceof Error
           ? error.message
           : String(error);
@@ -611,25 +619,34 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
   if (loadError)
     return (
       <div className="content-wrap">
-        <div className="panel error-panel">Agent 加载失败：{loadError}</div>
+        <div className="panel error-panel"><Trans>Agent 加载失败：{loadError}</Trans></div>
       </div>
     );
   if (!bootstrap)
     return (
       <div className="content-wrap">
-        <div className="panel loading-panel">正在加载 Agent Harness…</div>
+        <div className="panel loading-panel"><Trans>正在加载 Agent Harness…</Trans></div>
       </div>
     );
   return (
     <div className="agent-page-layout" data-chat-collapsed={chatCollapsed}>
       <div className="agent-main-column">
-        {active && <AlertMessage message={refreshError ? `配置刷新失败：${refreshError}` : ""} />}
+        {active && <AlertMessage message={refreshError ? t`配置刷新失败：${refreshError}` : ""} />}
         <PageHeading
-          eyebrow="个人助理 / 实时执行"
+          eyebrow={t`个人助理 / 实时执行`}
           title="Agent"
-          description="发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
+          description={t`发送消息，观察记忆召回、上下文组装、模型推理与工具执行。`}
           actions={
-            <div className="agent-intro-actions">
+            <div className="agent-intro-actions flex flex-col items-end gap-2.5">
+              <div className="flex flex-wrap items-center justify-end gap-2.5">
+                <LanguageSwitcher />
+                {(!bootstrap.settings.agentModel.keyConfigured ||
+                  !bootstrap.settings.smallModel.keyConfigured) && (
+                  <Button className="config-warning" onClick={onOpenConfig}>
+                    <Settings2 size={14} /><Trans> 配置模型后开始</Trans>
+                  </Button>
+                )}
+              </div>
               <div
                 className="consolidation-action"
                 data-status={consolidationTone}
@@ -637,7 +654,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                 {consolidationStatus && (
                   <span className="consolidation-status" role="status">
                     <i aria-hidden="true" />
-                    {consolidationStatus}
+                    {translateMessage(consolidationStatus)}
                   </span>
                 )}
                 <Button
@@ -654,12 +671,6 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   <RefreshCw size={13} aria-hidden="true" /> Consolidate
                 </Button>
               </div>
-              {(!bootstrap.settings.agentModel.keyConfigured ||
-                !bootstrap.settings.smallModel.keyConfigured) && (
-                <Button className="config-warning" onClick={onOpenConfig}>
-                  <Settings2 size={14} /> 配置模型后开始
-                </Button>
-              )}
             </div>
           }
         />
@@ -678,10 +689,10 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
               <Bot size={16} />
             </div>
             <div className="agent-session-heading">
-              <span className="chat-heading-label">与个人助理对话</span>
+              <span className="chat-heading-label"><Trans>与个人助理对话</Trans></span>
               <strong>
                 {sessions.find((item) => item.id === activeSessionId)?.title ??
-                  "当前会话"}
+                  t`当前会话`}
               </strong>
             </div>
             <Button
@@ -689,8 +700,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
               size="icon-sm"
               className="session-icon"
               onClick={() => void renameActiveSession()}
-              aria-label="重命名会话"
-              title="重命名会话"
+              aria-label={t`重命名会话`}
+              title={t`重命名会话`}
             >
               <Pencil size={13} />
             </Button>
@@ -699,8 +710,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
               size="icon-sm"
               className="session-icon danger"
               onClick={() => void deleteActiveSession()}
-              aria-label="删除会话"
-              title="删除会话"
+              aria-label={t`删除会话`}
+              title={t`删除会话`}
             >
               <Trash2 size={13} />
             </Button>
@@ -709,8 +720,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
               variant="ghost"
               size="icon-sm"
               className="panel-collapse-toggle chat-collapse-toggle"
-              aria-label={chatCollapsed ? "展开聊天区" : "收起聊天区"}
-              title={chatCollapsed ? "展开聊天区" : "收起聊天区"}
+              aria-label={chatCollapsed ? t`展开聊天区` : t`收起聊天区`}
+              title={chatCollapsed ? t`展开聊天区` : t`收起聊天区`}
               aria-expanded={!chatCollapsed}
               aria-controls="agent-chat-content"
               onClick={() => {
@@ -752,8 +763,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   disabled={running || !activeSessionId || messages.length === 0}
                   onClick={() => void createSession()}
                 >
-                  <MessageSquarePlus size={14} /> 新建对话
-                </Button>
+                  <MessageSquarePlus size={14} /><Trans> 新建对话
+                </Trans></Button>
                 <Button
                   type="button"
                   variant="outline"
@@ -761,28 +772,28 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   className="session-toolbar-button history-toggle"
                   ref={historyToggleRef}
                   aria-label={
-                    sessionRailCollapsed ? "展开对话列表" : "收起对话列表"
+                    sessionRailCollapsed ? t`展开对话列表` : t`收起对话列表`
                   }
-                  title={sessionRailCollapsed ? "展开对话列表" : "收起对话列表"}
+                  title={sessionRailCollapsed ? t`展开对话列表` : t`收起对话列表`}
                   aria-expanded={!sessionRailCollapsed}
                   aria-controls="agent-session-rail"
                   onClick={() =>
                     setSessionRailCollapsed((collapsed) => !collapsed)
                   }
-                >
+                ><Trans>
                   历史对话{" "}
                   {sessionRailCollapsed ? (
                     <ChevronDown size={14} />
                   ) : (
                     <ChevronUp size={14} />
                   )}
-                </Button>
+                </Trans></Button>
                 <Button
                   variant="secondary"
                   size="sm"
                   className="model-chip shadow-none"
                   onClick={onOpenConfig}
-                  title="打开模型配置"
+                  title={t`打开模型配置`}
                 >
                   <span
                     className={
@@ -804,8 +815,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                 hidden={sessionRailCollapsed}
               >
                 <div className="session-list-heading">
-                  <strong>历史对话</strong>
-                  <span>选择一个会话继续聊天</span>
+                  <strong><Trans>历史对话</Trans></strong>
+                  <span><Trans>选择一个会话继续聊天</Trans></span>
                 </div>
                 <div className="session-list">
                   {sessions.map((session) => (
@@ -816,7 +827,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                       onClick={() => void selectSession(session.id)}
                     >
                       <strong>{session.title}</strong>
-                      <span>{session.messageCount} 条记录</span>
+                      <span><Trans>{session.messageCount} 条记录</Trans></span>
                     </Button>
                   ))}
                 </div>
@@ -828,9 +839,9 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   <div className="chat-empty-icon">
                     <Bot size={28} />
                   </div>
-                  <strong>有什么可以帮你？</strong>
-                  <span>提一个问题，或交给我一件要做的事。</span>
-                  <small>对话记录保存在本地</small>
+                  <strong><Trans>有什么可以帮你？</Trans></strong>
+                  <span><Trans>提一个问题，或交给我一件要做的事。</Trans></span>
+                  <small><Trans>对话记录保存在本地</Trans></small>
                 </div>
               )}
               {messages.map((message) =>
@@ -855,7 +866,7 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
               />
               <div className="composer-input-box">
                 <Textarea
-                  aria-label="消息内容"
+                  aria-label={t`消息内容`}
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={(event) => {
@@ -867,8 +878,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   placeholder={
                     bootstrap.settings.agentModel.keyConfigured &&
                     bootstrap.settings.smallModel.keyConfigured
-                      ? "给 Everything Agent 发消息…"
-                      : "请先完整配置 Agent Model 与 Small Model"
+                      ? t`给 Everything Agent 发消息…`
+                      : t`请先完整配置 Agent Model 与 Small Model`
                   }
                   disabled={
                     running ||
@@ -878,9 +889,9 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                   rows={2}
                 />
                 <div className="agent-composer-actions">
-                  <span className="composer-hint">
+                  <span className="composer-hint"><Trans>
                     Enter 发送 · Shift + Enter 换行
-                  </span>
+                  </Trans></span>
                   <div className="composer-controls">
                     <ContextGauge usage={contextUsage} />
                     {running ? (
@@ -888,12 +899,12 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                         variant="destructive-outline"
                         size="sm"
                         className="stop-agent"
-                        aria-label="停止生成"
-                        title="停止生成"
+                        aria-label={t`停止生成`}
+                        title={t`停止生成`}
                         onClick={() => abortRef.current?.abort()}
                       >
-                        <CircleStop size={15} className="[&_rect]:fill-current" aria-hidden="true" /> 停止
-                      </Button>
+                        <CircleStop size={15} className="[&_rect]:fill-current" aria-hidden="true" /><Trans> 停止
+                      </Trans></Button>
                     ) : (
                       <Button
                         size="sm"
@@ -905,8 +916,8 @@ export function AgentPage({ active = true, onOpenConfig }: AgentPageProps) {
                           !bootstrap.settings.smallModel.keyConfigured
                         }
                       >
-                        <Send size={15} /> 发送
-                      </Button>
+                        <Send size={15} /><Trans> 发送
+                      </Trans></Button>
                     )}
                   </div>
                 </div>
@@ -926,6 +937,7 @@ function AssistantCard({
   message: AssistantChatMessage;
   tick: number;
 }) {
+  useLingui();
   const elapsed =
     message.result?.ms ?? message.elapsedMs ??
     (message.pending && message.startedAt !== undefined
@@ -964,9 +976,9 @@ function AssistantCard({
       </div>
       {message.compactions?.map((item) => <CompactionNotice key={item.compactionId} item={item} />)}
       {message.streamFallback && (
-        <div className="agent-inline-note">
+        <div className="agent-inline-note"><Trans>
           流式响应失败，已降级为普通请求。
-        </div>
+        </Trans></div>
       )}
       {message.tools.map((tool) => (
         <details
@@ -974,7 +986,7 @@ function AssistantCard({
           className={`tool-summary ${tool.status}`}
         >
           <summary>
-            <code>{tool.name}</code> · {tool.summary || "完成"}
+            <code>{tool.name}</code> · {translateMessage(tool.summary) || t`完成`}
             {tool.ms !== undefined && ` · ${tool.ms}ms`}
           </summary>
           <pre>
@@ -983,19 +995,19 @@ function AssistantCard({
         </details>
       ))}
       {message.error ? (
-        <div className="assistant-error">{message.error}</div>
+        <div className="assistant-error">{translateMessage(message.error)}</div>
       ) : message.content ? (
         <div className="assistant-reply">
           <ChatMarkdown content={message.content} />
           {message.pending && <span className="stream-caret" />}
         </div>
       ) : (
-        <div className="assistant-thinking">
+        <div className="assistant-thinking"><Trans>
           思考中… <span>{((elapsed ?? 0) / 1_000).toFixed(0)}s</span>
-        </div>
+        </Trans></div>
       )}
       <div className="assistant-meta">
-        <Clock3 size={11} /> {elapsed === undefined ? "耗时未知" : `${(elapsed / 1_000).toFixed(1)}s`}
+        <Clock3 size={11} /> {elapsed === undefined ? t`耗时未知` : `${(elapsed / 1_000).toFixed(1)}s`}
         {message.result && (
           <>
             {" "}
@@ -1146,7 +1158,7 @@ function toChatMessages(entries: ChatLogEntry[]): ChatMessage[] {
       content: final ? plainText(final.content) : "",
       compactions: user.compactions?.map((item) => ({ ...item, status: "done" })),
       pending: false,
-      ...(final ? {} : { error: "此回合未完成" }),
+      ...(final ? {} : { error: msg`此回合未完成` }),
       ...(Number.isFinite(elapsedMs) && elapsedMs >= 0 ? { elapsedMs } : {}),
       tools: toolCalls.map((call) => {
         const result = toolResults.find((item) => item.tool_use_id === call.id);
@@ -1154,7 +1166,7 @@ function toChatMessages(entries: ChatLogEntry[]): ChatMessage[] {
           id: String(call.id ?? crypto.randomUUID()),
           name: String(call.name ?? "tool"),
           status: result?.is_error ? "error" : "done",
-          summary: result?.is_error ? "工具执行失败" : "工具执行完成",
+          summary: result?.is_error ? msg`工具执行失败` : msg`工具执行完成`,
           args: call.input,
           output: result?.content,
         };

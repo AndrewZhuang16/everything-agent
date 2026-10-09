@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { lingui } from "@lingui/vite-plugin";
 import { defineConfig } from "vite";
 import { localEnginePlugin } from "./server/local-engine-plugin.ts";
 
@@ -9,7 +10,7 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
-  plugins: [react(), tailwindcss(), localEnginePlugin()],
+  plugins: [react(), lingui({ macroTransform: true }), tailwindcss(), localEnginePlugin()],
   build: {
     outDir: fileURLToPath(new URL("../dist-web", import.meta.url)),
     emptyOutDir: true,

@@ -1,4 +1,6 @@
 // @vitest-environment happy-dom
+import { I18nProvider } from "@lingui/react";
+import { i18n } from "../src/i18n";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
@@ -28,7 +30,7 @@ beforeEach(async () => {
   container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => root.render(<App />));
+  await act(async () => root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>));
 });
 afterEach(async () => {
   await act(async () => root.unmount());
@@ -175,7 +177,7 @@ it("历史回复按记录时间计算耗时，新回合计时不会改变旧回�
       { turnId: "history", kind: "assistant_message", content: "历史回复", createdAt: "2026-09-24T00:00:12.500Z" },
     ],
   });
-  await act(async () => { root.unmount(); root = createRoot(container); root.render(<App />); });
+  await act(async () => { root.unmount(); root = createRoot(container); root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>); });
   const elapsed = () => container.querySelector(".assistant-meta")!.textContent;
   expect(elapsed()).toContain("12.5s");
   vi.useFakeTimers();
@@ -220,7 +222,7 @@ it.each([
       ...(completed ? [{ turnId: "history", kind: "assistant_message", content: "历史回复", createdAt: end }] : []),
     ],
   });
-  await act(async () => { root.unmount(); root = createRoot(container); root.render(<App />); });
+  await act(async () => { root.unmount(); root = createRoot(container); root.render(<I18nProvider i18n={i18n}><App /></I18nProvider>); });
   expect(container.querySelector(".assistant-meta")!.textContent).toContain("耗时未知");
 });
 
@@ -242,4 +244,67 @@ it("运行中实时计时，请求失败后固定耗时", async () => {
     await click("发送");
     expect(container.querySelector(".assistant-meta")!.textContent).toContain("3.0s");
   } finally { clock.mockRestore(); vi.useRealTimers(); }
+});
+
+it("语言切换保留输入草稿、会话和后台订阅", async () => {
+  await enterMessage("未发送的中文草稿");
+  const textarea = container.querySelector("textarea")!;
+  const loadCount = api.loadAgent.mock.calls.length;
+  await click("切换语言");
+  expect(container.textContent).toContain("Settings");
+  expect(container.querySelector("textarea")).toBe(textarea);
+  expect(textarea.value).toBe("未发送的中文草稿");
+  expect(container.textContent).toContain("当前会话");
+  expect(api.loadAgent).toHaveBeenCalledTimes(loadCount);
+  expect(api.subscribeBackgroundEvents).toHaveBeenCalledTimes(1);
+  expect(api.subscribeBackgroundEvents.mock.results[0]!.value).not.toHaveBeenCalled();
+  await click("Switch language");
+  expect(container.textContent).toContain("配置");
+});
+
+it("运行中切换语言不取消请求，后续流式回复保持原文", async () => {
+  api.runAgent.mockImplementation((_prompt, _session, _onEvent, signal: AbortSignal) => new Promise((_resolve, reject) => {
+    signal.addEventListener("abort", () => reject(new Error("已停止")), { once: true });
+  }));
+  await enterMessage("执行原始中文任务");
+  await click("发送");
+  const [, , onEvent, signal] = api.runAgent.mock.calls[0]!;
+  await click("切换语言");
+  expect(signal.aborted).toBe(false);
+  expect(api.runAgent).toHaveBeenCalledTimes(1);
+  await act(async () => onEvent("text", { delta: "原始中文模型回复" }));
+  expect(container.textContent).toContain("原始中文模型回复");
+  await click("Stop generating");
+  expect(signal.aborted).toBe(true);
+  expect(container.textContent).toContain("This turn was stopped");
+  await click("Switch language");
+  expect(container.textContent).toContain("本轮运行已停止");
+});
+
+it("整理进度在切换时即时翻译，完成后的状态语义不变", async () => {
+  const onBackground = api.subscribeBackgroundEvents.mock.calls[0]![0];
+  await act(async () => {
+    onBackground("consolidation_started", {});
+    onBackground("consolidation_batch_completed", { completedBatches: 1, totalBatches: 3 });
+  });
+  expect(container.textContent).toContain("整理进度 1 / 3");
+  await click("切换语言");
+  expect(container.textContent).toContain("Consolidation progress 1 / 3");
+  await act(async () => onBackground("consolidation_completed", {}));
+  expect(container.textContent).toContain("Consolidation completed");
+  expect(container.querySelector(".consolidation-action")!.getAttribute("data-status")).toBe("success");
+  await click("Switch language");
+  expect(container.textContent).toContain("整理完成");
+  expect(container.querySelector(".consolidation-action")!.getAttribute("data-status")).toBe("success");
+});
+
+it("语言按钮始终位于整理操作之前，模型未配置时与配置按钮同组", async () => {
+  const language = container.querySelector('button[aria-label="切换语言"]')!;
+  expect(language.parentElement!.nextElementSibling?.classList.contains("consolidation-action")).toBe(true);
+  const bootstrap = await api.loadAgent();
+  api.loadAgent.mockResolvedValue({ ...bootstrap, settings: { ...bootstrap.settings, agentModel: { keyConfigured: false } } });
+  await click("配置");
+  await click("Agent");
+  expect([...language.parentElement!.querySelectorAll("button")].map(button => button.textContent!.trim()))
+    .toEqual(["English", "配置模型后开始"]);
 });

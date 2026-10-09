@@ -70,13 +70,18 @@
     "mock-data": "node mock-data/cli.ts",
     "langfuse:up": "node deploy/langfuse/setup.mjs up",
     "langfuse:down": "node deploy/langfuse/setup.mjs down",
-    "langfuse:status": "node deploy/langfuse/setup.mjs status"
+    "langfuse:status": "node deploy/langfuse/setup.mjs status",
+    "i18n:extract": "lingui extract --clean",
+    "i18n:check": "lingui compile --strict"
   },
   "engines": {
     "node": ">=24.12"
   },
   "license": "MIT",
   "devDependencies": {
+    "@lingui/cli": "^6.9.0",
+    "@lingui/format-po": "^6.9.0",
+    "@lingui/vite-plugin": "^6.9.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.3.0",
     "@types/react": "^19.2.18",
@@ -91,6 +96,8 @@
   },
   "dependencies": {
     "@langfuse/client": "^5.11.1",
+    "@lingui/core": "^6.9.0",
+    "@lingui/react": "^6.9.0",
     "@node-rs/jieba": "^2.0.3",
     "@radix-ui/react-alert-dialog": "^1.1.23",
     "@radix-ui/react-select": "^2.3.7",
