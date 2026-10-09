@@ -1,14 +1,34 @@
 import { I18nProvider } from "@lingui/react";
 import { i18n } from "../src/i18n";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { agentHarnessGraph, harnessPresentation, harnessEdgeLabels, describeHarnessRetrieval } from "../../src/agent-graph/harness-graph.ts";
 import { AgentHarnessCanvas } from "../src/pages/agent/AgentHarnessCanvas";
+
+afterEach(() => i18n.activate("zh"));
 
 function workflow() {
   const graph = agentHarnessGraph.describe();
   return { name: graph.name, nodes: graph.nodes.map((node) => ({ id: node.name, label: harnessPresentation[node.name]!.title, kind: node.kind, maxVisits: node.maxVisits, presentation: harnessPresentation[node.name]! })), edges: graph.edges.map((edge) => ({ ...edge, label: harnessEdgeLabels[`${edge.source}->${edge.target}`]! })) };
 }
+
+it("英文模式翻译全部可见边标签，保留拓扑与执行状态", () => {
+  const graph = workflow();
+  const render = () => renderToStaticMarkup(<I18nProvider i18n={i18n}><AgentHarnessCanvas workflow={graph} nodeStates={{ retrieval_gate: "running" }} activeEdges={new Set(["user_prompt->retrieval_gate"])} /></I18nProvider>);
+  i18n.activate("en");
+  const english = render();
+  const edgeTexts = [...english.matchAll(/class="harness-edge-label">([^<]*)<\/text>/g)].map(match => match[1]);
+  expect(edgeTexts.length).toBeGreaterThan(0);
+  for (const label of edgeTexts) expect(label).not.toMatch(/\p{Script=Han}/u);
+  expect(edgeTexts).toContain("Current question");
+  expect(edgeTexts).toContain("Last 3 completed turns");
+  expect(english).toContain('agent-edge active');
+  expect(english).toContain('agent-node running');
+  // 切换只改变显示文案，不改写 Graph 提供的标签。
+  expect(graph.edges.some(edge => edge.label === "当前问题")).toBe(true);
+  i18n.activate("zh");
+  expect(render()).toContain("当前问题");
+});
 
 describe("Agent 业务画布", () => {
   it("从 Graph 渲染所有业务节点和边说明，隐藏边界且不额外拼接输入", () => {

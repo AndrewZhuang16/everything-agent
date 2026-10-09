@@ -362,6 +362,10 @@ msgstr "上下文占用 {0}%"
 msgid "上下文压缩失败，保留原上下文"
 msgstr "上下文压缩失败，保留原上下文"
 
+#: web/src/presentation-i18n.ts
+msgid "上下文就绪"
+msgstr "上下文就绪"
+
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "上下文已压缩"
 msgstr "上下文已压缩"
@@ -403,13 +407,29 @@ msgstr "两项配置统一作用于该数据集的全部用例，本地与平台
 msgid "个人助理 / 实时执行"
 msgstr "个人助理 / 实时执行"
 
+#: web/src/presentation-i18n.ts
+msgid "串行处理"
+msgstr "串行处理"
+
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "为 <0>search_web</0> 配置只读网页搜索凭证，密钥只会保存在本机。"
 msgstr "为 <0>search_web</0> 配置只读网页搜索凭证，密钥只会保存在本机。"
 
+#: web/src/presentation-i18n.ts
+msgid "事务提交"
+msgstr "事务提交"
+
+#: web/src/presentation-i18n.ts
+msgid "事实及证据"
+msgstr "事实及证据"
+
 #: web/src/pages/agent/AgentPage.tsx
 msgid "事实超出上下文预算，请调整 Model Context Window"
 msgstr "事实超出上下文预算，请调整 Model Context Window"
+
+#: web/src/presentation-i18n.ts
+msgid "五类决策"
+msgstr "五类决策"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "仅 macOS"
@@ -500,6 +520,10 @@ msgid "允许本次"
 msgstr "允许本次"
 
 #: web/src/presentation-i18n.ts
+msgid "全量 / 分批"
+msgstr "全量 / 分批"
+
+#: web/src/presentation-i18n.ts
 msgid "全量事实与分批"
 msgstr "全量事实与分批"
 
@@ -537,6 +561,10 @@ msgstr "最低相似度说明"
 #: web/src/pages/workflow/RunPanel.tsx
 msgid "最后结果"
 msgstr "最后结果"
+
+#: web/src/presentation-i18n.ts
+msgid "最近 3 个已完成回合"
+msgstr "最近 3 个已完成回合"
 
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "最近 Session"
@@ -609,6 +637,10 @@ msgstr "单次模型输出（tokens）"
 msgid "危险区域"
 msgstr "危险区域"
 
+#: web/src/presentation-i18n.ts
+msgid "历史 / 事实证据"
+msgstr "历史 / 事实证据"
+
 #: web/src/pages/agent/AgentPage.tsx
 msgid "历史对话"
 msgstr "历史对话"
@@ -618,9 +650,17 @@ msgstr "历史对话"
 msgid "历史对话 {0}"
 msgstr "历史对话 {0}"
 
+#: web/src/presentation-i18n.ts
+msgid "历史证据"
+msgstr "历史证据"
+
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "历史超过分批上限"
 msgstr "历史超过分批上限"
+
+#: web/src/presentation-i18n.ts
+msgid "压缩完成 / 安全降级"
+msgstr "压缩完成 / 安全降级"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "压缩已取消或超时"
@@ -654,6 +694,10 @@ msgid "受控调用 · 参数验证"
 msgstr "受控调用 · 参数验证"
 
 #: web/src/presentation-i18n.ts
+msgid "可用 Skills"
+msgstr "可用 Skills"
+
+#: web/src/presentation-i18n.ts
 msgid "可用工具与参数"
 msgstr "可用工具与参数"
 
@@ -664,6 +708,10 @@ msgstr "可视化Agent控制台"
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "同步成功："
 msgstr "同步成功："
+
+#: web/src/presentation-i18n.ts
+msgid "后台入队"
+msgstr "后台入队"
 
 #: web/src/pages/agent/AgentHarnessCanvas.tsx
 msgid "后台写入 · 独立串行队列，不阻塞回复"
@@ -739,6 +787,7 @@ msgid "字段数"
 msgstr "字段数"
 
 #: web/src/pages/agent/AgentPage.tsx
+#: web/src/presentation-i18n.ts
 msgid "完成"
 msgstr "完成"
 
@@ -753,6 +802,10 @@ msgstr "定义一个可复用能力"
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "实际输出"
 msgstr "实际输出"
+
+#: web/src/presentation-i18n.ts
+msgid "审计与汇总"
+msgstr "审计与汇总"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "对话记录保存在本地"
@@ -822,6 +875,14 @@ msgstr "工具执行失败"
 #: web/src/pages/agent/AgentPage.tsx
 msgid "工具执行完成"
 msgstr "工具执行完成"
+
+#: web/src/presentation-i18n.ts
+msgid "工具接口"
+msgstr "工具接口"
+
+#: web/src/presentation-i18n.ts
+msgid "工具结果"
+msgstr "工具结果"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "工具配置已保存，下一回合立即生效。"
@@ -908,6 +969,10 @@ msgstr "已配置 ····{0}"
 msgid "已重新读取"
 msgstr "已重新读取"
 
+#: web/src/presentation-i18n.ts
+msgid "常驻规则"
+msgstr "常驻规则"
+
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "平台评分"
 msgstr "平台评分"
@@ -957,6 +1022,10 @@ msgstr "当前环境无法建立沙箱：{0}"
 #: web/src/pages/config/ConfigPage.tsx
 msgid "当前配置已就绪 · {0}"
 msgstr "当前配置已就绪 · {0}"
+
+#: web/src/presentation-i18n.ts
+msgid "当前问题"
+msgstr "当前问题"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "待同步"
@@ -1066,6 +1135,14 @@ msgstr "控制会话召回范围和模型上下文预算。"
 msgid "提一个问题，或交给我一件要做的事。"
 msgstr "提一个问题，或交给我一件要做的事。"
 
+#: web/src/presentation-i18n.ts
+msgid "提交"
+msgstr "提交"
+
+#: web/src/presentation-i18n.ts
+msgid "提交记忆 · 异步"
+msgstr "提交记忆 · 异步"
+
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "搜索"
 msgstr "搜索"
@@ -1077,6 +1154,10 @@ msgstr "搜索历史会话"
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "搜索语义记忆"
 msgstr "搜索语义记忆"
+
+#: web/src/presentation-i18n.ts
+msgid "摘要与后续工作记忆"
+msgstr "摘要与后续工作记忆"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "摘要为空或不完整"
@@ -1189,6 +1270,10 @@ msgstr "新技能草稿"
 msgid "无法读取整理状态"
 msgstr "无法读取整理状态"
 
+#: web/src/presentation-i18n.ts
+msgid "无需检索"
+msgstr "无需检索"
+
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "日常记忆快照"
 msgstr "日常记忆快照"
@@ -1276,6 +1361,14 @@ msgstr "本地数据已清理，但自动重建向量索引失败：{message}"
 #: web/src/pages/config/ConfigPage.tsx
 msgid "本地运行 / 安全配置"
 msgstr "本地运行 / 安全配置"
+
+#: web/src/presentation-i18n.ts
+msgid "本轮系统指令"
+msgstr "本轮系统指令"
+
+#: web/src/presentation-i18n.ts
+msgid "本轮输入"
+msgstr "本轮输入"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "本轮运行已停止"
@@ -1529,6 +1622,10 @@ msgstr "生产环境只读，修改请在开发环境完成后重新构建"
 msgid "生产环境只读查看"
 msgstr "生产环境只读查看"
 
+#: web/src/presentation-i18n.ts
+msgid "生成回复"
+msgstr "生成回复"
+
 #: web/src/pages/workflow/WorkflowPage.tsx
 msgid "用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。"
 msgstr "用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。"
@@ -1606,6 +1703,10 @@ msgstr "确认永久删除"
 msgid "确认清除"
 msgstr "确认清除"
 
+#: web/src/presentation-i18n.ts
+msgid "程序性知识"
+msgstr "程序性知识"
+
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "空白评估记忆"
 msgstr "空白评估记忆"
@@ -1680,6 +1781,10 @@ msgstr "终端命令的执行边界。命令只能写入这个工作区，由操
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "终端执行"
 msgstr "终端执行"
+
+#: web/src/presentation-i18n.ts
+msgid "结构化建议"
+msgstr "结构化建议"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "给 Everything Agent 发消息…"
@@ -1759,6 +1864,10 @@ msgstr "请求失败（{0}）"
 msgid "读取 Skills"
 msgstr "读取 Skills"
 
+#: web/src/presentation-i18n.ts
+msgid "调用工具"
+msgstr "调用工具"
+
 #: web/src/pages/config/ConfigPage.tsx
 msgid "负责主 Agent 推理、工具调用、记忆写入与 consolidation。"
 msgstr "负责主 Agent 推理、工具调用、记忆写入与 consolidation。"
@@ -1806,6 +1915,10 @@ msgstr "输入新的会话标题"
 #: web/src/pages/config/ConfigPage.tsx
 msgid "输入独立 Embedding API Key"
 msgstr "输入独立 Embedding API Key"
+
+#: web/src/presentation-i18n.ts
+msgid "达到 70%"
+msgstr "达到 70%"
 
 #: web/src/pages/database/DatabasePage.tsx
 msgid "运行 SQL"
@@ -1947,6 +2060,10 @@ msgstr "重新读取 Skills"
 #: web/src/pages/workflow/RunPanel.tsx
 msgid "错误：{0}"
 msgstr "错误：{0}"
+
+#: web/src/presentation-i18n.ts
+msgid "长期事实"
+msgstr "长期事实"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "随 Runtime 提供，不依赖外部服务。"
