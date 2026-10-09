@@ -20,7 +20,7 @@ it("英文模式翻译全部可见边标签，保留拓扑与执行状态", () =
   const edgeTexts = [...english.matchAll(/class="harness-edge-label">([^<]*)<\/text>/g)].map(match => match[1]);
   expect(edgeTexts.length).toBeGreaterThan(0);
   for (const label of edgeTexts) expect(label).not.toMatch(/\p{Script=Han}/u);
-  expect(edgeTexts).toContain("Current question");
+  expect(edgeTexts).toContain("Query");
   expect(edgeTexts).toContain("Last 3 completed turns");
   expect(english).toContain('agent-edge active');
   expect(english).toContain('agent-node running');

@@ -287,7 +287,7 @@ msgstr "Experiment details"
 
 #: web/src/presentation-i18n.ts
 msgid "FTS5 + BM25 · 排除当前会话"
-msgstr "FTS5 + BM25 · Excludes current session"
+msgstr "FTS5 + BM25 · Past sessions"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "Langfuse Experiment 配置说明"
@@ -311,7 +311,7 @@ msgstr "SELECT runs directly · INSERT / UPDATE / DELETE require confirmation"
 
 #: web/src/presentation-i18n.ts
 msgid "Semantic Facts · 上下文预算"
-msgstr "Semantic Facts · Context budget"
+msgstr "Facts · Context budget"
 
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "Semantic Memory、Session Recall、会话日志与整理状态。"
@@ -364,7 +364,7 @@ msgstr "Context compaction failed; original context retained"
 
 #: web/src/presentation-i18n.ts
 msgid "上下文就绪"
-msgstr "Context ready"
+msgstr "Ready"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "上下文已压缩"
@@ -409,7 +409,7 @@ msgstr "Personal assistant / Live execution"
 
 #: web/src/presentation-i18n.ts
 msgid "串行处理"
-msgstr "Serial processing"
+msgstr "Serial"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "为 <0>search_web</0> 配置只读网页搜索凭证，密钥只会保存在本机。"
@@ -417,11 +417,11 @@ msgstr "Configure read-only web search credentials for <0>search_web</0>. Keys a
 
 #: web/src/presentation-i18n.ts
 msgid "事务提交"
-msgstr "Commit transaction"
+msgstr "Commit"
 
 #: web/src/presentation-i18n.ts
 msgid "事实及证据"
-msgstr "Facts and evidence"
+msgstr "Facts"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "事实超出上下文预算，请调整 Model Context Window"
@@ -429,7 +429,7 @@ msgstr "Facts exceed the context budget. Adjust Model Context Window."
 
 #: web/src/presentation-i18n.ts
 msgid "五类决策"
-msgstr "Five decision types"
+msgstr "Decisions"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "仅 macOS"
@@ -521,11 +521,11 @@ msgstr "Allow once"
 
 #: web/src/presentation-i18n.ts
 msgid "全量 / 分批"
-msgstr "Full snapshot / Batches"
+msgstr "Batches"
 
 #: web/src/presentation-i18n.ts
 msgid "全量事实与分批"
-msgstr "Snapshot and batches"
+msgstr "Fact snapshot"
 
 #. placeholder {0}: data?.runs.length ?? 0
 #: web/src/pages/evaluation/EvaluationPage.tsx
@@ -639,7 +639,7 @@ msgstr "Danger zone"
 
 #: web/src/presentation-i18n.ts
 msgid "历史 / 事实证据"
-msgstr "History / Evidence"
+msgstr "History"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "历史对话"
@@ -652,7 +652,7 @@ msgstr "Chat history {0}"
 
 #: web/src/presentation-i18n.ts
 msgid "历史证据"
-msgstr "Historical evidence"
+msgstr "History"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "历史超过分批上限"
@@ -660,7 +660,7 @@ msgstr "History exceeds the batch limit"
 
 #: web/src/presentation-i18n.ts
 msgid "压缩完成 / 安全降级"
-msgstr "Compacted / Safe fallback"
+msgstr "Compacted / Fallback"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "压缩已取消或超时"
@@ -668,7 +668,7 @@ msgstr "Compaction cancelled or timed out"
 
 #: web/src/presentation-i18n.ts
 msgid "去重 / 合并 / 冲突 / 清理"
-msgstr "Deduplicate / Merge / Resolve / Clean"
+msgstr "Merge & clean"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
@@ -691,15 +691,15 @@ msgstr "Cancel rebuild"
 
 #: web/src/presentation-i18n.ts
 msgid "受控调用 · 参数验证"
-msgstr "Controlled calls · Validation"
+msgstr "Validated calls"
 
 #: web/src/presentation-i18n.ts
 msgid "可用 Skills"
-msgstr "Available Skills"
+msgstr "Skills"
 
 #: web/src/presentation-i18n.ts
 msgid "可用工具与参数"
-msgstr "Available tools and parameters"
+msgstr "Tool schemas"
 
 #: web/src/App.tsx
 msgid "可视化Agent控制台"
@@ -711,11 +711,11 @@ msgstr "Synced:"
 
 #: web/src/presentation-i18n.ts
 msgid "后台入队"
-msgstr "Queue in background"
+msgstr "Queue"
 
 #: web/src/pages/agent/AgentHarnessCanvas.tsx
 msgid "后台写入 · 独立串行队列，不阻塞回复"
-msgstr "Background writes · Independent serial queue; replies stay responsive"
+msgstr "Background memory · Serial queue"
 
 #: web/src/pages/config/ConfigPage.tsx
 msgid "向量索引"
@@ -805,7 +805,7 @@ msgstr "Actual output"
 
 #: web/src/presentation-i18n.ts
 msgid "审计与汇总"
-msgstr "Audit and summary"
+msgstr "Audit"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "对话记录保存在本地"
@@ -813,7 +813,7 @@ msgstr "Chat history is stored locally"
 
 #: web/src/presentation-i18n.ts
 msgid "小模型 · 代码验证检索意图"
-msgstr "Small model · Validated retrieval"
+msgstr "Intent check"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "尚无 Experiment。从平台或本页启动后，记录会显示在这里。"
@@ -882,7 +882,7 @@ msgstr "Tool interfaces"
 
 #: web/src/presentation-i18n.ts
 msgid "工具结果"
-msgstr "Tool results"
+msgstr "Result"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "工具配置已保存，下一回合立即生效。"
@@ -971,7 +971,7 @@ msgstr "Reloaded"
 
 #: web/src/presentation-i18n.ts
 msgid "常驻规则"
-msgstr "Persistent rules"
+msgstr "Rules"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "平台评分"
@@ -1025,7 +1025,7 @@ msgstr "Ready for the current settings · {0}"
 
 #: web/src/presentation-i18n.ts
 msgid "当前问题"
-msgstr "Current question"
+msgstr "Query"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "待同步"
@@ -1104,7 +1104,7 @@ msgstr "Batches / Unresolved conflicts"
 
 #: web/src/presentation-i18n.ts
 msgid "批次进度 / 冲突 / 错误"
-msgstr "Progress / Conflicts / Errors"
+msgstr "Progress & errors"
 
 #: web/src/pages/agent/ApprovalPrompt.tsx
 #: web/src/pages/evaluation/EvaluationPage.tsx
@@ -1141,7 +1141,7 @@ msgstr "Submit"
 
 #: web/src/presentation-i18n.ts
 msgid "提交记忆 · 异步"
-msgstr "Queue memory · Async"
+msgstr "Queue memory"
 
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "搜索"
@@ -1233,7 +1233,7 @@ msgstr "Consolidations"
 
 #: web/src/presentation-i18n.ts
 msgid "整理结果"
-msgstr "Consolidation result"
+msgstr "Results"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "整理超过 256 个子任务，请增加上下文预算"
@@ -1256,7 +1256,7 @@ msgstr "Created {0} / Updated {1} / Deleted {2} / Merged {3} / Skipped {4}"
 
 #: web/src/presentation-i18n.ts
 msgid "新增 / 更新 / 删除 / 合并 / 跳过"
-msgstr "Create / Update / Delete / Merge / Skip"
+msgstr "Store & revise facts"
 
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "新建"
@@ -1364,7 +1364,7 @@ msgstr "Local runtime / Safety settings"
 
 #: web/src/presentation-i18n.ts
 msgid "本轮系统指令"
-msgstr "Current system instructions"
+msgstr "Prompt"
 
 #: web/src/presentation-i18n.ts
 msgid "本轮输入"
@@ -1407,11 +1407,11 @@ msgstr "Query returned 0 rows"
 
 #: web/src/presentation-i18n.ts
 msgid "校验并保存"
-msgstr "Validate and save"
+msgstr "Save memory"
 
 #: web/src/presentation-i18n.ts
 msgid "校验并提交"
-msgstr "Validate and commit"
+msgstr "Commit facts"
 
 #: web/src/pages/agent/CompactionNotice.tsx
 msgid "检查点保存失败"
@@ -1423,7 +1423,7 @@ msgstr "Detecting"
 
 #: web/src/presentation-i18n.ts
 msgid "检索旧semantic memory"
-msgstr "Retrieve existing memories"
+msgstr "Review memories"
 
 #: web/src/pages/config/ConfigPage.tsx
 msgid "检索模式将回到 FTS5 + BM25。"
@@ -1435,7 +1435,7 @@ msgstr "Retrieval settings saved. Changes take effect on the next turn."
 
 #: web/src/presentation-i18n.ts
 msgid "模型 · 合并 / 更新 / 忘记"
-msgstr "Model · Merge / Update / Forget"
+msgstr "Merge / Update / Forget"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "模型尚未返回"
@@ -1443,7 +1443,7 @@ msgstr "Model not returned yet"
 
 #: web/src/presentation-i18n.ts
 msgid "模型整理"
-msgstr "Model consolidation"
+msgstr "Consolidation"
 
 #: web/src/pages/workflow/GraphCanvas.tsx
 msgid "模型调用"
@@ -1535,7 +1535,7 @@ msgstr "Configure only the name here, not terminal or memorySnapshot. Each Run l
 
 #: web/src/presentation-i18n.ts
 msgid "每日首次使用 / 手动触发"
-msgstr "First daily use / Manual trigger"
+msgstr "Daily / Manual"
 
 #: web/src/pages/skills/SkillsPage.tsx
 msgid "永久删除 {name}？"
@@ -1608,11 +1608,11 @@ msgstr "Live updates"
 
 #: web/src/presentation-i18n.ts
 msgid "版本检查 · 直接替换旧事实"
-msgstr "Version checks · Replace facts"
+msgstr "Check & replace"
 
 #: web/src/presentation-i18n.ts
 msgid "理解需求 · 决定下一步"
-msgstr "Reason and decide next steps"
+msgstr "Reason & act"
 
 #: web/src/pages/workflow/CodeEditor.tsx
 msgid "生产环境只读，修改请在开发环境完成后重新构建"
@@ -1624,7 +1624,7 @@ msgstr "Read only in production"
 
 #: web/src/presentation-i18n.ts
 msgid "生成回复"
-msgstr "Generate reply"
+msgstr "Reply"
 
 #: web/src/pages/workflow/WorkflowPage.tsx
 msgid "用代码定义智能体工作流，并实时观察节点、路由、并行 wave 和最终结果。"
@@ -1705,7 +1705,7 @@ msgstr "Confirm clearing"
 
 #: web/src/presentation-i18n.ts
 msgid "程序性知识"
-msgstr "Procedural knowledge"
+msgstr "Knowledge"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "空白评估记忆"
@@ -1784,7 +1784,7 @@ msgstr "Terminal execution"
 
 #: web/src/presentation-i18n.ts
 msgid "结构化建议"
-msgstr "Structured suggestions"
+msgstr "Plan"
 
 #: web/src/pages/agent/AgentPage.tsx
 msgid "给 Everything Agent 发消息…"
@@ -1825,7 +1825,7 @@ msgstr "Table"
 
 #: web/src/presentation-i18n.ts
 msgid "记忆任务入队"
-msgstr "Queue memory task"
+msgstr "Queue memory"
 
 #: web/src/pages/memory/MemoryPage.tsx
 msgid "记忆内容"
@@ -1833,7 +1833,7 @@ msgstr "Memory content"
 
 #: web/src/presentation-i18n.ts
 msgid "证据与版本校验 · 审计"
-msgstr "Evidence / Version checks / Audit"
+msgstr "Checks & audit"
 
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "评分刷新／同步重试已完成，请查看最新评分与同步状态。"
@@ -1866,7 +1866,7 @@ msgstr "Read Skills"
 
 #: web/src/presentation-i18n.ts
 msgid "调用工具"
-msgstr "Call tools"
+msgstr "Call"
 
 #: web/src/pages/config/ConfigPage.tsx
 msgid "负责主 Agent 推理、工具调用、记忆写入与 consolidation。"
@@ -1918,7 +1918,7 @@ msgstr "Enter independent Embedding API key"
 
 #: web/src/presentation-i18n.ts
 msgid "达到 70%"
-msgstr "70% reached"
+msgstr "70%"
 
 #: web/src/pages/database/DatabasePage.tsx
 msgid "运行 SQL"
@@ -2063,7 +2063,7 @@ msgstr "Error: {0}"
 
 #: web/src/presentation-i18n.ts
 msgid "长期事实"
-msgstr "Long-term facts"
+msgstr "Facts"
 
 #: web/src/pages/tools/ToolsPage.tsx
 msgid "随 Runtime 提供，不依赖外部服务。"
