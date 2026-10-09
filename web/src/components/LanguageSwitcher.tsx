@@ -1,4 +1,4 @@
-import { Languages } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useLingui } from "@lingui/react";
 import { t } from "@lingui/core/macro";
 import { activateLocale } from "../i18n";
@@ -9,7 +9,7 @@ export function LanguageSwitcher() {
   const { i18n } = useLingui();
   return <Button variant="secondary" size="sm" aria-label={t`切换语言`} title={t`切换语言`}
     onClick={() => activateLocale(i18n.locale === "zh" ? "en" : "zh")}>
-    <Languages size={14} aria-hidden="true" />
+    <Globe size={14} aria-hidden="true" />
     <span lang={i18n.locale === "zh" ? "en" : "zh-CN"}>{i18n.locale === "zh" ? "English" : "中文"}</span>
   </Button>;
 }
