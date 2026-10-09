@@ -395,6 +395,10 @@ msgstr "Unavailable"
 msgid "与个人助理对话"
 msgstr "Chat with your personal assistant"
 
+#: web/src/pages/agent/AgentPage.tsx
+msgid "与助理对话，实时查看执行过程。"
+msgstr "Chat with your Agent. Follow its progress."
+
 #: web/src/pages/evaluation/EvaluationPage.tsx
 msgid "两项配置统一作用于该数据集的全部用例，本地与平台启动均读取；未填写等同于 false。"
 msgstr "Both settings apply to all cases in the dataset and are read by local and platform launches. Omitted values default to false."
@@ -629,10 +633,6 @@ msgstr "Compaction cancelled or timed out"
 #: web/src/presentation-i18n.ts
 msgid "去重 / 合并 / 冲突 / 清理"
 msgstr "Deduplicate / Merge / Resolve / Clean"
-
-#: web/src/pages/agent/AgentPage.tsx
-msgid "发送消息，观察记忆召回、上下文组装、模型推理与工具执行。"
-msgstr "Send a message and watch memory retrieval, context assembly, model reasoning, and tool execution."
 
 #: web/src/pages/config/ConfigPage.tsx
 #: web/src/pages/database/DatabasePage.tsx
